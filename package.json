@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "jsonwebtoken": "^9.0.3",
-    "puppeteer": "^24.40.0"
-  }
-}
