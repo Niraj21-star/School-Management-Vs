@@ -1,13 +1,12 @@
-require('dotenv').config();
 const mongoose = require('mongoose');
 
 async function checkDB() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect('process.env.MONGO_URI');
     console.log('Connected to MongoDB');
-    
+
     const db = mongoose.connection.db;
-    
+
     // Check students
     const students = await db.collection('students').find().limit(5).toArray();
     console.log('\n=== STUDENTS (first 5) ===');
