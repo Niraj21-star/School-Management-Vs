@@ -14,6 +14,13 @@ const markSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
+    subjectName: {
+      type: String,
+      required: true,
+      trim: true,
+      index: true,
+    },
+
     section: {
       type: String,
       required: true,
@@ -48,7 +55,7 @@ const markSchema = new mongoose.Schema(
   }
 );
 
-markSchema.index({ examName: 1, className: 1, section: 1, studentId: 1 }, { unique: true });
+markSchema.index({ examName: 1, className: 1, section: 1, subjectName: 1, studentId: 1 }, { unique: true });
 
 const Mark = mongoose.model('Mark', markSchema);
 

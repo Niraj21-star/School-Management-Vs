@@ -53,8 +53,6 @@ const tcDuplicateRequestSchema = new mongoose.Schema(
   }
 );
 
-tcDuplicateRequestSchema.index({ studentId: 1, requestedBy: 1, status: 1 });
-
 tcDuplicateRequestSchema.index({ studentId: 1, requestedBy: 1, status: 1, consumed: 1 });
 
 const TCDuplicateRequest = mongoose.model('TCDuplicateRequest', tcDuplicateRequestSchema);

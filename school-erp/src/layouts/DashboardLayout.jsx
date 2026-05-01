@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar';
 const PAGE_TITLES = {
   dashboard: 'Dashboard',
   students: 'Students',
+  classes: 'Classes & Sections',
   teachers: 'Teachers',
   attendance: 'Attendance',
   fees: 'Fee Management',
@@ -19,7 +20,6 @@ const PAGE_TITLES = {
   records: 'Student Records',
   documents: 'Documents',
   receipts: 'Receipts',
-  homework: 'Homework',
   marks: 'Exam Marks',
 };
 

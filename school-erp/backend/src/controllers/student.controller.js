@@ -1,4 +1,6 @@
 const { Student } = require('../models/Student');
+const Assignment = require('../models/Assignment');
+const SchoolClass = require('../models/SchoolClass');
 const {
   isValidObjectId,
   buildStudentFilters,
@@ -6,23 +8,7 @@ const {
   normalizeStudentPayload,
 } = require('../services/student.service');
 
-const sendSuccess = (res, statusCode, message, data) => {
-  return res.status(statusCode).json({
-    success: true,
-    message,
-    data,
-  });
-};
-
-const sendError = (res, error) => {
-  const statusCode = error.statusCode || 500;
-
-  return res.status(statusCode).json({
-    success: false,
-    message: error.message,
-    data: null,
-  });
-};
+const { sendSuccess, sendError } = require('../utils/responseHelper');
 
 const resolveStudentQuery = (identifier) => {
   return isValidObjectId(identifier)
@@ -45,6 +31,16 @@ const getStudentOrThrow = async (identifier) => {
 const createStudent = async (req, res) => {
   try {
     const payload = normalizeStudentPayload(req.body, false);
+    
+    // Auto-assign rollNumber if missing or empty
+    if (!payload.academic.rollNumber) {
+      const count = await Student.countDocuments({
+        'academic.class': payload.academic.class,
+        'academic.section': payload.academic.section,
+      });
+      payload.academic.rollNumber = String(count + 1).padStart(2, '0');
+    }
+
     const student = await Student.create(payload);
 
     return sendSuccess(res, 201, 'Student created successfully', student);
@@ -61,6 +57,16 @@ const createStudent = async (req, res) => {
 const getAllStudents = async (req, res) => {
   try {
     const filters = buildStudentFilters(req.query);
+
+    if (req.user && req.user.role === 'teacher') {
+      const assignments = await Assignment.find({ teacherId: req.user._id }).lean();
+      const classIds = assignments.map(a => a.classId);
+      const schoolClasses = await SchoolClass.find({ _id: { $in: classIds } }).lean();
+      const classNames = schoolClasses.map(c => c.name);
+      
+      filters['academic.class'] = { $in: classNames };
+    }
+
     const options = buildStudentListOptions(req.query);
 
     const [students, total] = await Promise.all([

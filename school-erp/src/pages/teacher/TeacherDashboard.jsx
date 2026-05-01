@@ -93,7 +93,6 @@ const TeacherDashboard = () => {
           <div className="space-y-3">
             {[
               { label: 'Mark Attendance', desc: 'Mark today\'s attendance for your classes', path: '/teacher/attendance', color: 'bg-emerald-50 text-emerald-600' },
-              { label: 'Upload Homework', desc: 'Assign homework to your classes', path: '/teacher/homework', color: 'bg-blue-50 text-blue-600' },
               { label: 'Enter Exam Marks', desc: 'Enter exam marks for your students', path: '/teacher/marks', color: 'bg-violet-50 text-violet-600' },
             ].map((a) => (
               <button

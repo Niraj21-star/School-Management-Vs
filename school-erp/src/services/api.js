@@ -500,34 +500,26 @@ const ensureFeeStructure = async (studentId, totalAmount) => {
   }
 };
 
-export const recordPayment = async ({ studentName, class: classValue, amount, paid, mode = 'cash' }) => {
+export const recordPayment = async ({ studentId, amount, paid, mode = 'cash' }) => {
   try {
-    const students = await getStudents({ limit: 200 });
-
-    const selected = students.find((student) => {
-      const nameMatches = student.name.toLowerCase() === String(studentName || '').toLowerCase();
-      const classMatches = !classValue || student.class === classValue;
-      return nameMatches && classMatches;
-    });
-
-    if (!selected) {
-      throw new Error('Student not found. Use exact Student Name and Class from records.');
+    if (!studentId) {
+      throw new Error('Student ID is required.');
     }
 
     const totalAmount = Number(amount || 0);
     const paidAmount = Number(paid || 0);
 
-    await ensureFeeStructure(selected.id, totalAmount);
+    await ensureFeeStructure(studentId, totalAmount);
 
     if (paidAmount > 0) {
       await apiClient.post('/payments', {
-        studentId: selected.id,
+        studentId: studentId,
         amount: paidAmount,
         mode,
       });
     }
 
-    const feeResponse = await apiClient.get(`/fees/${selected.id}`);
+    const feeResponse = await apiClient.get(`/fees/${studentId}`);
     return mapFeeRecord(unwrapResponse(feeResponse));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to record payment.'));
@@ -857,13 +849,14 @@ export const getAllStudentsForReports = async ({ pageSize = 100 } = {}) => {
   }
 };
 
-export const getMarksByExamAndClass = async ({ className, section, examName }) => {
+export const getMarksByExamAndClass = async ({ className, section, examName, subjectName }) => {
   try {
     const response = await apiClient.get('/marks', {
       params: {
         class: className,
         section,
         examName,
+        subjectName,
       },
     });
 
@@ -880,12 +873,13 @@ export const getMarksByExamAndClass = async ({ className, section, examName }) =
   }
 };
 
-export const saveMarksBulk = async ({ className, section, examName, entries }) => {
+export const saveMarksBulk = async ({ className, section, examName, subjectName, entries }) => {
   try {
     const response = await apiClient.post('/marks/bulk', {
       className,
       section,
       examName,
+      subjectName,
       entries,
     });
 
@@ -927,7 +921,7 @@ export const createHomework = async (payload) => {
 export const deleteHomeworkById = async (id) => {
   try {
     const response = await apiClient.delete(`/homework/${id}`);
-    return unwrapResponse(response);
+     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to delete homework.'));
   }
@@ -951,4 +945,4 @@ export const updateSchoolSettings = async (payload) => {
   }
 };
 
-export default apiClient;
+

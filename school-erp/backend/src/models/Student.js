@@ -128,6 +128,11 @@ studentSchema.pre('validate', async function generateStudentId() {
   this.studentId = `SCH${currentYear}-${String(counter.seq).padStart(3, '0')}`;
 });
 
+studentSchema.index(
+  { 'academic.class': 1, 'academic.section': 1, 'academic.rollNumber': 1 },
+  { unique: true, partialFilterExpression: { status: 'active' } }
+);
+
 studentSchema.set('toJSON', {
   virtuals: true,
   transform: (doc, ret) => {

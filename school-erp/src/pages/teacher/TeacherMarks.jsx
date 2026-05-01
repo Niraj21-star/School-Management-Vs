@@ -6,6 +6,7 @@ import { Save, CheckCircle } from 'lucide-react';
 import {
   getClasses,
   getExams,
+  getSubjects,
   getMarksByExamAndClass,
   getStudents,
   saveMarksBulk,
@@ -24,13 +25,16 @@ const gradeFromMarks = (mark) => {
 const TeacherMarks = () => {
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedExam, setSelectedExam] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('');
   const [marks, setMarks] = useState({});
   const [students, setStudents] = useState([]);
   const [classOptions, setClassOptions] = useState([]);
   const [examOptions, setExamOptions] = useState([]);
+  const [subjectOptions, setSubjectOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   const [className, section] = useMemo(() => {
     const parts = String(selectedClass).split('-');
@@ -39,9 +43,10 @@ const TeacherMarks = () => {
 
   const bootstrap = useCallback(async () => {
     setLoading(true);
+    setError('');
 
     try {
-      const [classes, exams] = await Promise.all([getClasses(), getExams()]);
+      const [classes, exams, subjects] = await Promise.all([getClasses(), getExams(), getSubjects()]);
 
       const classesList = classes.flatMap((item) =>
         (item.sections || []).map((sec) => `${item.name}-${sec}`)
@@ -49,8 +54,12 @@ const TeacherMarks = () => {
 
       setClassOptions(classesList);
       setExamOptions(exams.map((exam) => exam.name));
+      setSubjectOptions(subjects.map((sub) => sub.name));
       setSelectedClass((prev) => prev || classesList[0] || '');
       setSelectedExam((prev) => prev || exams[0]?.name || '');
+      setSelectedSubject((prev) => prev || subjects[0]?.name || '');
+    } catch (err) {
+      setError(err.message || 'Unable to load class and exam data.');
     } finally {
       setLoading(false);
     }
@@ -61,33 +70,39 @@ const TeacherMarks = () => {
   }, [bootstrap]);
 
   const loadStudentsAndMarks = useCallback(async () => {
-    if (!selectedClass || !selectedExam) {
+    if (!selectedClass || !selectedExam || !selectedSubject) {
       setStudents([]);
       setMarks({});
       return;
     }
 
-    const [selectedClassName, selectedSection = 'A'] = String(selectedClass).split('-');
+    setError('');
 
-    const [studentsData, marksData] = await Promise.all([
-      getStudents({ class: selectedClassName, section: selectedSection, limit: 200 }),
-      getMarksByExamAndClass({ className: selectedClassName, section: selectedSection, examName: selectedExam }),
-    ]);
+    try {
+      const [selectedClassName, selectedSection = 'A'] = String(selectedClass).split('-');
 
-    const mappedStudents = studentsData.map((student) => ({
-      id: student.id,
-      rollNo: student.rollNo,
-      name: student.name,
-    }));
+      const [studentsData, marksData] = await Promise.all([
+        getStudents({ class: selectedClassName, section: selectedSection, limit: 200 }),
+        getMarksByExamAndClass({ className: selectedClassName, section: selectedSection, examName: selectedExam, subjectName: selectedSubject }),
+      ]);
 
-    const markMap = marksData.reduce((accumulator, item) => {
-      accumulator[item.studentId] = item.marks;
-      return accumulator;
-    }, {});
+      const mappedStudents = studentsData.map((student) => ({
+        id: student.id,
+        rollNo: student.rollNo,
+        name: student.name,
+      }));
 
-    setStudents(mappedStudents);
-    setMarks(markMap);
-  }, [selectedClass, selectedExam]);
+      const markMap = marksData.reduce((accumulator, item) => {
+        accumulator[item.studentId] = item.marks;
+        return accumulator;
+      }, {});
+
+      setStudents(mappedStudents);
+      setMarks(markMap);
+    } catch (err) {
+      setError(err.message || 'Unable to load students and marks.');
+    }
+  }, [selectedClass, selectedExam, selectedSubject]);
 
   useEffect(() => {
     loadStudentsAndMarks();
@@ -100,6 +115,7 @@ const TeacherMarks = () => {
 
   const handleSave = async () => {
     setSaving(true);
+    setError('');
 
     try {
       const entries = students
@@ -110,6 +126,7 @@ const TeacherMarks = () => {
         }));
 
       if (entries.length === 0) {
+        setSaving(false);
         return;
       }
 
@@ -117,11 +134,14 @@ const TeacherMarks = () => {
         className,
         section,
         examName: selectedExam,
+        subjectName: selectedSubject,
         entries,
       });
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err.message || 'Unable to save marks.');
     } finally {
       setSaving(false);
     }
@@ -137,10 +157,19 @@ const TeacherMarks = () => {
             <SelectInput value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)} options={classOptions.map((value) => ({ value, label: value }))} />
           </div>
           <div className="w-44">
+            <SelectInput value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} options={subjectOptions.map((value) => ({ value, label: value }))} />
+          </div>
+          <div className="w-44">
             <SelectInput value={selectedExam} onChange={(e) => setSelectedExam(e.target.value)} options={examOptions.map((value) => ({ value, label: value }))} />
           </div>
         </div>
       </PageHeader>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+          {error}
+        </div>
+      )}
 
       {saved && (
         <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-lg flex items-center gap-2">

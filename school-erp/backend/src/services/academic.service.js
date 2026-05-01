@@ -5,23 +5,7 @@ const Subject = require('../models/Subject');
 
 const isValidObjectId = (value) => mongoose.Types.ObjectId.isValid(value);
 
-const sendSuccess = (res, statusCode, message, data) => {
-  return res.status(statusCode).json({
-    success: true,
-    message,
-    data,
-  });
-};
-
-const sendError = (res, error) => {
-  const statusCode = error.statusCode || 500;
-
-  return res.status(statusCode).json({
-    success: false,
-    message: error.message || 'Internal Server Error',
-    data: null,
-  });
-};
+const { sendSuccess, sendError } = require('../utils/responseHelper');
 
 const ensureClassExists = async (classId) => {
   const schoolClass = await SchoolClass.findById(classId);

@@ -13,6 +13,7 @@ const MENU_CONFIG = {
   [ROLES.ADMIN]: [
     { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'Students', path: '/admin/students', icon: Users },
+    { label: 'Classes & Sections', path: '/admin/classes', icon: CalendarDays },
     { label: 'Teachers', path: '/admin/teachers', icon: GraduationCap },
     { label: 'Attendance', path: '/admin/attendance', icon: ClipboardCheck },
     { label: 'Fee Management', path: '/admin/fees', icon: DollarSign },
@@ -34,7 +35,6 @@ const MENU_CONFIG = {
   [ROLES.TEACHER]: [
     { label: 'Dashboard', path: '/teacher/dashboard', icon: LayoutDashboard },
     { label: 'Mark Attendance', path: '/teacher/attendance', icon: ClipboardCheck },
-    { label: 'Upload Homework', path: '/teacher/homework', icon: Upload },
     { label: 'Exam Marks', path: '/teacher/marks', icon: PenSquare },
     { label: 'View Timetable', path: '/teacher/timetable', icon: Clock },
   ],

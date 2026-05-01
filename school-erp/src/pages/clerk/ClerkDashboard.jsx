@@ -19,25 +19,25 @@ const ClerkDashboard = () => {
     {
       label: 'New Admission',
       desc: 'Register a new student',
-      color: 'bg-blue-50 text-blue-600',
+      dotColor: 'bg-blue-600',
       path: '/clerk/admissions',
     },
     {
       label: 'Collect Fee',
       desc: 'Record fee payment',
-      color: 'bg-emerald-50 text-emerald-600',
+      dotColor: 'bg-emerald-600',
       path: '/clerk/fees',
     },
     {
       label: 'Upload Document',
       desc: 'Upload student documents',
-      color: 'bg-amber-50 text-amber-600',
+      dotColor: 'bg-amber-600',
       path: '/clerk/documents',
     },
     {
       label: 'Print Receipt',
       desc: 'Generate fee receipt',
-      color: 'bg-violet-50 text-violet-600',
+      dotColor: 'bg-violet-600',
       path: '/clerk/receipts',
     },
   ];
@@ -103,7 +103,7 @@ const ClerkDashboard = () => {
                 className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${a.color.replace('text-', 'bg-')}`} />
+                  <div className={`w-2 h-2 rounded-full ${a.dotColor}`} />
                   <div className="text-left">
                     <p className="text-sm font-medium text-slate-700">{a.label}</p>
                     <p className="text-xs text-slate-400">{a.desc}</p>

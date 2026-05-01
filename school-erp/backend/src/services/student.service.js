@@ -33,8 +33,9 @@ const buildStudentFilters = (query) => {
       error.statusCode = 400;
       throw error;
     }
-
     filters.status = query.status;
+  } else {
+    filters.status = 'active';
   }
 
   return filters;
@@ -123,7 +124,7 @@ const normalizeStudentPayload = (payload, forUpdate = false) => {
     const academic = payload.academic || {};
 
     if (!forUpdate) {
-      const requiredAcademicFields = ['class', 'section', 'rollNumber', 'admissionDate'];
+      const requiredAcademicFields = ['class', 'section', 'admissionDate'];
       const missingAcademicFields = requiredAcademicFields.filter((field) => !academic[field]);
       if (missingAcademicFields.length > 0) {
         const error = new Error(`Missing required academic fields: ${missingAcademicFields.join(', ')}`);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getFees, recordPayment } from '../../services/api';
+import { getFees, recordPayment, getStudents } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
@@ -29,7 +29,8 @@ const AdminFees = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState({ studentName: '', class: '', amount: '', paid: '', status: 'Pending' });
+  const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '', status: 'Pending' });
+  const [classStudents, setClassStudents] = useState([]);
 
   const loadFees = useCallback(async () => {
     setLoading(true);
@@ -48,6 +49,18 @@ const AdminFees = () => {
   useEffect(() => {
     loadFees();
   }, [loadFees]);
+
+  useEffect(() => {
+    if (form.class) {
+      const [className, section = 'A'] = String(form.class).split('-');
+      getStudents({ class: className, section, limit: 200 })
+        .then(setClassStudents)
+        .catch(() => setClassStudents([]));
+    } else {
+      setClassStudents([]);
+      setForm((prev) => ({ ...prev, studentId: '' }));
+    }
+  }, [form.class]);
 
   const classTabs = useMemo(() => {
     const counts = fees.reduce((accumulator, item) => {
@@ -99,7 +112,7 @@ const AdminFees = () => {
         return next;
       });
 
-      setForm({ studentName: '', class: '', amount: '', paid: '', status: 'Pending' });
+      setForm({ studentId: '', class: '', amount: '', paid: '', status: 'Pending' });
       setModalOpen(false);
     } catch (err) {
       setError(err.message || 'Unable to save payment.');
@@ -117,6 +130,9 @@ const AdminFees = () => {
     { key: 'status', label: 'Status', render: (val) => <StatusBadge status={val} /> },
     { key: 'date', label: 'Date' },
   ];
+
+  const totalCollected = filteredFees.reduce((s, f) => s + f.paid, 0);
+  const totalDue = filteredFees.reduce((s, f) => s + f.due, 0);
 
   const handleExport = () => {
     exportRowsToPdf({
@@ -148,8 +164,7 @@ const AdminFees = () => {
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800" /></div>;
 
-  const totalCollected = filteredFees.reduce((s, f) => s + f.paid, 0);
-  const totalDue = filteredFees.reduce((s, f) => s + f.due, 0);
+
 
   return (
     <div>
@@ -215,13 +230,21 @@ const AdminFees = () => {
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Record Fee Payment">
         <div className="space-y-4">
-          <FormInput label="Student Name" value={form.studentName} onChange={(e) => setForm({ ...form, studentName: e.target.value })} required />
           <SelectInput
             label="Class"
             value={form.class}
-            onChange={(e) => setForm({ ...form, class: e.target.value })}
+            onChange={(e) => setForm({ ...form, class: e.target.value, studentId: '' })}
             placeholder="Select class"
             options={classOptions}
+            required
+          />
+          <SelectInput
+            label="Student"
+            value={form.studentId}
+            onChange={(e) => setForm({ ...form, studentId: e.target.value })}
+            placeholder={form.class ? 'Select student' : 'Select a class first'}
+            options={classStudents.map(s => ({ value: s.id, label: `${s.name} (${s.rollNo})` }))}
+            disabled={!form.class}
             required
           />
           <FormInput label="Total Amount" type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />

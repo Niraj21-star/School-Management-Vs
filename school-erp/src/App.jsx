@@ -16,6 +16,7 @@ import AdminNotices from './pages/admin/AdminNotices';
 import AdminReports from './pages/admin/AdminReports';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminDuplicateTCRequests from './pages/admin/AdminDuplicateTCRequests';
+import AdminClasses from './pages/admin/AdminClasses';
 
 /* Clerk Pages */
 import ClerkDashboard from './pages/clerk/ClerkDashboard';
@@ -28,7 +29,6 @@ import ClerkReceipts from './pages/clerk/ClerkReceipts';
 /* Teacher Pages */
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import TeacherAttendance from './pages/teacher/TeacherAttendance';
-import TeacherHomework from './pages/teacher/TeacherHomework';
 import TeacherMarks from './pages/teacher/TeacherMarks';
 import TeacherTimetable from './pages/teacher/TeacherTimetable';
 
@@ -52,6 +52,7 @@ const App = () => {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="students" element={<AdminStudents />} />
+            <Route path="classes" element={<AdminClasses />} />
             <Route path="teachers" element={<AdminTeachers />} />
             <Route path="attendance" element={<AdminAttendance />} />
             <Route path="fees" element={<AdminFees />} />
@@ -93,7 +94,6 @@ const App = () => {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<TeacherDashboard />} />
             <Route path="attendance" element={<TeacherAttendance />} />
-            <Route path="homework" element={<TeacherHomework />} />
             <Route path="marks" element={<TeacherMarks />} />
             <Route path="timetable" element={<TeacherTimetable />} />
           </Route>

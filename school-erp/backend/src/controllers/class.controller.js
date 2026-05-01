@@ -1,4 +1,6 @@
 const SchoolClass = require('../models/SchoolClass');
+const { Student } = require('../models/Student');
+const Assignment = require('../models/Assignment');
 const {
   isValidObjectId,
   sendSuccess,
@@ -33,7 +35,14 @@ const createClass = async (req, res) => {
 
 const getAllClasses = async (req, res) => {
   try {
-    const classes = await SchoolClass.find().sort({ createdAt: -1 }).lean();
+    let classes = await SchoolClass.find().sort({ createdAt: -1 }).lean();
+
+    if (req.user && req.user.role === 'teacher') {
+      const assignments = await Assignment.find({ teacherId: req.user._id }).lean();
+      const assignedClassIds = new Set(assignments.map(a => String(a.classId)));
+      classes = classes.filter(c => assignedClassIds.has(String(c._id)));
+    }
+
     return sendSuccess(res, 200, 'Operation successful', classes);
   } catch (error) {
     return sendError(res, error);
@@ -54,16 +63,18 @@ const updateClass = async (req, res) => {
     if (req.body.name !== undefined) updates.name = String(req.body.name).trim();
     if (req.body.sections !== undefined) updates.sections = req.body.sections;
 
-    const schoolClass = await SchoolClass.findByIdAndUpdate(id, updates, {
-      new: true,
-      runValidators: true,
-    });
+    const schoolClass = await SchoolClass.findById(id);
 
     if (!schoolClass) {
       const error = new Error('Class not found');
       error.statusCode = 404;
       throw error;
     }
+
+    Object.assign(schoolClass, updates);
+    await schoolClass.save();
+
+
 
     return sendSuccess(res, 200, 'Operation successful', schoolClass);
   } catch (error) {
@@ -86,7 +97,21 @@ const deleteClass = async (req, res) => {
       throw error;
     }
 
-    const schoolClass = await SchoolClass.findByIdAndDelete(id);
+    const schoolClass = await SchoolClass.findById(id);
+    if (!schoolClass) {
+      const error = new Error('Class not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const enrolledStudents = await Student.countDocuments({ 'academic.class': schoolClass.name });
+    if (enrolledStudents > 0) {
+      const error = new Error(`Cannot delete class. There are ${enrolledStudents} students enrolled.`);
+      error.statusCode = 400;
+      throw error;
+    }
+
+    await SchoolClass.findByIdAndDelete(id);
     if (!schoolClass) {
       const error = new Error('Class not found');
       error.statusCode = 404;

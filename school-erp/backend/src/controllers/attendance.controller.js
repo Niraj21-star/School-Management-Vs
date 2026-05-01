@@ -234,8 +234,63 @@ const getAttendanceReport = async (req, res) => {
   }
 };
 
+const updateAttendance = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { students } = req.body;
+
+    if (!isValidObjectId(id)) {
+      const error = new Error('Invalid attendance ID');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!Array.isArray(students) || students.length === 0) {
+      const error = new Error('Students array is required for update');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const attendance = await Attendance.findById(id).populate('classId');
+    if (!attendance) {
+      const error = new Error('Attendance record not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (req.user.role === 'teacher') {
+      await ensureTeacherAssignment(req.user._id, attendance.classId._id);
+    }
+
+    const normalizedStudents = await normalizeStudentsInput({
+      students,
+      markAllPresent: false,
+      className: attendance.classId.name,
+      section: attendance.section,
+    });
+
+    await ensureStudentsBelongToClassSection({
+      studentEntries: normalizedStudents,
+      className: attendance.classId.name,
+      section: attendance.section,
+    });
+
+    attendance.students = normalizedStudents;
+    await attendance.save();
+
+    const populatedAttendance = await Attendance.findById(attendance._id)
+      .populate('classId', 'name sections')
+      .populate('students.studentId', 'name studentId');
+
+    return sendSuccess(res, 200, 'Attendance updated', populatedAttendance);
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
 module.exports = {
   markAttendance,
   getAttendanceByDate,
   getAttendanceReport,
+  updateAttendance,
 };

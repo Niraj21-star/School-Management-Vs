@@ -48,6 +48,10 @@ const AdminAttendance = () => {
     },
   ];
 
+  const avgAttendance = data.length
+    ? (data.reduce((s, d) => s + d.percentage, 0) / data.length).toFixed(1)
+    : '0.0';
+
   const handleExport = () => {
     exportRowsToPdf({
       title: 'Attendance Overview Report',
@@ -70,9 +74,7 @@ const AdminAttendance = () => {
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800" /></div>;
 
-  const avgAttendance = data.length
-    ? (data.reduce((s, d) => s + d.percentage, 0) / data.length).toFixed(1)
-    : '0.0';
+
 
   return (
     <div>

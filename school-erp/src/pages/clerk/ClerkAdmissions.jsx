@@ -9,7 +9,7 @@ import { createStudent, getClasses } from '../../services/api';
 const ClerkAdmissions = () => {
   const [form, setForm] = useState({
     name: '', fatherName: '', motherName: '', dob: '', gender: '',
-    class: '', rollNo: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '',
+    class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '',
   });
   const [classOptions, setClassOptions] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
@@ -90,7 +90,7 @@ const ClerkAdmissions = () => {
 
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 3000);
-      setForm({ name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', rollNo: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '' });
+      setForm({ name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '' });
     } catch (err) {
       setError(err.message || 'Unable to submit admission.');
     } finally {
@@ -132,7 +132,6 @@ const ClerkAdmissions = () => {
             options={classOptions}
             required
           />
-          <FormInput label="Roll No" value={form.rollNo} onChange={(e) => setForm({ ...form, rollNo: e.target.value })} required />
           <FormInput label="Phone" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
           <FormInput label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           <FormInput label="Previous School" value={form.previousSchool} onChange={(e) => setForm({ ...form, previousSchool: e.target.value })} />

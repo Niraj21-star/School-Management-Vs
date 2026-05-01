@@ -23,6 +23,7 @@ const healthRoutes = require('./routes/health.routes');
 const studentRoutes = require('./routes/student.routes');
 const staffRoutes = require('./routes/staff.routes');
 const settingRoutes = require('./routes/setting.routes');
+const academicRoutes = require('./routes/academic.routes');
 const notFoundHandler = require('./middleware/notFound.middleware');
 const errorHandler = require('./middleware/errorHandler.middleware');
 
@@ -121,6 +122,7 @@ app.use('/api/homework', homeworkRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/settings', settingRoutes);
+app.use('/api/academic', academicRoutes);
 
 // Error handling middlewares should stay at the end.
 app.use(notFoundHandler);

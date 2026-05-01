@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const EXAM_STATUSES = ['Upcoming', 'Completed'];
+const EXAM_STATUSES = ['Upcoming', 'In Progress', 'Completed'];
 
 const examSchema = new mongoose.Schema(
   {
@@ -41,11 +41,18 @@ const examSchema = new mongoose.Schema(
 );
 
 examSchema.pre('validate', function normalizeStatus() {
-  if (!this.startDate) {
+  if (!this.startDate || !this.endDate) {
     return;
   }
 
-  this.status = new Date(this.startDate) > new Date() ? 'Upcoming' : 'Completed';
+  const now = new Date();
+  if (now < new Date(this.startDate)) {
+    this.status = 'Upcoming';
+  } else if (now > new Date(this.endDate)) {
+    this.status = 'Completed';
+  } else {
+    this.status = 'In Progress';
+  }
 });
 
 examSchema.index({ startDate: 1, endDate: 1 });

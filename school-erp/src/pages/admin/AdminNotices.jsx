@@ -37,19 +37,28 @@ const AdminNotices = () => {
 
   const handleSave = async () => {
     setSaving(true);
+    setError('');
     try {
       const created = await createNotice(form);
       setNotices((prev) => [created, ...prev]);
       setForm({ title: '', content: '', priority: 'Medium', status: 'Draft' });
       setModalOpen(false);
+    } catch (err) {
+      setError(err.message || 'Unable to create notice.');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    await deleteNoticeById(id);
-    setNotices((prev) => prev.filter((n) => n.id !== id));
+    if (!window.confirm('Are you sure you want to delete this notice?')) return;
+    setError('');
+    try {
+      await deleteNoticeById(id);
+      setNotices((prev) => prev.filter((n) => n.id !== id));
+    } catch (err) {
+      setError(err.message || 'Unable to delete notice.');
+    }
   };
 
   const columns = [

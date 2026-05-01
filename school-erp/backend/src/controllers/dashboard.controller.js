@@ -1,4 +1,4 @@
-  const { Student } = require('../models/Student');
+const { Student } = require('../models/Student');
 const { User } = require('../models/User');
 const Attendance = require('../models/Attendance');
 const Fee = require('../models/Fee');
@@ -7,6 +7,7 @@ const { Expense } = require('../models/Expense');
 const { Notice } = require('../models/Notice');
 const { Exam } = require('../models/Exam');
 const Assignment = require('../models/Assignment');
+const { Homework } = require('../models/Homework');
 const Mark = require('../models/Mark');
 const { sendSuccess, sendError } = require('../services/academic.service');
 
@@ -129,8 +130,9 @@ const getDashboardStats = async (req, res) => {
       todayAttendanceRecords,
       todayAttendanceSummary,
       presentTeachersToday,
+      activeHomework,
     ] = await Promise.all([
-      Student.countDocuments(),
+      Student.countDocuments({ status: 'active' }),
       User.countDocuments({ role: 'teacher', status: 'active' }),
       getAttendancePercent(),
       Fee.aggregate([
@@ -155,9 +157,20 @@ const getDashboardStats = async (req, res) => {
         ],
       }),
       Assignment.countDocuments({ teacherId: req.user._id }),
-      Attendance.countDocuments({ date: { $gte: startOfDay, $lte: endOfDay } }),
+      (async () => {
+        if (req.user.role === 'teacher') {
+          const assignments = await Assignment.find({ teacherId: req.user._id }).lean();
+          const classIds = assignments.map(a => a.classId);
+          return Attendance.countDocuments({
+            date: { $gte: startOfDay, $lte: endOfDay },
+            classId: { $in: classIds }
+          });
+        }
+        return Attendance.countDocuments({ date: { $gte: startOfDay, $lte: endOfDay } });
+      })(),
       getTodayAttendanceTotals(startOfDay, endOfDay),
       getTodayPresentTeachers(startOfDay, endOfDay),
+      Homework.countDocuments({ teacherId: req.user._id, status: 'Active' }),
     ]);
 
     const pendingFees = pendingFeesData[0]?.total || 0;
@@ -181,7 +194,7 @@ const getDashboardStats = async (req, res) => {
       TEACHER: {
         todayClasses: teacherAssignments,
         pendingAttendance: Math.max(0, teacherAssignments - todayAttendanceRecords),
-        pendingHomework: Math.max(0, Math.round(teacherAssignments / 2)),
+        pendingHomework: activeHomework,
       },
     };
 
