@@ -78,7 +78,7 @@ const mapFeeRecord = (feeDetails) => {
 };
 
 const fetchStudentPageRaw = async (params = {}) => {
-  const response = await apiClient.get('/students', { params });
+  const response = await apiClient.get('/api/students', { params });
   const data = unwrapResponse(response);
   return {
     students: data?.students || [],
@@ -93,7 +93,7 @@ const fetchStudentListRaw = async (params = {}) => {
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await apiClient.post('/auth/login', { email, password });
+    const response = await apiClient.post('/api/auth/login', { email, password });
     const data = unwrapResponse(response);
 
     return {
@@ -111,7 +111,7 @@ export const loginUser = async (email, password) => {
 
 export const getCurrentUser = async () => {
   try {
-    const response = await apiClient.get('/auth/me');
+    const response = await apiClient.get('/api/auth/me');
     const data = unwrapResponse(response);
 
     return {
@@ -165,7 +165,7 @@ export const createStudent = async (formData) => {
       status: String(formData.status || 'active').toLowerCase(),
     };
 
-    const response = await apiClient.post('/students', payload);
+    const response = await apiClient.post('/api/students', payload);
     const data = unwrapResponse(response);
     return mapStudent(data);
   } catch (error) {
@@ -192,7 +192,7 @@ export const updateStudentById = async (id, formData) => {
       status: String(formData.status || 'active').toLowerCase(),
     };
 
-    const response = await apiClient.put(`/students/${id}`, payload);
+    const response = await apiClient.put(`/api/students/${id}`, payload);
     const data = unwrapResponse(response);
     return mapStudent(data);
   } catch (error) {
@@ -202,7 +202,7 @@ export const updateStudentById = async (id, formData) => {
 
 export const deleteStudentById = async (id) => {
   try {
-    const response = await apiClient.delete(`/students/${id}`);
+    const response = await apiClient.delete(`/api/students/${id}`);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to delete student.'));
@@ -214,7 +214,7 @@ export const getAllStaff = async (params = {}) => {
 
   try {
     return await withShortCache(`staff:${queryKey}`, 12000, async () => {
-      const response = await apiClient.get('/staff', { params });
+      const response = await apiClient.get('/api/staff', { params });
       const data = unwrapResponse(response);
       return data?.staff || [];
     });
@@ -225,7 +225,7 @@ export const getAllStaff = async (params = {}) => {
 
 export const createStaff = async (payload) => {
   try {
-    const response = await apiClient.post('/staff', payload);
+    const response = await apiClient.post('/api/staff', payload);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create staff member.'));
@@ -234,7 +234,7 @@ export const createStaff = async (payload) => {
 
 export const updateStaffById = async (id, payload) => {
   try {
-    const response = await apiClient.put(`/staff/${id}`, payload);
+    const response = await apiClient.put(`/api/staff/${id}`, payload);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to update staff member.'));
@@ -243,7 +243,7 @@ export const updateStaffById = async (id, payload) => {
 
 export const deleteStaffById = async (id) => {
   try {
-    const response = await apiClient.delete(`/staff/${id}`);
+    const response = await apiClient.delete(`/api/staff/${id}`);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to deactivate staff member.'));
@@ -313,7 +313,7 @@ export const getTeachers = async () => {
 
 export const getClasses = async () => {
   try {
-    const response = await apiClient.get('/classes');
+    const response = await apiClient.get('/api/classes');
     const classes = unwrapResponse(response) || [];
 
     return classes.map((item) => ({
@@ -331,7 +331,7 @@ export const getClasses = async () => {
 
 export const createClass = async ({ name, sections }) => {
   try {
-    const response = await apiClient.post('/classes', { name, sections });
+    const response = await apiClient.post('/api/classes', { name, sections });
     const created = unwrapResponse(response);
 
     return {
@@ -349,7 +349,7 @@ export const createClass = async ({ name, sections }) => {
 
 export const updateClassById = async (id, payload) => {
   try {
-    const response = await apiClient.put(`/classes/${id}`, payload);
+    const response = await apiClient.put(`/api/classes/${id}`, payload);
     const updated = unwrapResponse(response);
 
     return {
@@ -367,7 +367,7 @@ export const updateClassById = async (id, payload) => {
 
 export const deleteClassById = async (id) => {
   try {
-    const response = await apiClient.delete(`/classes/${id}`);
+    const response = await apiClient.delete(`/api/classes/${id}`);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to delete class.'));
@@ -379,7 +379,7 @@ export const getSubjects = async (classId) => {
 
   try {
     return await withShortCache(cacheKey, 12000, async () => {
-      const response = await apiClient.get('/subjects', {
+      const response = await apiClient.get('/api/subjects', {
         params: classId ? { classId } : undefined,
       });
       return unwrapResponse(response) || [];
@@ -391,7 +391,7 @@ export const getSubjects = async (classId) => {
 
 export const createSubject = async (payload) => {
   try {
-    const response = await apiClient.post('/subjects', payload);
+    const response = await apiClient.post('/api/subjects', payload);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create subject.'));
@@ -401,7 +401,7 @@ export const createSubject = async (payload) => {
 export const getAssignments = async () => {
   try {
     return await withShortCache('assignments:all', 12000, async () => {
-      const response = await apiClient.get('/assignments');
+      const response = await apiClient.get('/api/assignments');
       return unwrapResponse(response) || [];
     });
   } catch (error) {
@@ -411,7 +411,7 @@ export const getAssignments = async () => {
 
 export const createAssignment = async (payload) => {
   try {
-    const response = await apiClient.post('/assignments', payload);
+    const response = await apiClient.post('/api/assignments', payload);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create assignment.'));
@@ -428,7 +428,7 @@ export const getAttendance = async () => {
       classes.flatMap((schoolClass) =>
         (schoolClass.sections || []).map(async (section) => {
           try {
-            const response = await apiClient.get('/attendance/report', {
+            const response = await apiClient.get('/api/attendance/report', {
               params: {
                 classId: schoolClass.id,
                 section,
@@ -465,7 +465,7 @@ export const getAttendance = async () => {
 
 export const markAttendance = async ({ classId, section, date, students, markAllPresent = false }) => {
   try {
-    const response = await apiClient.post('/attendance', {
+    const response = await apiClient.post('/api/attendance', {
       classId,
       section,
       date,
@@ -480,7 +480,7 @@ export const markAttendance = async ({ classId, section, date, students, markAll
 
 export const getFees = async () => {
   try {
-    const response = await apiClient.get('/fees');
+    const response = await apiClient.get('/api/fees');
     const data = unwrapResponse(response) || [];
     return data.map(mapFeeRecord).filter(Boolean);
   } catch (error) {
@@ -490,13 +490,13 @@ export const getFees = async () => {
 
 const ensureFeeStructure = async (studentId, totalAmount) => {
   try {
-    await apiClient.get(`/fees/${studentId}`);
+    await apiClient.get(`/api/fees/${studentId}`);
   } catch (error) {
     if (error?.response?.status !== 404) {
       throw error;
     }
 
-    await apiClient.post('/fees', { studentId, totalAmount });
+    await apiClient.post('/api/fees', { studentId, totalAmount });
   }
 };
 
@@ -512,14 +512,14 @@ export const recordPayment = async ({ studentId, amount, paid, mode = 'cash' }) 
     await ensureFeeStructure(studentId, totalAmount);
 
     if (paidAmount > 0) {
-      await apiClient.post('/payments', {
+      await apiClient.post('/api/payments', {
         studentId: studentId,
         amount: paidAmount,
         mode,
       });
     }
 
-    const feeResponse = await apiClient.get(`/fees/${studentId}`);
+    const feeResponse = await apiClient.get(`/api/fees/${studentId}`);
     return mapFeeRecord(unwrapResponse(feeResponse));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to record payment.'));
@@ -528,7 +528,7 @@ export const recordPayment = async ({ studentId, amount, paid, mode = 'cash' }) 
 
 export const getExpenses = async (params = {}) => {
   try {
-    const response = await apiClient.get('/expenses', { params });
+    const response = await apiClient.get('/api/expenses', { params });
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to fetch expenses.'));
@@ -537,7 +537,7 @@ export const getExpenses = async (params = {}) => {
 
 export const createExpense = async (payload) => {
   try {
-    const response = await apiClient.post('/expenses', payload);
+    const response = await apiClient.post('/api/expenses', payload);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create expense.'));
@@ -546,7 +546,7 @@ export const createExpense = async (payload) => {
 
 export const downloadBonafide = async (studentId) => {
   try {
-    const response = await apiClient.get(`/documents/bonafide/${studentId}`, {
+    const response = await apiClient.get(`/api/documents/bonafide/${studentId}`, {
       responseType: 'blob',
     });
     return response.data;
@@ -557,7 +557,7 @@ export const downloadBonafide = async (studentId) => {
 
 export const downloadTC = async (studentId) => {
   try {
-    const response = await apiClient.get(`/documents/tc/${studentId}`, {
+    const response = await apiClient.get(`/api/documents/tc/${studentId}`, {
       responseType: 'blob',
     });
     return response.data;
@@ -568,7 +568,7 @@ export const downloadTC = async (studentId) => {
 
 export const downloadFeeReceipt = async (studentId, paymentId) => {
   try {
-    const response = await apiClient.get(`/documents/receipt/${studentId}`, {
+    const response = await apiClient.get(`/api/documents/receipt/${studentId}`, {
       params: paymentId ? { paymentId } : undefined,
       responseType: 'blob',
     });
@@ -610,7 +610,7 @@ const mapDuplicateTCRequest = (request) => ({
 
 export const getDocumentRecords = async () => {
   try {
-    const response = await apiClient.get('/documents');
+    const response = await apiClient.get('/api/documents');
     const data = unwrapResponse(response) || [];
     return data.map(mapDocumentRecord);
   } catch (error) {
@@ -620,7 +620,7 @@ export const getDocumentRecords = async () => {
 
 export const createDocumentRecord = async (payload) => {
   try {
-    const response = await apiClient.post('/documents', payload);
+    const response = await apiClient.post('/api/documents', payload);
     return mapDocumentRecord(unwrapResponse(response));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create document record.'));
@@ -629,7 +629,7 @@ export const createDocumentRecord = async (payload) => {
 
 export const deleteDocumentRecordById = async (id) => {
   try {
-    const response = await apiClient.delete(`/documents/${id}`);
+    const response = await apiClient.delete(`/api/documents/${id}`);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to delete document record.'));
@@ -638,7 +638,7 @@ export const deleteDocumentRecordById = async (id) => {
 
 export const createDuplicateTCRequest = async (studentId, reason = '') => {
   try {
-    const response = await apiClient.post(`/documents/tc/${studentId}/request-duplicate`, { reason });
+    const response = await apiClient.post(`/api/documents/tc/${studentId}/request-duplicate`, { reason });
     return mapDuplicateTCRequest(unwrapResponse(response));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to submit duplicate TC request.'));
@@ -647,7 +647,7 @@ export const createDuplicateTCRequest = async (studentId, reason = '') => {
 
 export const getDuplicateTCRequests = async (params = {}) => {
   try {
-    const response = await apiClient.get('/documents/tc-duplicate-requests', { params });
+    const response = await apiClient.get('/api/documents/tc-duplicate-requests', { params });
     const data = unwrapResponse(response) || [];
     return data.map(mapDuplicateTCRequest);
   } catch (error) {
@@ -657,7 +657,7 @@ export const getDuplicateTCRequests = async (params = {}) => {
 
 export const reviewDuplicateTCRequest = async (requestId, action, adminComment = '') => {
   try {
-    const response = await apiClient.patch(`/documents/tc-duplicate-requests/${requestId}/review`, {
+    const response = await apiClient.patch(`/api/documents/tc-duplicate-requests/${requestId}/review`, {
       action,
       adminComment,
     });
@@ -739,7 +739,7 @@ export const getDashboardStats = async (role) => {
 
   try {
     return await withShortCache(cacheKey, 15000, async () => {
-      const response = await apiClient.get('/dashboard/stats', {
+      const response = await apiClient.get('/api/dashboard/stats', {
         params: { role: normalizedRole },
       });
       return unwrapResponse(response);
@@ -751,7 +751,7 @@ export const getDashboardStats = async (role) => {
 
 export const getExams = async () => {
   try {
-    const response = await apiClient.get('/exams');
+    const response = await apiClient.get('/api/exams');
     const data = unwrapResponse(response) || [];
     return data.map(mapExam);
   } catch (error) {
@@ -761,7 +761,7 @@ export const getExams = async () => {
 
 export const createExam = async (payload) => {
   try {
-    const response = await apiClient.post('/exams', payload);
+    const response = await apiClient.post('/api/exams', payload);
     return mapExam(unwrapResponse(response));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create exam.'));
@@ -770,7 +770,7 @@ export const createExam = async (payload) => {
 
 export const getTimetable = async () => {
   try {
-    const response = await apiClient.get('/timetable');
+    const response = await apiClient.get('/api/timetable');
     return unwrapResponse(response) || [];
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to fetch timetable.'));
@@ -779,7 +779,7 @@ export const getTimetable = async () => {
 
 export const getNotices = async () => {
   try {
-    const response = await apiClient.get('/notices');
+    const response = await apiClient.get('/api/notices');
     const data = unwrapResponse(response) || [];
     return data.map(mapNotice);
   } catch (error) {
@@ -789,7 +789,7 @@ export const getNotices = async () => {
 
 export const createNotice = async (payload) => {
   try {
-    const response = await apiClient.post('/notices', payload);
+    const response = await apiClient.post('/api/notices', payload);
     return mapNotice(unwrapResponse(response));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create notice.'));
@@ -798,7 +798,7 @@ export const createNotice = async (payload) => {
 
 export const updateNoticeById = async (id, payload) => {
   try {
-    const response = await apiClient.patch(`/notices/${id}`, payload);
+    const response = await apiClient.patch(`/api/notices/${id}`, payload);
     return mapNotice(unwrapResponse(response));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to update notice.'));
@@ -807,7 +807,7 @@ export const updateNoticeById = async (id, payload) => {
 
 export const deleteNoticeById = async (id) => {
   try {
-    const response = await apiClient.delete(`/notices/${id}`);
+    const response = await apiClient.delete(`/api/notices/${id}`);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to delete notice.'));
@@ -817,7 +817,7 @@ export const deleteNoticeById = async (id) => {
 export const getRecentActivity = async () => {
   try {
     return await withShortCache('dashboard:recent-activity', 10000, async () => {
-      const response = await apiClient.get('/dashboard/recent-activity');
+      const response = await apiClient.get('/api/dashboard/recent-activity');
       return unwrapResponse(response) || [];
     });
   } catch (error) {
@@ -851,7 +851,7 @@ export const getAllStudentsForReports = async ({ pageSize = 100 } = {}) => {
 
 export const getMarksByExamAndClass = async ({ className, section, examName, subjectName }) => {
   try {
-    const response = await apiClient.get('/marks', {
+    const response = await apiClient.get('/api/marks', {
       params: {
         class: className,
         section,
@@ -875,7 +875,7 @@ export const getMarksByExamAndClass = async ({ className, section, examName, sub
 
 export const saveMarksBulk = async ({ className, section, examName, subjectName, entries }) => {
   try {
-    const response = await apiClient.post('/marks/bulk', {
+    const response = await apiClient.post('/api/marks/bulk', {
       className,
       section,
       examName,
@@ -901,7 +901,7 @@ const mapHomework = (item) => ({
 
 export const getHomework = async (params = {}) => {
   try {
-    const response = await apiClient.get('/homework', { params });
+    const response = await apiClient.get('/api/homework', { params });
     const data = unwrapResponse(response) || [];
     return data.map(mapHomework);
   } catch (error) {
@@ -911,7 +911,7 @@ export const getHomework = async (params = {}) => {
 
 export const createHomework = async (payload) => {
   try {
-    const response = await apiClient.post('/homework', payload);
+    const response = await apiClient.post('/api/homework', payload);
     return mapHomework(unwrapResponse(response));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create homework.'));
@@ -920,7 +920,7 @@ export const createHomework = async (payload) => {
 
 export const deleteHomeworkById = async (id) => {
   try {
-    const response = await apiClient.delete(`/homework/${id}`);
+    const response = await apiClient.delete(`/api/homework/${id}`);
      return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to delete homework.'));
@@ -929,7 +929,7 @@ export const deleteHomeworkById = async (id) => {
 
 export const getSchoolSettings = async () => {
   try {
-    const response = await apiClient.get('/settings');
+    const response = await apiClient.get('/api/settings');
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to fetch school settings.'));
@@ -938,7 +938,7 @@ export const getSchoolSettings = async () => {
 
 export const updateSchoolSettings = async (payload) => {
   try {
-    const response = await apiClient.put('/settings', payload);
+    const response = await apiClient.put('/api/settings', payload);
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to update school settings.'));

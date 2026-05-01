@@ -86,13 +86,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 app.use(
 	cors({
-		origin: (origin, callback) => {
-			if (!origin || allowedOrigins.includes(origin)) {
-				return callback(null, true);
-			}
-
-			return callback(new Error('CORS policy does not allow this origin'));
-		},
+		origin: 'https://my-frontend.vercel.app',
 		credentials: true,
 	})
 );
@@ -103,7 +97,7 @@ app.use('/api', globalLimiter);
 app.use('/api/auth/login', authLimiter);
 
 // Basic health route.
-app.use('/api/health', healthRoutes);
+app.get('/api/health', (req, res) => res.send('API working'));
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/subjects', subjectRoutes);
