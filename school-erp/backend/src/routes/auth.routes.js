@@ -10,7 +10,7 @@ const { verifyToken, allowRoles } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
-router.post('/register', verifyToken, allowRoles('admin'), registerUser);
+router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 // Sample protected routes using JWT + RBAC middleware.

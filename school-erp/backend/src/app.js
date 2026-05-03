@@ -19,7 +19,6 @@ const timetableRoutes = require('./routes/timetable.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const markRoutes = require('./routes/mark.routes');
 const homeworkRoutes = require('./routes/homework.routes');
-const healthRoutes = require('./routes/health.routes');
 const studentRoutes = require('./routes/student.routes');
 const staffRoutes = require('./routes/staff.routes');
 const settingRoutes = require('./routes/setting.routes');
@@ -86,7 +85,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 app.use(
 	cors({
-		origin: 'https://my-frontend.vercel.app',
+		origin: allowedOrigins,
 		credentials: true,
 	})
 );
@@ -97,7 +96,11 @@ app.use('/api', globalLimiter);
 app.use('/api/auth/login', authLimiter);
 
 // Basic health route.
-app.get('/api/health', (req, res) => res.send('API working'));
+app.get('/api/health', (req, res) => {
+	return res.status(200).json({
+		message: 'API working',
+	});
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/subjects', subjectRoutes);

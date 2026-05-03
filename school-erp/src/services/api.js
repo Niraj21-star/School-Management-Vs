@@ -1,5 +1,7 @@
 import apiClient from './apiClient';
 
+const API = apiClient;
+
 const toUpperRole = (role = '') => String(role).toUpperCase();
 
 const getErrorMessage = (error, fallback = 'Something went wrong. Please try again.') => {
@@ -93,7 +95,7 @@ const fetchStudentListRaw = async (params = {}) => {
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await apiClient.post('/api/auth/login', { email, password });
+    const response = await API.post('/api/auth/login', { email, password });
     const data = unwrapResponse(response);
 
     return {
