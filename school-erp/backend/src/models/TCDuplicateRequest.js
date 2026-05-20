@@ -19,7 +19,7 @@ const tcDuplicateRequestSchema = new mongoose.Schema(
     reason: {
       type: String,
       trim: true,
-      default: '',
+      required: true,
     },
     status: {
       type: String,
@@ -47,6 +47,44 @@ const tcDuplicateRequestSchema = new mongoose.Schema(
     consumedAt: {
       type: Date,
     },
+
+    // Supporting document (stored as base64 data URI)
+    documentData: {
+      type: String,
+      default: '',
+    },
+    documentName: {
+      type: String,
+      default: '',
+    },
+    documentMimeType: {
+      type: String,
+      default: '',
+    },
+    documentSize: {
+      type: Number,
+      default: 0,
+    },
+
+    // Duplicate TC tracking
+    duplicateTcNumber: {
+      type: String,
+      default: '',
+    },
+    duplicateCount: {
+      type: Number,
+      default: 0,
+    },
+
+    // Audit info
+    ipAddress: {
+      type: String,
+      default: '',
+    },
+    userAgent: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,
@@ -61,3 +99,4 @@ module.exports = {
   TCDuplicateRequest,
   REQUEST_STATUSES,
 };
+

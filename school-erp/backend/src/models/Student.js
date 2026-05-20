@@ -17,7 +17,13 @@ const studentSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    surname: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     dob: {
+
       type: Date,
       required: true,
     },
@@ -38,6 +44,46 @@ const studentSchema = new mongoose.Schema(
     },
     passportPhoto: {
       type: String,
+      default: '',
+    },
+    email: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    previousSchool: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    caste: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    subCaste: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    placeOfBirth: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    nationality: {
+      type: String,
+      trim: true,
+      default: 'Indian',
+    },
+    fatherEducation: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    motherEducation: {
+      type: String,
+      trim: true,
       default: '',
     },
     parent: {

@@ -40,6 +40,7 @@ const mapStudent = (student) => {
     studentId: student?.studentId,
     rollNo: student?.academic?.rollNumber || '-',
     name: student?.name || '-',
+    surname: student?.surname || '',
     class: section ? `${className}-${section}` : className,
     gender: student?.gender ? `${student.gender[0].toUpperCase()}${student.gender.slice(1)}` : '-',
     phone: student?.contact || '-',
@@ -49,6 +50,7 @@ const mapStudent = (student) => {
     raw: student,
   };
 };
+
 
 const mapFeeStatus = (status) => {
   if (status === 'paid') return 'Paid';
@@ -148,11 +150,18 @@ export const createStudent = async (formData) => {
 
     const payload = {
       name: formData.name,
+      surname: formData.surname || '',
       dob: formData.dob || defaultDob.toISOString().split('T')[0],
       gender: String(formData.gender || 'other').toLowerCase(),
       contact: formData.phone || '0000000000',
       address: formData.address || 'Not provided',
       passportPhoto: formData.passportPhoto || '',
+      caste: formData.caste || '',
+      subCaste: formData.subCaste || '',
+      placeOfBirth: formData.placeOfBirth || '',
+      nationality: formData.nationality || 'Indian',
+      fatherEducation: formData.fatherEducation || '',
+      motherEducation: formData.motherEducation || '',
       parent: {
         fatherName: formData.fatherName || 'Not provided',
         motherName: formData.motherName || 'Not provided',
@@ -165,6 +174,7 @@ export const createStudent = async (formData) => {
         admissionDate: formData.admissionDate || new Date().toISOString().split('T')[0],
       },
       status: String(formData.status || 'active').toLowerCase(),
+      isTcIssued: formData.isTcIssued || false,
     };
 
     const response = await apiClient.post('/api/students', payload);
@@ -183,9 +193,16 @@ export const updateStudentById = async (id, formData) => {
 
     const payload = {
       name: formData.name,
+      surname: formData.surname,
       contact: formData.phone,
       gender: String(formData.gender || '').toLowerCase(),
       passportPhoto: formData.passportPhoto,
+      caste: formData.caste,
+      subCaste: formData.subCaste,
+      placeOfBirth: formData.placeOfBirth,
+      nationality: formData.nationality,
+      fatherEducation: formData.fatherEducation,
+      motherEducation: formData.motherEducation,
       academic: {
         class: academicClass,
         section,
@@ -193,6 +210,7 @@ export const updateStudentById = async (id, formData) => {
       },
       status: String(formData.status || 'active').toLowerCase(),
     };
+
 
     const response = await apiClient.put(`/api/students/${id}`, payload);
     const data = unwrapResponse(response);
@@ -502,13 +520,13 @@ const ensureFeeStructure = async (studentId, totalAmount) => {
   }
 };
 
-export const recordPayment = async ({ studentId, amount, paid, mode = 'cash' }) => {
+export const recordPayment = async ({ studentId, amount, paid, mode = 'cash', breakdown = {} }) => {
   try {
     if (!studentId) {
       throw new Error('Student ID is required.');
     }
 
-    const totalAmount = Number(amount || 0);
+    const totalAmount = Number(amount || paid || 0);
     const paidAmount = Number(paid || 0);
 
     await ensureFeeStructure(studentId, totalAmount);
@@ -518,6 +536,7 @@ export const recordPayment = async ({ studentId, amount, paid, mode = 'cash' }) 
         studentId: studentId,
         amount: paidAmount,
         mode,
+        breakdown,
       });
     }
 
@@ -546,17 +565,18 @@ export const createExpense = async (payload) => {
   }
 };
 
-export const downloadBonafide = async (studentId) => {
+export const getBonafideHtml = async (studentId) => {
   try {
     const response = await apiClient.get(`/api/documents/bonafide/${studentId}`, {
-      responseType: 'blob',
+      responseType: 'text',
     });
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, 'Unable to download bonafide certificate.'));
+    throw new Error(getErrorMessage(error, 'Unable to generate bonafide certificate.'));
   }
 };
 
+// Legacy PDF download — kept for backward compat
 export const downloadTC = async (studentId) => {
   try {
     const response = await apiClient.get(`/api/documents/tc/${studentId}`, {
@@ -567,6 +587,66 @@ export const downloadTC = async (studentId) => {
     throw new Error(getErrorMessage(error, 'Unable to download transfer certificate.'));
   }
 };
+
+// Get TC status for a student (print count, canPrintOriginal, etc.)
+export const getTCStatus = async (studentId) => {
+  try {
+    const response = await apiClient.get(`/api/documents/tc-status/${studentId}`);
+    return unwrapResponse(response);
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to fetch TC status.'));
+  }
+};
+
+// Get TC as HTML string for print-window approach (original, one-time)
+export const getTCHtml = async (studentId) => {
+  try {
+    const response = await apiClient.get(`/api/documents/tc/${studentId}/html`, {
+      responseType: 'text',
+    });
+    return response.data; // raw HTML string
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to generate Transfer Certificate. It may have already been printed.'));
+  }
+};
+
+// Get Admission Form as HTML string for print-window
+export const getAdmissionFormHtml = async (studentId) => {
+  try {
+    const response = await apiClient.get(`/api/documents/admission-form/${studentId}/html`, {
+      responseType: 'text',
+    });
+    return response.data; // raw HTML string
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to generate Admission Form.'));
+  }
+};
+
+// Get duplicate TC as HTML string for print-window
+export const getDuplicateTCHtml = async (studentId, requestId) => {
+  try {
+    const response = await apiClient.get(`/api/documents/tc/${studentId}/duplicate-html`, {
+      params: { requestId },
+      responseType: 'text',
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to generate duplicate TC.'));
+  }
+};
+
+// Get all print logs (optionally filtered by studentId)
+export const getTCPrintLogs = async (studentId) => {
+  try {
+    const response = await apiClient.get('/api/documents/tc-print-logs', {
+      params: studentId ? { studentId } : undefined,
+    });
+    return unwrapResponse(response) || [];
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to fetch print logs.'));
+  }
+};
+
 
 export const downloadFeeReceipt = async (studentId, paymentId) => {
   try {
@@ -638,9 +718,13 @@ export const deleteDocumentRecordById = async (id) => {
   }
 };
 
-export const createDuplicateTCRequest = async (studentId, reason = '') => {
+export const createDuplicateTCRequest = async (studentId, reason = '', documentInfo = null) => {
   try {
-    const response = await apiClient.post(`/api/documents/tc/${studentId}/request-duplicate`, { reason });
+    const payload = {
+      reason,
+      ...(documentInfo || {}),
+    };
+    const response = await apiClient.post(`/api/documents/tc/${studentId}/request-duplicate`, payload);
     return mapDuplicateTCRequest(unwrapResponse(response));
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to submit duplicate TC request.'));

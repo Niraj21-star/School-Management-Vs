@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.use(verifyToken);
 
-router.get('/', allowRoles('admin', 'clerk', 'teacher'), getTimetable);
+router.get('/', allowRoles('clerk', 'teacher'), getTimetable);
 
 module.exports = router;

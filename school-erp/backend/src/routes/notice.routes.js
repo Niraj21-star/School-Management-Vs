@@ -12,9 +12,9 @@ const router = express.Router();
 
 router.use(verifyToken);
 
-router.get('/', allowRoles('admin', 'clerk', 'teacher'), getAllNotices);
-router.post('/', allowRoles('admin'), createNotice);
-router.patch('/:id', allowRoles('admin'), updateNotice);
-router.delete('/:id', allowRoles('admin'), deleteNotice);
+router.get('/', allowRoles('clerk', 'teacher'), getAllNotices);
+router.post('/', allowRoles(), createNotice);
+router.patch('/:id', allowRoles(), updateNotice);
+router.delete('/:id', allowRoles(), deleteNotice);
 
 module.exports = router;

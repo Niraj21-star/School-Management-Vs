@@ -6,7 +6,7 @@ import Button from '../../components/Button';
 import { Save, UserPlus, Printer } from 'lucide-react';
 import { createStudent, getClasses, getAdmissionFormHtml } from '../../services/api';
 
-const ClerkAdmissions = () => {
+const AdminAdmissions = () => {
   const [form, setForm] = useState({
     name: '', fatherName: '', motherName: '', dob: '', gender: '',
     class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '',
@@ -218,4 +218,4 @@ const ClerkAdmissions = () => {
   );
 };
 
-export default ClerkAdmissions;
+export default AdminAdmissions;

@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   getStudents,
-  downloadBonafide,
-  downloadTC,
+  getBonafideHtml,
   getClasses,
-  createDuplicateTCRequest,
-  getDuplicateTCRequests,
 } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
@@ -21,19 +18,21 @@ const ClerkRecords = () => {
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState('');
-  const [requestingId, setRequestingId] = useState('');
-  const [duplicateRequestsByStudent, setDuplicateRequestsByStudent] = useState({});
   const [error, setError] = useState('');
 
-  const saveBlob = (blob, fileName) => {
-    const url = window.URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = fileName;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.URL.revokeObjectURL(url);
+  const openPrintWindow = (html) => {
+    const win = window.open('', '_blank', 'width=900,height=700,menubar=no,toolbar=no,location=no');
+    if (!win) { alert('Pop-up blocked. Please allow pop-ups for this site.'); return; }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.onload = () => {
+      setTimeout(() => {
+        win.focus();
+        win.print();
+        setTimeout(() => win.close(), 1500);
+      }, 400);
+    };
   };
 
   const loadClasses = useCallback(async () => {
@@ -65,22 +64,8 @@ const ClerkRecords = () => {
     setError('');
 
     try {
-      const [data, duplicateRequests] = await Promise.all([
-        getStudents({ class: selectedClass, limit: 200 }),
-        getDuplicateTCRequests(),
-      ]);
-
-      const latestByStudent = duplicateRequests.reduce((accumulator, request) => {
-        const key = request.studentId;
-        if (!key || accumulator[key]) {
-          return accumulator;
-        }
-        accumulator[key] = request;
-        return accumulator;
-      }, {});
-
+      const data = await getStudents({ class: selectedClass, limit: 200, status: 'all' });
       setStudents(data);
-      setDuplicateRequestsByStudent(latestByStudent);
     } catch (err) {
       setError(err.message || 'Unable to load student records.');
     } finally {
@@ -96,44 +81,17 @@ const ClerkRecords = () => {
     loadStudents();
   }, [loadStudents]);
 
-  const handleDownload = async (type, student) => {
+  const handlePrintBonafide = async (student) => {
     setError('');
-    setDownloadingId(`${type}-${student.id}`);
+    setDownloadingId(student.id);
 
     try {
-      const blob = type === 'bonafide'
-        ? await downloadBonafide(student.id)
-        : await downloadTC(student.id);
-
-      const fileName = `${type}-${student.studentId || student.rollNo || student.id}.pdf`;
-      saveBlob(blob, fileName);
-
-      if (type === 'tc') {
-        await loadStudents();
-      }
+      const html = await getBonafideHtml(student.id);
+      openPrintWindow(html);
     } catch (err) {
-      setError(err.message || 'Unable to download document.');
+      setError(err.message || 'Unable to generate document.');
     } finally {
       setDownloadingId('');
-    }
-  };
-
-  const handleRequestDuplicate = async (student) => {
-    const reason = window.prompt('Reason for duplicate TC request (optional):', '');
-    if (reason === null) {
-      return;
-    }
-
-    setError('');
-    setRequestingId(student.id);
-
-    try {
-      await createDuplicateTCRequest(student.id, reason);
-      await loadStudents();
-    } catch (err) {
-      setError(err.message || 'Unable to submit duplicate TC request.');
-    } finally {
-      setRequestingId('');
     }
   };
 
@@ -146,67 +104,20 @@ const ClerkRecords = () => {
     { key: 'admissionDate', label: 'Admission Date' },
     { key: 'status', label: 'Status', render: (val) => <StatusBadge status={val} /> },
     {
-      key: 'tcStatus',
-      label: 'TC Status',
-      sortable: false,
-      render: (_, row) => {
-        const tcDownloadCount = row?.raw?.tcCertificate?.downloadCount || 0;
-        const issued = tcDownloadCount > 0;
-
-        return (
-          <span
-            className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${issued ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}
-          >
-            {issued ? 'TC Issued' : 'Not Issued'}
-          </span>
-        );
-      },
-    },
-    {
       key: 'documents',
       label: 'Documents',
       sortable: false,
-      render: (_, row) => {
-        const tcAlreadyIssued = (row?.raw?.tcCertificate?.downloadCount || 0) > 0;
-        const tcRequest = duplicateRequestsByStudent[row.id];
-        const tcRequestPending = tcRequest?.status === 'pending';
-        const tcRequestApproved = tcRequest?.status === 'approved' && !tcRequest?.consumed;
-
-        return (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handleDownload('bonafide', row)}
-              disabled={downloadingId === `bonafide-${row.id}`}
-              className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
-            >
-              {downloadingId === `bonafide-${row.id}` ? 'Downloading...' : 'Download Bonafide'}
-            </button>
-            <button
-              onClick={() => handleDownload('tc', row)}
-              disabled={downloadingId === `tc-${row.id}` || (tcAlreadyIssued && !tcRequestApproved)}
-              title={tcAlreadyIssued && !tcRequestApproved ? 'Duplicate TC approval required from admin.' : 'Download TC'}
-              className="px-2.5 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50"
-            >
-              {downloadingId === `tc-${row.id}`
-                ? 'Downloading...'
-                : tcAlreadyIssued
-                  ? tcRequestApproved
-                    ? 'Download Approved TC'
-                    : 'TC Issued'
-                  : 'Download TC'}
-            </button>
-            {tcAlreadyIssued && !tcRequestApproved && (
-              <button
-                onClick={() => handleRequestDuplicate(row)}
-                disabled={requestingId === row.id || tcRequestPending}
-                className="px-2.5 py-1 rounded-md text-xs font-medium bg-violet-50 text-violet-700 hover:bg-violet-100 disabled:opacity-50"
-              >
-                {requestingId === row.id ? 'Requesting...' : tcRequestPending ? 'Request Pending' : 'Request Duplicate TC'}
-              </button>
-            )}
-          </div>
-        );
-      },
+      render: (_, row) => (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handlePrintBonafide(row)}
+            disabled={downloadingId === row.id}
+            className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+          >
+            {downloadingId === row.id ? 'Generating...' : 'Print Bonafide'}
+          </button>
+        </div>
+      ),
     },
   ];
 

@@ -41,7 +41,18 @@ const createStudent = async (req, res) => {
       payload.academic.rollNumber = String(count + 1).padStart(2, '0');
     }
 
+    if (req.body.isTcIssued) {
+      payload.status = 'inactive';
+      payload.tcCertificate = {
+        downloadCount: 1,
+        firstDownloadedAt: new Date(),
+        lastDownloadedAt: new Date(),
+      };
+    }
+
+    console.log('--- CREATE STUDENT PAYLOAD ---', payload);
     const student = await Student.create(payload);
+    console.log('--- CREATED STUDENT ---', student);
 
     return sendSuccess(res, 201, 'Student created successfully', student);
   } catch (error) {

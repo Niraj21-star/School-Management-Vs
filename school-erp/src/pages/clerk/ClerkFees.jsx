@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getFees, getClasses, recordPayment, getStudents } from '../../services/api';
+import { getFees, getClasses, recordPayment, getStudents, downloadFeeReceipt } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
@@ -7,7 +7,7 @@ import Modal from '../../components/Modal';
 import FormInput from '../../components/FormInput';
 import SelectInput from '../../components/SelectInput';
 import Button from '../../components/Button';
-import { Plus } from 'lucide-react';
+import { Plus, Printer } from 'lucide-react';
 import { formatCurrency } from '../../utils/helpers';
 
 
@@ -20,7 +20,13 @@ const ClerkFees = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '' });
+  
+  const defaultBreakdown = {
+    admission: '', bdf: '', tuition: '', exam: '', computer: '', sport: '', medical: '',
+    craft: '', library: '', laboratory: '', misc: '', other: '', late: '', discount: ''
+  };
+  
+  const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '', breakdown: { ...defaultBreakdown } });
   const [classStudents, setClassStudents] = useState([]);
 
   const filteredFees = selectedClass
@@ -73,14 +79,29 @@ const ClerkFees = () => {
   useEffect(() => {
     if (form.class) {
       const [className, section = 'A'] = String(form.class).split('-');
-      getStudents({ class: className, section, limit: 200 })
+      getStudents({ class: className, section, limit: 200, status: 'all' })
         .then(setClassStudents)
         .catch(() => setClassStudents([]));
     } else {
       setClassStudents([]);
-      setForm((prev) => ({ ...prev, studentId: '' }));
+      setForm((prev) => ({ ...prev, studentId: '', amount: '', paid: '', breakdown: { ...defaultBreakdown } }));
     }
   }, [form.class]);
+
+  // Auto-calculate total paid based on breakdown inputs
+  useEffect(() => {
+    const sum = [
+      'admission', 'bdf', 'tuition', 'exam', 'computer', 'sport',
+      'medical', 'craft', 'library', 'laboratory', 'misc', 'other', 'late'
+    ].reduce((acc, key) => acc + (Number(form.breakdown[key]) || 0), 0);
+    
+    const discount = Number(form.breakdown.discount) || 0;
+    const total = sum - discount;
+    
+    if (total !== Number(form.paid) && (total > 0 || form.paid !== '')) {
+      setForm(prev => ({ ...prev, paid: total > 0 ? String(total) : '' }));
+    }
+  }, [form.breakdown]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -97,7 +118,7 @@ const ClerkFees = () => {
         return next;
       });
 
-      setForm({ studentId: '', class: '', amount: '', paid: '' });
+      setForm({ studentId: '', class: '', amount: '', paid: '', breakdown: { ...defaultBreakdown } });
       setModalOpen(false);
     } catch (err) {
       setError(err.message || 'Unable to record payment.');
@@ -114,6 +135,33 @@ const ClerkFees = () => {
     { key: 'due', label: 'Due', render: (val) => <span className={val > 0 ? 'text-red-600 font-medium' : ''}>{formatCurrency(val)}</span> },
     { key: 'status', label: 'Status', render: (val) => <StatusBadge status={val} /> },
     { key: 'date', label: 'Date' },
+    {
+      key: 'actions',
+      label: 'Receipt',
+      render: (_, row) => (
+        <button
+          onClick={async () => {
+            try {
+              const blob = await downloadFeeReceipt(row.studentId);
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `Fee_Receipt_${row.studentName}.pdf`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(url);
+            } catch (err) {
+              alert(err.message || 'Error generating receipt');
+            }
+          }}
+          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+          title="Print Last Receipt"
+        >
+          <Printer className="w-4 h-4" />
+        </button>
+      ),
+    },
   ];
 
   if (loading || loadingClasses)
@@ -170,15 +218,54 @@ const ClerkFees = () => {
             onChange={(e) => {
               const studentId = e.target.value;
               const feeRecord = fees.find((f) => f.studentId === studentId);
-              setForm({ ...form, studentId, amount: feeRecord ? String(feeRecord.due || feeRecord.amount || '') : '', paid: '' });
+              setForm({ ...form, studentId, amount: feeRecord ? String(feeRecord.due || feeRecord.amount || '') : '', paid: '', breakdown: { ...defaultBreakdown } });
             }}
             placeholder={form.class ? 'Select student' : 'Select a class first'}
             options={classStudents.map(s => ({ value: s.id, label: `${s.name} (${s.rollNo})` }))}
             disabled={!form.class}
             required
           />
-          <FormInput label="Pending Amount (₹)" type="number" value={form.amount} readOnly />
-          <FormInput label="Payment Amount (₹)" type="number" value={form.paid} onChange={(e) => setForm({ ...form, paid: e.target.value })} required />
+          <FormInput
+            label="Pending Amount (₹)"
+            type="number"
+            value={form.amount}
+            onChange={(e) => setForm({ ...form, amount: e.target.value })}
+            readOnly={!!form.studentId && fees.some((f) => f.studentId === form.studentId)}
+          />
+          
+          <div className="pt-2">
+            <h4 className="text-sm font-semibold text-slate-700 mb-3 border-b border-slate-100 pb-2">Block-Wise Fee Breakdown</h4>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { key: 'admission', label: 'Admission Fee' },
+                { key: 'bdf', label: 'B.D.F.' },
+                { key: 'tuition', label: 'Tuition Fee' },
+                { key: 'exam', label: 'Exam Fee' },
+                { key: 'computer', label: 'Computer Fee' },
+                { key: 'sport', label: 'Sport Fee' },
+                { key: 'medical', label: 'Medical Charges' },
+                { key: 'craft', label: 'Craft Fee' },
+                { key: 'library', label: 'Library' },
+                { key: 'laboratory', label: 'Laboratories' },
+                { key: 'misc', label: 'Misc.' },
+                { key: 'other', label: 'Other' },
+                { key: 'late', label: 'Late Fee' },
+                { key: 'discount', label: 'Discount' },
+              ].map(field => (
+                <FormInput
+                  key={field.key}
+                  label={field.label}
+                  type="number"
+                  value={form.breakdown[field.key]}
+                  onChange={(e) => setForm(f => ({ ...f, breakdown: { ...f.breakdown, [field.key]: e.target.value } }))}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <div className="pt-3 border-t border-slate-100 mt-2">
+            <FormInput label="Total Payment Amount (₹) [Auto-calculated]" type="number" value={form.paid} readOnly required className="bg-slate-50 font-bold" />
+          </div>
         </div>
         <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
           <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>

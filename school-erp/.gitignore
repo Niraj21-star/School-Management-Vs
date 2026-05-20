@@ -28,3 +28,38 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Database and Volumes
+.mongo/
+.mongo-clean/
+.mongodb-data/
+.mongodb-log/
+backend/.mongodb-data/
+backend/.mongodb-log/
+
+# Backend Modules and Env
+backend/node_modules/
+backend/.env.*
+
+# Secrets and Keys
+*.pem
+*.key
+*.cert
+*.rsa
+*.pub
+
+# Temporary Files
+.temp/
+.tmp/
+temp/
+tmp/
+*.pid
+
+# Testing and Coverage
+coverage/
+backend/coverage/
+.nyc_output/
+
+# Build outputs
+build/
+backend/build/

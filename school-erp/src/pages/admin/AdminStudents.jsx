@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   getStudents,
   createStudent,
   updateStudentById,
   deleteStudentById,
+  getAdmissionFormHtml,
 } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
@@ -12,7 +14,7 @@ import Modal from '../../components/Modal';
 import FormInput from '../../components/FormInput';
 import SelectInput from '../../components/SelectInput';
 import Button from '../../components/Button';
-import { Plus, Download, Eye, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Download, Pencil, Trash2, Scroll, Printer } from 'lucide-react';
 import { exportRowsToPdf } from '../../utils/pdfExport';
 
 const AdminStudents = () => {
@@ -23,14 +25,31 @@ const AdminStudents = () => {
   const [error, setError] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editStudent, setEditStudent] = useState(null);
-  const [form, setForm] = useState({ name: '', class: '', rollNo: '', gender: '', phone: '', status: 'Active' });
+  const [submitted, setSubmitted] = useState(false);
+  const [lastStudent, setLastStudent] = useState(null);
+  const [form, setForm] = useState({
+    name: '',
+    surname: '',
+    class: '',
+    rollNo: '',
+    gender: '',
+    phone: '',
+    status: 'Active',
+    caste: '',
+    subCaste: '',
+    placeOfBirth: '',
+    nationality: 'Indian',
+    motherEducation: '',
+    isTcIssued: false,
+  });
+  const navigate = useNavigate();
 
   const loadStudents = useCallback(async () => {
     setLoading(true);
     setError('');
 
     try {
-      const data = await getStudents({ limit: 200 });
+      const data = await getStudents({ limit: 200, status: 'all' });
       setStudents(data);
     } catch (err) {
       setError(err.message || 'Unable to load students.');
@@ -90,12 +109,14 @@ const AdminStudents = () => {
       if (editStudent) {
         const updated = await updateStudentById(editStudent.id, form);
         setStudents((prev) => prev.map((s) => (s.id === editStudent.id ? updated : s)));
+        resetForm();
       } else {
         const created = await createStudent(form);
         setStudents((prev) => [created, ...prev]);
+        setLastStudent(created);
+        setSubmitted(true);
+        resetForm();
       }
-
-      resetForm();
     } catch (err) {
       setError(err.message || 'Unable to save student.');
     } finally {
@@ -117,15 +138,60 @@ const AdminStudents = () => {
   };
 
   const resetForm = () => {
-    setForm({ name: '', class: '', rollNo: '', gender: '', phone: '', status: 'Active' });
+    setForm({
+      name: '',
+      surname: '',
+      class: '',
+      rollNo: '',
+      gender: '',
+      phone: '',
+      status: 'Active',
+      caste: '',
+      subCaste: '',
+      placeOfBirth: '',
+      nationality: 'Indian',
+      fatherEducation: '',
+      motherEducation: '',
+      isTcIssued: false,
+    });
     setEditStudent(null);
     setModalOpen(false);
   };
 
   const openEdit = (student) => {
     setEditStudent(student);
-    setForm({ name: student.name, class: student.class, rollNo: student.rollNo, gender: student.gender, phone: student.phone, status: student.status });
+    setForm({
+      name: student.name,
+      surname: student.raw?.surname || '',
+      class: student.class,
+      rollNo: student.rollNo,
+      gender: student.gender,
+      phone: student.phone,
+      status: student.status,
+      caste: student.raw?.caste || '',
+      subCaste: student.raw?.subCaste || '',
+      placeOfBirth: student.raw?.placeOfBirth || '',
+      nationality: student.raw?.nationality || 'Indian',
+      fatherEducation: student.raw?.fatherEducation || '',
+      motherEducation: student.raw?.motherEducation || '',
+      isTcIssued: false, // Don't show this field on edit, or reset it
+    });
     setModalOpen(true);
+  };
+
+  const handlePrintAdmissionForm = async (studentId) => {
+    try {
+      const html = await getAdmissionFormHtml(studentId);
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(html);
+        printWindow.document.close();
+      } else {
+        alert('Please allow popups to print the admission form.');
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to open print window.');
+    }
   };
 
   const columns = [
@@ -142,6 +208,20 @@ const AdminStudents = () => {
       sortable: false,
       render: (_, row) => (
         <div className="flex items-center gap-1">
+          <button
+            onClick={() => handlePrintAdmissionForm(row.id)}
+            className="p-1.5 rounded-lg hover:bg-emerald-50"
+            title="Print Admission Form"
+          >
+            <Printer className="w-4 h-4 text-emerald-600" />
+          </button>
+          <button
+            onClick={() => navigate('/admin/tc')}
+            className="p-1.5 rounded-lg hover:bg-indigo-50"
+            title="Go to TC Management"
+          >
+            <Scroll className="w-4 h-4 text-indigo-600" />
+          </button>
           <button onClick={() => openEdit(row)} className="p-1.5 rounded-lg hover:bg-slate-100" title="Edit">
             <Pencil className="w-4 h-4 text-slate-500" />
           </button>
@@ -195,6 +275,35 @@ const AdminStudents = () => {
         <Button variant="secondary" onClick={handleExport}><Download className="w-4 h-4" /> Export</Button>
         <Button onClick={() => setModalOpen(true)}><Plus className="w-4 h-4" /> Add Student</Button>
       </PageHeader>
+
+      {submitted && lastStudent && (
+        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-fade-in">
+          <div>
+            <h4 className="font-semibold text-emerald-900 flex items-center gap-2 text-base">
+              ✓ Student Admission Recorded Successfully!
+            </h4>
+            <p className="text-sm mt-0.5 text-emerald-700">
+              Admission form is generated for <strong>{lastStudent.name}</strong> (ID: {lastStudent.studentId || lastStudent.id}).
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => handlePrintAdmissionForm(lastStudent.id)}
+              className="!bg-white !text-emerald-700 border border-emerald-200 hover:!bg-emerald-100/50 flex items-center gap-2"
+            >
+              <Printer className="w-4 h-4" /> Print Admission Form
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setSubmitted(false)}
+              className="!bg-white !text-slate-500 border border-slate-200 hover:!bg-slate-50"
+            >
+              Dismiss
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="card p-4 mb-6">
         <div className="flex items-center justify-between gap-3 mb-4">
@@ -254,6 +363,7 @@ const AdminStudents = () => {
       <Modal isOpen={modalOpen} onClose={resetForm} title={editStudent ? 'Edit Student' : 'Add New Student'} size="lg">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormInput label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <FormInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
           <FormInput label="Roll No" value={form.rollNo} onChange={(e) => setForm({ ...form, rollNo: e.target.value })} required />
           <SelectInput label="Class" value={form.class} onChange={(e) => setForm({ ...form, class: e.target.value })} placeholder="Select class" options={[
             { value: '10-A', label: '10-A' }, { value: '10-B', label: '10-B' },
@@ -268,6 +378,17 @@ const AdminStudents = () => {
           <SelectInput label="Status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} options={[
             { value: 'Active', label: 'Active' }, { value: 'Inactive', label: 'Inactive' },
           ]} />
+          <FormInput label="Nationality" value={form.nationality} onChange={(e) => setForm({ ...form, nationality: e.target.value })} />
+          <FormInput label="Place of Birth" value={form.placeOfBirth} onChange={(e) => setForm({ ...form, placeOfBirth: e.target.value })} />
+          <FormInput label="Caste" value={form.caste} onChange={(e) => setForm({ ...form, caste: e.target.value })} />
+          <FormInput label="Sub-Caste" value={form.subCaste} onChange={(e) => setForm({ ...form, subCaste: e.target.value })} />
+          <FormInput label="Father's Education" value={form.fatherEducation} onChange={(e) => setForm({ ...form, fatherEducation: e.target.value })} />
+          <FormInput label="Mother's Education" value={form.motherEducation} onChange={(e) => setForm({ ...form, motherEducation: e.target.value })} />
+          {!editStudent && (
+            <SelectInput label="TC Issued (Historical)" value={form.isTcIssued ? 'Yes' : 'No'} onChange={(e) => setForm({ ...form, isTcIssued: e.target.value === 'Yes' })} options={[
+              { value: 'No', label: 'No' }, { value: 'Yes', label: 'Yes' }
+            ]} />
+          )}
         </div>
         <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
           <Button variant="secondary" onClick={resetForm}>Cancel</Button>
@@ -279,3 +400,4 @@ const AdminStudents = () => {
 };
 
 export default AdminStudents;
+

@@ -11,7 +11,6 @@ import {
 } from '../../services/api';
 
 const DOCUMENT_TYPES = [
-  { value: 'Transfer Certificate', label: 'Transfer Certificate' },
   { value: 'Marksheet', label: 'Marksheet' },
   { value: 'ID Proof', label: 'ID Proof' },
   { value: 'Bonafide', label: 'Bonafide' },
@@ -67,7 +66,7 @@ const ClerkDocuments = () => {
 
     try {
       const [className, section] = String(selectedClass).split('-');
-      const studentList = await getStudents({ class: className, section, limit: 200 });
+      const studentList = await getStudents({ class: className, section, limit: 200, status: 'all' });
       setStudents(studentList);
     } catch (err) {
       setError(err.message || 'Unable to load students.');

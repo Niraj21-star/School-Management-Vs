@@ -6,21 +6,21 @@ import {
   LayoutDashboard, Users, GraduationCap, ClipboardCheck,
   DollarSign, FileText, CalendarDays, Bell, BarChart3, Settings,
   LogOut, ChevronLeft, ChevronRight, UserCheck, Upload, Receipt,
-  FileUp, PenSquare, Clock
+  PenSquare, Clock, FileUp, Scroll
 } from 'lucide-react';
 
 const MENU_CONFIG = {
   [ROLES.ADMIN]: [
     { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { label: 'Student Admissions', path: '/admin/admissions', icon: UserCheck },
     { label: 'Students', path: '/admin/students', icon: Users },
     { label: 'Classes & Sections', path: '/admin/classes', icon: CalendarDays },
     { label: 'Teachers', path: '/admin/teachers', icon: GraduationCap },
     { label: 'Attendance', path: '/admin/attendance', icon: ClipboardCheck },
     { label: 'Fee Management', path: '/admin/fees', icon: DollarSign },
     { label: 'Exams & Results', path: '/admin/exams', icon: FileText },
-    { label: 'Timetable', path: '/admin/timetable', icon: CalendarDays },
-    { label: 'Notices', path: '/admin/notices', icon: Bell },
-    { label: 'Duplicate TC Requests', path: '/admin/tc-requests', icon: FileUp },
+    { label: 'TC Management', path: '/admin/tc', icon: Scroll },
+
     { label: 'Reports', path: '/admin/reports', icon: BarChart3 },
     { label: 'Settings', path: '/admin/settings', icon: Settings },
   ],

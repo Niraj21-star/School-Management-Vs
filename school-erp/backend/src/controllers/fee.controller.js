@@ -97,7 +97,7 @@ const getAllFees = async (req, res) => {
 
 const recordPayment = async (req, res) => {
   try {
-    const { studentId, amount, date, mode } = req.body;
+    const { studentId, amount, date, mode, breakdown = {} } = req.body;
 
     if (!studentId || amount === undefined || !mode) {
       const error = new Error('studentId, amount and mode are required');
@@ -147,6 +147,7 @@ const recordPayment = async (req, res) => {
         amount: normalizedAmount,
         date: date || Date.now(),
         mode,
+        breakdown,
       };
 
       const paymentDoc = session

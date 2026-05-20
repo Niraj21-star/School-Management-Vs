@@ -14,7 +14,6 @@ const AdminDashboard = () => {
   const quickActions = [
     { label: 'Add New Student', icon: Users, color: 'text-blue-600 bg-blue-50', path: '/admin/students' },
     { label: 'Record Fee Payment', icon: DollarSign, color: 'text-emerald-600 bg-emerald-50', path: '/admin/fees' },
-    { label: 'Post Notice', icon: GraduationCap, color: 'text-violet-600 bg-violet-50', path: '/admin/notices' },
     { label: 'View Reports', icon: ClipboardCheck, color: 'text-amber-600 bg-amber-50', path: '/admin/reports' },
   ];
 
@@ -57,15 +56,15 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Present Students Today"
-          value={`${stats.presentStudents || 0} / ${stats.totalStudents || 0}`}
+          value={`${stats?.presentStudents || 0} / ${stats?.totalStudents || 0}`}
           icon={Users}
           color="bg-blue-600"
           trend="up"
-          trendValue={`${stats.todayMarkedStudents || 0} attendance entries marked`}
+          trendValue={`${stats?.todayMarkedStudents || 0} attendance entries marked`}
         />
         <StatCard
           title="Present Teachers Today"
-          value={`${stats.presentTeachersToday || 0} / ${stats.totalTeachers || 0}`}
+          value={`${stats?.presentTeachersToday || 0} / ${stats?.totalTeachers || 0}`}
           icon={GraduationCap}
           color="bg-violet-600"
           trend="up"

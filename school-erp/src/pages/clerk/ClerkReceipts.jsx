@@ -33,6 +33,7 @@ const ClerkReceipts = () => {
       const allReceipts = feeRecords.flatMap((fee) =>
         (fee.paymentHistory || []).map((payment) => ({
           id: payment._id,
+          receiptNo: payment.receiptNo || payment._id,
           studentId: fee.studentId,
           student: fee.studentName,
           class: fee.class,
@@ -98,7 +99,7 @@ const ClerkReceipts = () => {
           <tbody className="divide-y divide-slate-100">
             {receipts.map((r) => (
               <tr key={r.id} className="hover:bg-slate-50">
-                <td className="table-cell font-medium text-slate-800">{r.id}</td>
+                <td className="table-cell font-medium text-slate-800">#{r.receiptNo}</td>
                 <td className="table-cell">{r.student}</td>
                 <td className="table-cell">{r.class}</td>
                 <td className="table-cell font-medium text-emerald-600">{formatCurrency(r.amount)}</td>

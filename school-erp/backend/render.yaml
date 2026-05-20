@@ -1,0 +1,22 @@
+# Render Infrastructure Blueprint for School ERP Backend
+services:
+  - type: web
+    name: school-erp-backend
+    env: node
+    plan: starter
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://school-erp-frontend.vercel.app,http://localhost:5173
+      - key: TRUST_PROXY
+        value: true
+      - key: MONGO_URI
+        sync: false # Set database string in Render Dashboard UI for security

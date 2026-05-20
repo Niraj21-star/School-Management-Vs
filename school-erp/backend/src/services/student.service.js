@@ -28,12 +28,15 @@ const buildStudentFilters = (query) => {
   }
 
   if (query.status) {
-    if (!STATUSES.includes(query.status)) {
-      const error = new Error(`status must be one of: ${STATUSES.join(', ')}`);
+    if (query.status === 'all') {
+      // Do not filter by status
+    } else if (!STATUSES.includes(query.status)) {
+      const error = new Error(`status must be one of: ${STATUSES.join(', ')} or all`);
       error.statusCode = 400;
       throw error;
+    } else {
+      filters.status = query.status;
     }
-    filters.status = query.status;
   } else {
     filters.status = 'active';
   }
@@ -88,6 +91,16 @@ const normalizeStudentPayload = (payload, forUpdate = false) => {
   if (payload.contact !== undefined) updates.contact = String(payload.contact).trim();
   if (payload.address !== undefined) updates.address = String(payload.address).trim();
   if (payload.passportPhoto !== undefined) updates.passportPhoto = String(payload.passportPhoto).trim();
+  if (payload.surname !== undefined) updates.surname = String(payload.surname).trim();
+  if (payload.email !== undefined) updates.email = String(payload.email).trim();
+
+  if (payload.previousSchool !== undefined) updates.previousSchool = String(payload.previousSchool).trim();
+  if (payload.caste !== undefined) updates.caste = String(payload.caste).trim();
+  if (payload.subCaste !== undefined) updates.subCaste = String(payload.subCaste).trim();
+  if (payload.placeOfBirth !== undefined) updates.placeOfBirth = String(payload.placeOfBirth).trim();
+  if (payload.nationality !== undefined) updates.nationality = String(payload.nationality).trim();
+  if (payload.fatherEducation !== undefined) updates.fatherEducation = String(payload.fatherEducation).trim();
+  if (payload.motherEducation !== undefined) updates.motherEducation = String(payload.motherEducation).trim();
 
   if (payload.status !== undefined) {
     if (!STATUSES.includes(payload.status)) {

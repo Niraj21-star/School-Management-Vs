@@ -11,12 +11,12 @@ import AdminTeachers from './pages/admin/AdminTeachers';
 import AdminAttendance from './pages/admin/AdminAttendance';
 import AdminFees from './pages/admin/AdminFees';
 import AdminExams from './pages/admin/AdminExams';
-import AdminTimetable from './pages/admin/AdminTimetable';
-import AdminNotices from './pages/admin/AdminNotices';
 import AdminReports from './pages/admin/AdminReports';
 import AdminSettings from './pages/admin/AdminSettings';
-import AdminDuplicateTCRequests from './pages/admin/AdminDuplicateTCRequests';
+import AdminAdmissions from './pages/admin/AdminAdmissions';
+
 import AdminClasses from './pages/admin/AdminClasses';
+import AdminTC from './pages/admin/AdminTC';
 
 /* Clerk Pages */
 import ClerkDashboard from './pages/clerk/ClerkDashboard';
@@ -51,17 +51,17 @@ const App = () => {
           >
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="admissions" element={<AdminAdmissions />} />
             <Route path="students" element={<AdminStudents />} />
             <Route path="classes" element={<AdminClasses />} />
             <Route path="teachers" element={<AdminTeachers />} />
             <Route path="attendance" element={<AdminAttendance />} />
             <Route path="fees" element={<AdminFees />} />
             <Route path="exams" element={<AdminExams />} />
-            <Route path="timetable" element={<AdminTimetable />} />
-            <Route path="notices" element={<AdminNotices />} />
-            <Route path="tc-requests" element={<AdminDuplicateTCRequests />} />
+
             <Route path="reports" element={<AdminReports />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="tc" element={<AdminTC />} />
           </Route>
 
           {/* Clerk Routes */}

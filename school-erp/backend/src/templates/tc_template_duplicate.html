@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaving Certificate (T.C.) – Shree Swami Vivekanand English School</title>
+  <style>
+    /* =============================================
+       PRINT & PAGE SETUP
+       ============================================= */
+    @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap');
+
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm 10mm 12mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 210mm;
+      min-height: 297mm;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 11pt;
+      color: #000;
+      background: #fff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* =============================================
+       OUTER WRAPPER (TRIPLICATE BADGE + BORDER)
+       ============================================= */
+    .page-wrapper {
+      width: 186mm;
+      min-height: 277mm;
+      margin: 0 auto;
+      border: 2px solid #000;
+      padding: 6mm 8mm 8mm 8mm;
+      position: relative;
+    }
+
+    /* =============================================
+       COPY BADGE (ORIGINAL / DUPLICATE)
+       ============================================= */
+    .triplicate-badge,
+    .copy-badge,
+    .original,
+    .duplicate-badge {
+      display: block;
+      width: fit-content;
+      margin: 0 auto 3mm auto;
+      background: #000;
+      color: #fff;
+      font-size: 9pt;
+      font-weight: bold;
+      letter-spacing: 2px;
+      padding: 2px 14px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    /* Duplicate badge shown in red */
+    .duplicate-badge {
+      background: #c0392b;
+    }
+
+    /* =============================================
+       SCHOOL HEADER SECTION
+       ============================================= */
+    .school-header {
+      position: relative;
+      text-align: center;
+      border-bottom: 1.5px solid #000;
+      padding-bottom: 4mm;
+      margin-bottom: 3mm;
+      min-height: 26mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .school-header .trust-name {
+      font-size: 9pt;
+      margin-bottom: 1mm;
+    }
+
+    .school-header .school-name {
+      font-size: 17pt;
+      font-weight: bold;
+      line-height: 1.2;
+      margin-bottom: 1mm;
+    }
+
+    .school-header .school-address {
+      font-size: 9.5pt;
+      margin-bottom: 2mm;
+    }
+
+    .school-header .logo {
+      width: 22mm;
+      height: 22mm;
+      margin: 2mm auto;
+      display: block;
+      border: 1px solid #000;
+      border-radius: 50%;
+      object-fit: contain;
+      /* Fallback decorative circle when no image is provided */
+      background: #fff;
+      position: relative;
+    }
+
+    /* Decorative dots around logo — mimics the original */
+    .logo-wrapper {
+      position: absolute;
+      left: -2mm;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26mm;
+      height: 26mm;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-wrapper::before,
+    .logo-wrapper::after {
+      content: '· · ·';
+      position: absolute;
+      font-size: 8pt;
+      letter-spacing: 2px;
+      color: #000;
+    }
+
+    .logo-wrapper::before {
+      left: -8mm;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .logo-wrapper::after {
+      right: -8mm;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .logo-inner {
+      width: 22mm;
+      height: 22mm;
+      border-radius: 50%;
+      border: 1.5px solid #000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 7pt;
+      color: #555;
+      background: #fff;
+    }
+
+    .logo-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* =============================================
+       CERTIFICATE TITLE
+       ============================================= */
+    .cert-title {
+      text-align: center;
+      margin-bottom: 1mm;
+    }
+
+    .cert-title h2 {
+      font-size: 12pt;
+      font-weight: bold;
+      text-decoration: underline;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .cert-title .rule-ref {
+      font-size: 8.5pt;
+      margin-top: 0.5mm;
+    }
+
+    .cert-title .notice {
+      font-size: 7.5pt;
+      margin-top: 1mm;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    /* =============================================
+       OFFICE USE ROW (Register No / Roll No / Year)
+       ============================================= */
+    .office-use-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border: 1px solid #000;
+      padding: 2mm 3mm;
+      margin: 3mm 0;
+      font-size: 9.5pt;
+    }
+
+    .office-use-row .field-cell {
+      flex: 1;
+      text-align: center;
+      border-right: 1px solid #000;
+      padding: 0 2mm;
+    }
+
+    .office-use-row .field-cell:last-child {
+      border-right: none;
+    }
+
+    .office-use-row .field-label {
+      font-weight: normal;
+      display: block;
+      margin-bottom: 3mm;
+    }
+
+    .office-use-row .field-value {
+      border-bottom: 1px solid #000;
+      min-width: 30mm;
+      display: inline-block;
+      min-height: 4mm;
+      font-size: 10pt;
+    }
+
+    /* =============================================
+       STUDENT DETAILS SECTION
+       ============================================= */
+    .student-details {
+      margin-top: 3mm;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: flex-end;
+      margin-bottom: 4.5mm;
+      font-size: 10pt;
+      line-height: 1.4;
+    }
+
+    .detail-row .sno {
+      min-width: 7mm;
+      font-weight: normal;
+    }
+
+    .detail-row .label {
+      white-space: nowrap;
+      margin-right: 2mm;
+    }
+
+    .detail-row .value-line {
+      flex: 1;
+      border-bottom: 1px solid #000;
+      min-height: 4.5mm;
+      padding-left: 1mm;
+    }
+
+    /* Multi-part rows (e.g., name split into surname / student name / father name) */
+    .name-block {
+      margin-bottom: 1.5mm;
+    }
+
+    .name-block .name-row {
+      display: flex;
+      align-items: flex-end;
+      margin-bottom: 3.5mm;
+      font-size: 10pt;
+    }
+
+    .name-block .name-row .label {
+      white-space: nowrap;
+      margin-right: 2mm;
+    }
+
+    .name-block .name-row .value-line {
+      flex: 1;
+      border-bottom: 1px solid #000;
+      min-height: 4.5mm;
+      padding-left: 1mm;
+    }
+
+    /* Inline pair rows (e.g., Religion + Nationality) */
+    .inline-pair {
+      display: flex;
+      gap: 6mm;
+    }
+
+    .inline-pair .pair-item {
+      display: flex;
+      align-items: flex-end;
+      flex: 1;
+    }
+
+    .inline-pair .pair-item .label {
+      white-space: nowrap;
+      margin-right: 2mm;
+    }
+
+    .inline-pair .pair-item .value-line {
+      flex: 1;
+      border-bottom: 1px solid #000;
+      min-height: 4.5mm;
+      padding-left: 1mm;
+    }
+
+    /* Standard in which studying + Since When */
+    .study-block {
+      margin-bottom: 4.5mm;
+    }
+
+    .study-block .row1,
+    .study-block .row2 {
+      display: flex;
+      align-items: flex-end;
+      font-size: 10pt;
+      margin-bottom: 3.5mm;
+    }
+
+    .study-block .row1 .label,
+    .study-block .row2 .label {
+      white-space: nowrap;
+      margin-right: 2mm;
+    }
+
+    .study-block .row1 .value-line,
+    .study-block .row2 .value-line {
+      flex: 1;
+      border-bottom: 1px solid #000;
+      min-height: 4.5mm;
+      padding-left: 1mm;
+    }
+
+    /* Separator line (after item 7 in words) */
+    .separator-line {
+      border: none;
+      border-top: 1px solid #000;
+      margin: 4mm 0;
+    }
+
+    /* =============================================
+       CERTIFICATION STATEMENT
+       ============================================= */
+    .certification-statement {
+      font-size: 9pt;
+      text-align: left;
+      margin-top: 4mm;
+      font-style: italic;
+      border-top: 1px solid #000;
+      padding-top: 2mm;
+    }
+
+    /* =============================================
+       SIGNATURES SECTION
+       ============================================= */
+    .signatures-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 8mm;
+      padding-top: 2mm;
+    }
+
+    .signatures-section .date-block {
+      font-size: 10pt;
+    }
+
+    .signatures-section .date-block .date-label {
+      font-weight: normal;
+    }
+
+    .signatures-section .date-block .date-value {
+      display: inline-block;
+      min-width: 35mm;
+      border-bottom: 1px solid #000;
+      min-height: 4.5mm;
+      padding-left: 1mm;
+    }
+
+    .signatures-section .principal-block {
+      text-align: center;
+      font-size: 11pt;
+      font-weight: bold;
+    }
+
+    .signatures-section .principal-block .sig-line {
+      border-top: 1px solid #000;
+      width: 45mm;
+      margin: 10mm auto 1mm auto;
+    }
+
+    /* =============================================
+       WATERMARK — RED DUPLICATE
+       ============================================= */
+    .page-wrapper::after {
+      content: 'DUPLICATE COPY';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-35deg);
+      font-size: 44pt;
+      font-weight: bold;
+      color: rgba(192, 57, 43, 0.08);
+      white-space: nowrap;
+      pointer-events: none;
+      letter-spacing: 6px;
+      z-index: 0;
+    }
+
+    /* Keep content above watermark */
+    .page-wrapper>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* =============================================
+       PRINT OVERRIDES
+       ============================================= */
+    @media print {
+
+      html,
+      body {
+        width: 210mm;
+        height: 297mm;
+      }
+
+      .page-wrapper {
+        border: 2pt solid #000;
+        page-break-inside: avoid;
+      }
+
+      a {
+        text-decoration: none;
+        color: #000;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page-wrapper">
+
+    <!-- =============================================
+         TRIPLICATE BADGE
+         ============================================= -->
+    <span class="duplicate-badge">DUPLICATE COPY</span>
+
+    <!-- =============================================
+         SCHOOL HEADER SECTION
+         ============================================= -->
+    <header class="school-header">
+      <p class="trust-name">Shri Swami Vivekanand Pratisthan Gangapur,</p>
+      <h1 class="school-name">Shree Swami Vivekanand English School</h1>
+      <p class="school-address">Siddhnath Wadgaon Tq.Gangapur Dist.Aurangabad</p>
+
+      <!-- School Logo (base64 embedded for reliable rendering) -->
+      <div class="logo-wrapper">
+        <div class="logo-inner">
+          {{#logo_base64}}<img src="{{logo_base64}}" alt="School Seal" />{{/logo_base64}}{{^logo_base64}}<span
+            style="font-size:7pt;color:#888;">SEAL</span>{{/logo_base64}}
+        </div>
+      </div>
+    </header>
+
+    <!-- =============================================
+         CERTIFICATE TITLE
+         ============================================= -->
+    <div class="cert-title">
+      <h2>Leaving Certificate (T.C.)</h2>
+      <p class="rule-ref">(Vide Rule 17)</p>
+      <p class="notice">
+        (No Change in any entry in this Certificate shall be made except by the authority issuing it and any<br />
+        infringement of this requirement is liable to involve the imposition of penalty such as that of rustication)
+      </p>
+    </div>
+
+    <!-- =============================================
+         OFFICE USE SECTION (Register No / Roll No / Year)
+         ============================================= -->
+    <div class="office-use-row">
+      <div class="field-cell">
+        <span class="field-label">Register No.</span>
+        <span class="field-value">{{register_no}}</span>
+      </div>
+      <div class="field-cell">
+        <span class="field-label">Duplicate No.</span>
+        <span class="field-value" style="font-weight:bold; color:#c0392b;">{{duplicate_tc_number}}</span>
+      </div>
+      <div class="field-cell">
+        <span class="field-label">Issue Date</span>
+        <span class="field-value">{{duplicate_issue_date}}</span>
+      </div>
+      <div class="field-cell" style="border-right:none;">
+        <span class="field-label">Original TC No.</span>
+        <span class="field-value">{{tc_number}}</span>
+      </div>
+    </div>
+
+    <!-- =============================================
+         STUDENT DETAILS SECTION
+         ============================================= -->
+    <section class="student-details">
+
+      <!-- 1. Name of Pupil -->
+      <div class="detail-row" style="align-items: flex-start; flex-direction: column; padding-left: 7mm;">
+        <div style="display:flex; align-items:flex-end; margin-bottom:3.5mm; font-size:10pt; width:100%;">
+          <span class="sno">1.</span>
+          <span class="label">Name of the Pupile in full name : Surname</span>
+          <span class="value-line">{{surname}}</span>
+        </div>
+        <div
+          style="display:flex; align-items:flex-end; margin-bottom:3.5mm; font-size:10pt; width:100%; padding-left:20mm;">
+          <span class="label">Student Name</span>
+          <span class="value-line">{{student_name}}</span>
+        </div>
+        <div style="display:flex; align-items:flex-end; font-size:10pt; width:100%; padding-left:20mm;">
+          <span class="label">Father's Name</span>
+          <span class="value-line">{{father_name}}</span>
+        </div>
+      </div>
+
+      <!-- 2. Mother's Name -->
+      <div class="detail-row">
+        <span class="sno">2.</span>
+        <span class="label">Mother's Name</span>
+        <span class="value-line">{{mother_name}}</span>
+      </div>
+
+      <!-- 3. Religion + 4. Nationality -->
+      <div class="detail-row" style="flex-direction:column; align-items:flex-start;">
+        <div class="inline-pair" style="width:100%;">
+          <div class="pair-item">
+            <span style="min-width:7mm;">3.</span>
+            <span class="label">Religion</span>
+            <span class="value-line">{{religion}}</span>
+          </div>
+          <div class="pair-item">
+            <span class="label">4. Nationality</span>
+            <span class="value-line">{{nationality}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Caste + Subcaste -->
+      <div class="detail-row" style="flex-direction:column; align-items:flex-start;">
+        <div class="inline-pair" style="width:100%;">
+          <div class="pair-item">
+            <span style="min-width:7mm;">5.</span>
+            <span class="label">Caste</span>
+            <span class="value-line">{{caste}}</span>
+          </div>
+          <div class="pair-item">
+            <span class="label">Subcaste</span>
+            <span class="value-line">{{subcaste}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Place of Birth -->
+      <div class="detail-row">
+        <span class="sno">6.</span>
+        <span class="label">Place of Birth</span>
+        <span class="value-line">{{place_of_birth}}</span>
+      </div>
+
+      <!-- 7. Date of Birth (figures + words) -->
+      <div class="detail-row">
+        <span class="sno">7.</span>
+        <span class="label">Date of Birth</span>
+        <span class="value-line">{{dob}}</span>
+      </div>
+      <div style="display:flex; align-items:flex-end; margin-bottom:4.5mm; font-size:10pt; padding-left:7mm;">
+        <span class="label">(In words)</span>
+        <span class="value-line"
+          style="flex:1; border-bottom:1px solid #000; min-height:4.5mm; padding-left:1mm; margin-left:2mm;">{{dob_in_words}}</span>
+      </div>
+
+      <hr class="separator-line" />
+
+      <!-- 8. Last School Attended -->
+      <div class="detail-row">
+        <span class="sno">8.</span>
+        <span class="label">Last School Attended</span>
+        <span class="value-line">{{last_school_attended}}</span>
+      </div>
+
+      <!-- 9. Date of Admission -->
+      <div class="detail-row">
+        <span class="sno">9.</span>
+        <span class="label">Date of Admission</span>
+        <span class="value-line">{{date_of_admission}}</span>
+      </div>
+
+      <!-- 10. Standard in which studying + Since When -->
+      <div class="study-block">
+        <div class="row1">
+          <span style="min-width:7mm;">10.</span>
+          <span class="label">Standard in which studying</span>
+          <span class="value-line">{{standard}} &nbsp;&nbsp; Div: {{division}}</span>
+        </div>
+        <div class="row2" style="padding-left:7mm;">
+          <span class="label">&amp; Since When</span>
+          <span class="value-line">{{since_when}}</span>
+        </div>
+      </div>
+
+      <!-- 11. Progress -->
+      <div class="detail-row">
+        <span class="sno">11.</span>
+        <span class="label">Progress</span>
+        <span class="value-line">{{progress}}</span>
+      </div>
+
+      <!-- 12. Conduct -->
+      <div class="detail-row">
+        <span class="sno">12.</span>
+        <span class="label">Conduct</span>
+        <span class="value-line">{{conduct}}</span>
+      </div>
+
+      <!-- 13. Date of Leaving School -->
+      <div class="detail-row">
+        <span class="sno">13.</span>
+        <span class="label">Date of Leaving school</span>
+        <span class="value-line">{{date_of_leaving}}</span>
+      </div>
+
+      <!-- 14. Reason of Leaving School -->
+      <div class="detail-row">
+        <span class="sno">14.</span>
+        <span class="label">Reason of leaving the school</span>
+        <span class="value-line">{{reason_of_leaving}}</span>
+      </div>
+
+      <!-- 15. Remarks -->
+      <div class="detail-row">
+        <span class="sno">15.</span>
+        <span class="label">Remarks</span>
+        <span class="value-line">{{remarks}}</span>
+      </div>
+
+    </section>
+
+    <!-- =============================================
+         CERTIFICATION STATEMENT
+         ============================================= -->
+    <div class="certification-statement">
+      Certified That Above Information is in Accordance with the school Register
+    </div>
+
+    <!-- =============================================
+         SIGNATURES SECTION
+         ============================================= -->
+    <div class="signatures-section">
+
+      <!-- Date block -->
+      <div class="date-block">
+        <span class="date-label">Date : </span>
+        <span class="date-value">{{issue_date}}</span>
+      </div>
+
+      <!-- Principal Signature -->
+      <div class="principal-block">
+        <div class="sig-line"></div>
+        <strong>PRINCIPAL</strong>
+      </div>
+
+    </div>
+
+    <!-- =============================================
+         VERIFICATION FOOTER
+         ============================================= -->
+    <div
+      style="margin-top:4mm; border-top:1px dashed #999; padding-top:2mm; display:flex; justify-content:space-between; align-items:center; font-size:7.5pt; color:#555;">
+      <div>
+        <span style="font-weight:bold;">Verification Code:</span>
+        <span style="font-family:monospace; letter-spacing:1.5px;"> {{verification_code}}</span><br />
+        <span style="font-size:7pt;">Visit school office to verify authenticity of this certificate.</span>
+      </div>
+      <div style="text-align:right; font-size:7pt; color:#888;">
+        Generated: {{issue_date}}<br />
+        TC No: {{tc_number}}
+      </div>
+    </div>
+
+  </div><!-- /.page-wrapper -->
+
+</body>
+
+</html>

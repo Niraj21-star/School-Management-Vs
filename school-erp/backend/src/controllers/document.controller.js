@@ -4,10 +4,16 @@ const Fee = require('../models/Fee');
 const Payment = require('../models/Payment');
 const { DocumentRecord, DOCUMENT_TYPES, DOCUMENT_STATUSES } = require('../models/DocumentRecord');
 const { TCDuplicateRequest } = require('../models/TCDuplicateRequest');
+const TCPrintLog = require('../models/TCPrintLog');
+const TCCounter = require('../models/TCCounter');
+
 const {
-  generateBonafide,
+  generateBonafideHtml,
   generateTC,
+  generateTCHtml,
+  generateDuplicateTCHtml,
   generateFeeReceipt,
+  generateAdmissionFormHtml,
 } = require('../services/documentService');
 
 const isValidObjectId = (value) => mongoose.Types.ObjectId.isValid(value);
@@ -29,11 +35,7 @@ const sendPdfResponse = (res, pdfBuffer, filename) => {
 };
 
 const sendSuccess = (res, statusCode, message, data) => {
-  return res.status(statusCode).json({
-    success: true,
-    message,
-    data,
-  });
+  return res.status(statusCode).json({ success: true, message, data });
 };
 
 const sendError = (res, error) => {
@@ -45,21 +47,32 @@ const sendError = (res, error) => {
   });
 };
 
-const formatDuplicateRequest = (request) => ({
-  id: request?._id,
-  studentId: request?.studentId?._id || request?.studentId,
-  studentName: request?.studentId?.name || '-',
-  studentCode: request?.studentId?.studentId || '-',
-  requestedById: request?.requestedBy?._id || request?.requestedBy,
-  requestedByName: request?.requestedBy?.name || '-',
-  status: request?.status,
-  reason: request?.reason || '',
-  adminComment: request?.adminComment || '',
-  consumed: Boolean(request?.consumed),
-  reviewedByName: request?.reviewedBy?.name || '',
-  reviewedAt: request?.reviewedAt,
-  createdAt: request?.createdAt,
-});
+// Generate a unique TC number: TC-2026-001
+const getNextTcNumber = async () => {
+  const year = new Date().getFullYear();
+  const key = `tc:${year}`;
+  const counter = await TCCounter.findOneAndUpdate(
+    { _id: key },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+  return `TC-${year}-${String(counter.seq).padStart(3, '0')}`;
+};
+
+// Generate a verification code: SVES-{tcNumber}-{XXXX}
+const makeVerificationCode = (tcNumber) => {
+  const rand = Math.random().toString(36).toUpperCase().slice(2, 6);
+  return `SVES-${tcNumber}-${rand}`;
+};
+
+const getClientIp = (req) =>
+  req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+  req.socket?.remoteAddress ||
+  '';
+
+/* ============================================================
+   DOCUMENT RECORDS
+   ============================================================ */
 
 const getDocumentRecords = async (req, res) => {
   try {
@@ -202,6 +215,10 @@ const deleteDocumentRecord = async (req, res) => {
   }
 };
 
+/* ============================================================
+   BONAFIDE
+   ============================================================ */
+
 const getBonafide = async (req, res) => {
   try {
     const { studentId } = req.params;
@@ -211,185 +228,302 @@ const getBonafide = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Student not found', data: null });
     }
 
-    const pdfBuffer = await generateBonafide(student);
+    const html = await generateBonafideHtml(student);
 
-    return sendPdfResponse(res, pdfBuffer, `bonafide-${student.studentId}.pdf`);
+    res.setHeader('Content-Type', 'text/html');
+    return res.status(200).send(html);
   } catch (error) {
-    const statusCode = error.statusCode || 500;
-    return res.status(statusCode).json({
-      success: false,
-      message: error.message || 'Internal Server Error',
-      data: null,
-    });
+    return sendError(res, error);
   }
 };
 
-const getTC = async (req, res) => {
+/* ============================================================
+   TC — STATUS CHECK
+   ============================================================ */
+
+const getTCStatus = async (req, res) => {
   try {
     const { studentId } = req.params;
-    const requesterRole = req.user?.role;
 
     const student = await findStudent(studentId);
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student not found', data: null });
     }
 
-    const tcDownloadCount = student.tcCertificate?.downloadCount || 0;
+    const printCount = student.tcCertificate?.downloadCount || 0;
+    const firstPrintedAt = student.tcCertificate?.firstDownloadedAt || null;
 
-    let approvedDuplicateRequest = null;
-    if (requesterRole !== 'admin' && tcDownloadCount >= 1) {
-      approvedDuplicateRequest = await TCDuplicateRequest.findOne({
-        studentId: student._id,
-        requestedBy: req.user._id,
-        status: 'approved',
-        consumed: false,
-      }).sort({ createdAt: 1 });
+    // Count approved (unconsumed) duplicate requests
+    const pendingDuplicates = await TCDuplicateRequest.countDocuments({
+      studentId: student._id,
+      status: 'approved',
+      consumed: false,
+    });
 
-      if (!approvedDuplicateRequest) {
-        return res.status(403).json({
-          success: false,
-          message: 'Transfer Certificate already issued once. Please submit a duplicate TC request and wait for admin approval.',
-          data: null,
-        });
-      }
+    // Count all duplicate requests
+    const totalDuplicates = await TCDuplicateRequest.countDocuments({
+      studentId: student._id,
+    });
+
+    return sendSuccess(res, 200, 'TC status fetched', {
+      studentId: student._id,
+      studentCode: student.studentId,
+      studentName: student.name,
+      printCount,
+      firstPrintedAt,
+      canPrintOriginal: printCount === 0,
+      pendingDuplicates,
+      totalDuplicates,
+    });
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+/* ============================================================
+   TC — ORIGINAL HTML (for print window — no PDF file)
+   ============================================================ */
+
+const getTCHtml = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const student = await findStudent(studentId);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found', data: null });
+    }
+
+    // Enforce one-time original print
+    if ((student.tcCertificate?.downloadCount || 0) >= 1) {
+      const error = new Error(
+        'Original TC has already been printed. Please use the Duplicate TC workflow.'
+      );
+      error.statusCode = 403;
+      throw error;
+    }
+
+    // Generate unique TC number and verification code
+    const tcNumber = await getNextTcNumber();
+    const verificationCode = makeVerificationCode(tcNumber);
+
+    const html = generateTCHtml(student, { tc_number: tcNumber, verification_code: verificationCode });
+
+    // Update student TC tracking
+    const now = new Date();
+    await Student.findByIdAndUpdate(student._id, {
+      $inc: { 'tcCertificate.downloadCount': 1 },
+      $set: {
+        'tcCertificate.firstDownloadedAt': now,
+        'tcCertificate.lastDownloadedAt': now,
+        'tcCertificate.lastDownloadedBy': req.user._id,
+      },
+    });
+
+    // Record in print log
+    await TCPrintLog.create({
+      studentId: student._id,
+      printedBy: req.user._id,
+      printType: 'original',
+      tcNumber,
+      ipAddress: getClientIp(req),
+      userAgent: req.headers['user-agent'] || '',
+    });
+
+    // Return HTML for client to open in print window
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('X-TC-Number', tcNumber);
+    return res.status(200).send(html);
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+/* ============================================================
+   TC — LEGACY PDF (kept for backward compat if needed)
+   ============================================================ */
+
+const getTC = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const student = await findStudent(studentId);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found', data: null });
     }
 
     const pdfBuffer = await generateTC(student);
     const now = new Date();
 
-    if (requesterRole === 'admin') {
-      const setFields = {
-        'tcCertificate.lastDownloadedAt': now,
-        'tcCertificate.lastDownloadedBy': req.user._id,
-      };
+    const setFields = {
+      'tcCertificate.lastDownloadedAt': now,
+      'tcCertificate.lastDownloadedBy': req.user._id,
+    };
 
-      if (!student.tcCertificate?.firstDownloadedAt) {
-        setFields['tcCertificate.firstDownloadedAt'] = now;
-      }
-
-      await Student.findByIdAndUpdate(student._id, {
-        $inc: { 'tcCertificate.downloadCount': 1 },
-        $set: setFields,
-      });
-    } else {
-      if (tcDownloadCount === 0) {
-        const updatedStudent = await Student.findOneAndUpdate(
-          {
-            _id: student._id,
-            $or: [
-              { 'tcCertificate.downloadCount': { $exists: false } },
-              { 'tcCertificate.downloadCount': 0 },
-            ],
-          },
-          {
-            $inc: { 'tcCertificate.downloadCount': 1 },
-            $set: {
-              'tcCertificate.firstDownloadedAt': now,
-              'tcCertificate.lastDownloadedAt': now,
-              'tcCertificate.lastDownloadedBy': req.user._id,
-            },
-          },
-          { returnDocument: 'after' }
-        );
-
-        if (!updatedStudent) {
-          return res.status(403).json({
-            success: false,
-            message: 'Transfer Certificate already issued once. Please submit a duplicate TC request and wait for admin approval.',
-            data: null,
-          });
-        }
-      } else {
-        const updatedRequest = await TCDuplicateRequest.findOneAndUpdate(
-          {
-            _id: approvedDuplicateRequest._id,
-            consumed: false,
-            status: 'approved',
-          },
-          {
-            $set: {
-              consumed: true,
-              consumedAt: now,
-            },
-          },
-          { returnDocument: 'after' }
-        );
-
-        if (!updatedRequest) {
-          return res.status(403).json({
-            success: false,
-            message: 'Duplicate TC approval is no longer available. Please submit a new request.',
-            data: null,
-          });
-        }
-
-        await Student.findByIdAndUpdate(student._id, {
-          $inc: { 'tcCertificate.downloadCount': 1 },
-          $set: {
-            'tcCertificate.lastDownloadedAt': now,
-            'tcCertificate.lastDownloadedBy': req.user._id,
-          },
-        });
-      }
+    if (!student.tcCertificate?.firstDownloadedAt) {
+      setFields['tcCertificate.firstDownloadedAt'] = now;
     }
+
+    await Student.findByIdAndUpdate(student._id, {
+      $inc: { 'tcCertificate.downloadCount': 1 },
+      $set: setFields,
+    });
 
     return sendPdfResponse(res, pdfBuffer, `transfer-certificate-${student.studentId}.pdf`);
   } catch (error) {
-    const statusCode = error.statusCode || 500;
-    return res.status(statusCode).json({
-      success: false,
-      message: error.message || 'Internal Server Error',
-      data: null,
-    });
+    return sendError(res, error);
   }
 };
 
-const createDuplicateTCRequest = async (req, res) => {
+/* ============================================================
+   TC — DUPLICATE HTML (for print window)
+   ============================================================ */
+
+const getDuplicateTCHtml = async (req, res) => {
   try {
     const { studentId } = req.params;
-    const { reason = '' } = req.body || {};
+    const { requestId } = req.query;
 
     const student = await findStudent(studentId);
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student not found', data: null });
     }
 
-    const tcDownloadCount = student.tcCertificate?.downloadCount || 0;
-    if (tcDownloadCount < 1) {
-      return res.status(400).json({
-        success: false,
-        message: 'Duplicate TC request is available only after initial TC has been issued.',
-        data: null,
-      });
+    if (!requestId || !isValidObjectId(requestId)) {
+      const error = new Error('Valid requestId is required');
+      error.statusCode = 400;
+      throw error;
     }
 
-    const existingPending = await TCDuplicateRequest.findOne({
+    const request = await TCDuplicateRequest.findOne({
+      _id: requestId,
       studentId: student._id,
-      requestedBy: req.user._id,
-      status: 'pending',
+      status: 'approved',
+      consumed: false,
     });
 
-    if (existingPending) {
-      return res.status(409).json({
-        success: false,
-        message: 'A duplicate TC request is already pending for this student.',
-        data: null,
-      });
+    if (!request) {
+      const error = new Error('No approved duplicate TC request found for this student.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // Generate duplicate TC number if not yet assigned
+    if (!request.duplicateTcNumber) {
+      const originalPrintCount = student.tcCertificate?.downloadCount || 1;
+      request.duplicateTcNumber = `DUP-${student.studentId}-${String(request.duplicateCount + 1).padStart(2, '0')}`;
+      request.duplicateCount += 1;
+    }
+
+    const html = generateDuplicateTCHtml(student, request, {
+      tc_number: student.tcCertificate?.tcNumber || '',
+      verification_code: makeVerificationCode(request.duplicateTcNumber),
+    });
+
+    // Mark request as consumed
+    request.consumed = true;
+    request.consumedAt = new Date();
+    await request.save();
+
+    // Log print
+    await TCPrintLog.create({
+      studentId: student._id,
+      printedBy: req.user._id,
+      printType: 'duplicate',
+      tcNumber: request.duplicateTcNumber,
+      duplicateRequestId: request._id,
+      ipAddress: getClientIp(req),
+      userAgent: req.headers['user-agent'] || '',
+    });
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return res.status(200).send(html);
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+/* ============================================================
+   TC — DUPLICATE REQUESTS
+   ============================================================ */
+
+const createDuplicateTCRequest = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { reason, documentData, documentName, documentMimeType, documentSize } = req.body;
+
+    const student = await findStudent(studentId);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found', data: null });
+    }
+
+    // Must have had original printed first
+    if ((student.tcCertificate?.downloadCount || 0) === 0) {
+      const error = new Error('Original TC has not been printed yet. Print the original TC first.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!reason || !String(reason).trim()) {
+      const error = new Error('Reason for duplicate TC is required.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!documentData) {
+      const error = new Error('A supporting document is required for duplicate TC requests.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const ALLOWED_MIME = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (documentMimeType && !ALLOWED_MIME.includes(documentMimeType)) {
+      const error = new Error('Only PDF, JPG, and PNG files are allowed.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    if (documentSize && Number(documentSize) > MAX_SIZE) {
+      const error = new Error('File size must not exceed 5MB.');
+      error.statusCode = 400;
+      throw error;
     }
 
     const request = await TCDuplicateRequest.create({
       studentId: student._id,
       requestedBy: req.user._id,
-      reason: String(reason || '').trim(),
-      status: 'pending',
+      reason: String(reason).trim(),
+      status: 'approved', // Admin-initiated requests auto-approved
+      reviewedBy: req.user._id,
+      reviewedAt: new Date(),
+      documentData: documentData || '',
+      documentName: documentName || '',
+      documentMimeType: documentMimeType || '',
+      documentSize: Number(documentSize || 0),
+      ipAddress: getClientIp(req),
+      userAgent: req.headers['user-agent'] || '',
     });
 
     const populated = await TCDuplicateRequest.findById(request._id)
       .populate('studentId', 'name studentId')
-      .populate('requestedBy', 'name role')
+      .populate('requestedBy', 'name email')
       .lean();
 
-    return sendSuccess(res, 201, 'Duplicate TC request submitted for admin approval.', formatDuplicateRequest(populated));
+    return sendSuccess(res, 201, 'Duplicate TC request created and approved', {
+      id: populated._id,
+      studentId: populated.studentId?._id,
+      studentName: populated.studentId?.name || '-',
+      studentCode: populated.studentId?.studentId || '-',
+      requestedById: populated.requestedBy?._id,
+      requestedByName: populated.requestedBy?.name || '-',
+      status: populated.status,
+      reason: populated.reason,
+      adminComment: populated.adminComment,
+      consumed: populated.consumed,
+      createdAt: populated.createdAt,
+    });
   } catch (error) {
     return sendError(res, error);
   }
@@ -397,25 +531,39 @@ const createDuplicateTCRequest = async (req, res) => {
 
 const getDuplicateTCRequests = async (req, res) => {
   try {
-    const { status } = req.query;
-    const filters = {};
+    const { studentId, status } = req.query;
 
-    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
-      filters.status = status;
-    }
+    const filter = {};
+    if (studentId && isValidObjectId(studentId)) filter.studentId = studentId;
+    if (status) filter.status = status;
 
-    if (req.user.role !== 'admin') {
-      filters.requestedBy = req.user._id;
-    }
-
-    const requests = await TCDuplicateRequest.find(filters)
+    const requests = await TCDuplicateRequest.find(filter)
       .populate('studentId', 'name studentId')
-      .populate('requestedBy', 'name role')
-      .populate('reviewedBy', 'name role')
+      .populate('requestedBy', 'name email')
+      .populate('reviewedBy', 'name')
       .sort({ createdAt: -1 })
       .lean();
 
-    return sendSuccess(res, 200, 'Duplicate TC requests fetched.', requests.map(formatDuplicateRequest));
+    const formatted = requests.map((r) => ({
+      id: r._id,
+      studentId: r.studentId?._id,
+      studentName: r.studentId?.name || '-',
+      studentCode: r.studentId?.studentId || '-',
+      requestedById: r.requestedBy?._id,
+      requestedByName: r.requestedBy?.name || '-',
+      reviewedByName: r.reviewedBy?.name || '',
+      status: r.status,
+      reason: r.reason,
+      adminComment: r.adminComment,
+      consumed: r.consumed,
+      reviewedAt: r.reviewedAt,
+      createdAt: r.createdAt,
+      hasDocument: Boolean(r.documentData),
+      documentName: r.documentName,
+      duplicateTcNumber: r.duplicateTcNumber,
+    }));
+
+    return sendSuccess(res, 200, 'Duplicate TC requests fetched', formatted);
   } catch (error) {
     return sendError(res, error);
   }
@@ -423,56 +571,103 @@ const getDuplicateTCRequests = async (req, res) => {
 
 const reviewDuplicateTCRequest = async (req, res) => {
   try {
-    const { requestId } = req.params;
-    const { action, adminComment = '' } = req.body || {};
+    const { id } = req.params;
+    const { action, adminComment = '' } = req.body;
 
-    if (!isValidObjectId(requestId)) {
-      const error = new Error('Invalid duplicate request id');
+    if (!['approved', 'rejected'].includes(action)) {
+      const error = new Error('action must be "approved" or "rejected"');
       error.statusCode = 400;
       throw error;
     }
 
-    if (!['approve', 'reject'].includes(action)) {
-      const error = new Error('action must be either approve or reject');
+    if (!isValidObjectId(id)) {
+      const error = new Error('Invalid request ID');
       error.statusCode = 400;
       throw error;
     }
 
-    const request = await TCDuplicateRequest.findById(requestId);
+    const request = await TCDuplicateRequest.findById(id);
     if (!request) {
-      const error = new Error('Duplicate TC request not found');
+      const error = new Error('Request not found');
       error.statusCode = 404;
       throw error;
     }
 
     if (request.status !== 'pending') {
-      const error = new Error('This request has already been reviewed');
-      error.statusCode = 409;
+      const error = new Error(`Request is already ${request.status}`);
+      error.statusCode = 400;
       throw error;
     }
 
-    request.status = action === 'approve' ? 'approved' : 'rejected';
-    request.adminComment = String(adminComment || '').trim();
+    request.status = action;
+    request.adminComment = String(adminComment).trim();
     request.reviewedBy = req.user._id;
     request.reviewedAt = new Date();
     await request.save();
 
     const populated = await TCDuplicateRequest.findById(request._id)
       .populate('studentId', 'name studentId')
-      .populate('requestedBy', 'name role')
-      .populate('reviewedBy', 'name role')
+      .populate('requestedBy', 'name')
+      .populate('reviewedBy', 'name')
       .lean();
 
-    return sendSuccess(
-      res,
-      200,
-      `Duplicate TC request ${action === 'approve' ? 'approved' : 'rejected'} successfully.`,
-      formatDuplicateRequest(populated)
-    );
+    return sendSuccess(res, 200, `Request ${action}`, {
+      id: populated._id,
+      studentId: populated.studentId?._id,
+      studentName: populated.studentId?.name || '-',
+      studentCode: populated.studentId?.studentId || '-',
+      requestedByName: populated.requestedBy?.name || '-',
+      reviewedByName: populated.reviewedBy?.name || '',
+      status: populated.status,
+      reason: populated.reason,
+      adminComment: populated.adminComment,
+      consumed: populated.consumed,
+      reviewedAt: populated.reviewedAt,
+      createdAt: populated.createdAt,
+    });
   } catch (error) {
     return sendError(res, error);
   }
 };
+
+/* ============================================================
+   TC — PRINT LOGS
+   ============================================================ */
+
+const getTCPrintLogs = async (req, res) => {
+  try {
+    const { studentId } = req.query;
+
+    const filter = {};
+    if (studentId && isValidObjectId(studentId)) filter.studentId = studentId;
+
+    const logs = await TCPrintLog.find(filter)
+      .populate('studentId', 'name studentId')
+      .populate('printedBy', 'name email')
+      .sort({ printedAt: -1 })
+      .lean();
+
+    const formatted = logs.map((log) => ({
+      id: log._id,
+      studentId: log.studentId?._id,
+      studentName: log.studentId?.name || '-',
+      studentCode: log.studentId?.studentId || '-',
+      printedByName: log.printedBy?.name || '-',
+      printType: log.printType,
+      tcNumber: log.tcNumber,
+      ipAddress: log.ipAddress,
+      printedAt: log.printedAt,
+    }));
+
+    return sendSuccess(res, 200, 'Print logs fetched', formatted);
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+/* ============================================================
+   FEE RECEIPT
+   ============================================================ */
 
 const getFeeReceipt = async (req, res) => {
   try {
@@ -505,12 +700,22 @@ const getFeeReceipt = async (req, res) => {
 
     return sendPdfResponse(res, pdfBuffer, `fee-receipt-${student.studentId}.pdf`);
   } catch (error) {
-    const statusCode = error.statusCode || 500;
-    return res.status(statusCode).json({
-      success: false,
-      message: error.message || 'Internal Server Error',
-      data: null,
-    });
+    return sendError(res, error);
+  }
+};
+
+const getAdmissionFormHtml = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const student = await findStudent(studentId);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found', data: null });
+    }
+
+    const html = generateAdmissionFormHtml(student);
+    return res.status(200).send(html);
+  } catch (error) {
+    return sendError(res, error);
   }
 };
 
@@ -520,8 +725,13 @@ module.exports = {
   deleteDocumentRecord,
   getBonafide,
   getTC,
-  getFeeReceipt,
+  getTCStatus,
+  getTCHtml,
+  getDuplicateTCHtml,
   createDuplicateTCRequest,
   getDuplicateTCRequests,
   reviewDuplicateTCRequest,
+  getTCPrintLogs,
+  getFeeReceipt,
+  getAdmissionFormHtml,
 };

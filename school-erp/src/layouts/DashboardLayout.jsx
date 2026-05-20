@@ -13,7 +13,6 @@ const PAGE_TITLES = {
   exams: 'Exams & Results',
   timetable: 'Timetable',
   notices: 'Notices',
-  'tc-requests': 'Duplicate TC Requests',
   reports: 'Reports',
   settings: 'Settings',
   admissions: 'Student Admissions',
