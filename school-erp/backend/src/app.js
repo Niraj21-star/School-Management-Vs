@@ -84,10 +84,17 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://erp-z46f.vercel.app"
-  ],
+  origin: function(origin, callback) {
+    if (
+      !origin ||
+      origin.includes("vercel.app") ||
+      origin === "http://localhost:5173"
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: `${bodyLimitMb}mb` }));
