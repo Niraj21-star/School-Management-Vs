@@ -8,6 +8,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminStudents from './pages/admin/AdminStudents';
 import AdminTeachers from './pages/admin/AdminTeachers';
+import AdminClerks from './pages/admin/AdminClerks';
 import AdminAttendance from './pages/admin/AdminAttendance';
 import AdminFees from './pages/admin/AdminFees';
 import AdminExams from './pages/admin/AdminExams';
@@ -55,6 +56,7 @@ const App = () => {
             <Route path="students" element={<AdminStudents />} />
             <Route path="classes" element={<AdminClasses />} />
             <Route path="teachers" element={<AdminTeachers />} />
+            <Route path="clerks" element={<AdminClerks />} />
             <Route path="attendance" element={<AdminAttendance />} />
             <Route path="fees" element={<AdminFees />} />
             <Route path="exams" element={<AdminExams />} />

@@ -8,6 +8,7 @@ const PAGE_TITLES = {
   students: 'Students',
   classes: 'Classes & Sections',
   teachers: 'Teachers',
+  clerks: 'Clerks',
   attendance: 'Attendance',
   fees: 'Fee Management',
   exams: 'Exams & Results',

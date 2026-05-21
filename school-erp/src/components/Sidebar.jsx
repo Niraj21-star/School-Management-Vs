@@ -16,6 +16,7 @@ const MENU_CONFIG = {
     { label: 'Students', path: '/admin/students', icon: Users },
     { label: 'Classes & Sections', path: '/admin/classes', icon: CalendarDays },
     { label: 'Teachers', path: '/admin/teachers', icon: GraduationCap },
+    { label: 'Clerks', path: '/admin/clerks', icon: Users },
     { label: 'Attendance', path: '/admin/attendance', icon: ClipboardCheck },
     { label: 'Fee Management', path: '/admin/fees', icon: DollarSign },
     { label: 'Exams & Results', path: '/admin/exams', icon: FileText },

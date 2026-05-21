@@ -270,6 +270,23 @@ export const deleteStaffById = async (id) => {
   }
 };
 
+export const getClerks = async () => {
+  try {
+    const staffList = await getAllStaff({ role: 'clerk' });
+    return staffList.map((clerk) => ({
+      id: clerk.id || clerk._id,
+      name: clerk.name,
+      phone: clerk.contact || '-',
+      email: clerk.email,
+      status: clerk.status === 'active' ? 'Active' : 'Inactive',
+      joinDate: toDateString(clerk.createdAt),
+      role: toUpperRole(clerk.role),
+    }));
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to fetch clerks.'));
+  }
+};
+
 export const getTeachers = async () => {
   try {
     const [staffList, assignments, subjects] = await Promise.all([
