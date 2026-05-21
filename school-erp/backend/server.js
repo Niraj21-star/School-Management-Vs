@@ -5,6 +5,8 @@ validateEnv();
 const app = require('./src/app');
 const connectDatabase = require('./config/db');
 const { seedDemoUsers } = require('./src/services/seedDemoUsers.service');
+const { bootstrapProductionAdmin } = require('./src/services/bootstrapAdmin.service');
+
 
 const PORT = process.env.PORT || 5000;
 
@@ -19,6 +21,8 @@ const startServer = async () => {
       if (createdCount > 0) {
         console.log(`Seeded ${createdCount} demo user${createdCount === 1 ? '' : 's'}`);
       }
+    } else {
+      await bootstrapProductionAdmin();
     }
 
     app.listen(PORT, '0.0.0.0', () => {
