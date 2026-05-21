@@ -84,13 +84,12 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://school-erp-ruby-nine.vercel.app"
-  ],
-  credentials: true
+	origin: [
+		"http://localhost:5173",
+		"https://school-erp-ruby-nine.vercel.app"
+	],
+	credentials: true
 }));
-app.options("*", cors());
 app.use(express.json({ limit: `${bodyLimitMb}mb` }));
 app.use(express.urlencoded({ extended: true, limit: `${bodyLimitMb}mb` }));
 
