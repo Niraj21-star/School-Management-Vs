@@ -31,9 +31,15 @@ const DashboardLayout = () => {
   const pageTitle = PAGE_TITLES[segment] || 'Dashboard';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
+      {/* Global Dashboard Watermark */}
+      <div 
+        className="fixed inset-0 pointer-events-none opacity-[0.02] bg-center bg-no-repeat bg-[length:500px] mix-blend-multiply"
+        style={{ backgroundImage: 'url(/logo.png)', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+      />
+      
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      <div className={`transition-all duration-300 ${collapsed ? 'ml-20' : 'ml-64'}`}>
+      <div className={`transition-all duration-300 ${collapsed ? 'ml-20' : 'ml-64'} relative z-10`}>
         <Navbar title={pageTitle} />
         <main className="p-6">
           <Outlet />

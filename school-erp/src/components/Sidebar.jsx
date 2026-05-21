@@ -54,9 +54,9 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   return (
     <aside className={`fixed top-0 left-0 h-screen bg-slate-900 text-white z-30 flex flex-col transition-all duration-300 ${collapsed ? 'w-20' : 'w-64'}`}>
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-700/50">
-        <div className="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
-          <GraduationCap className="w-5 h-5" />
+      <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-700/50 relative z-10">
+        <div className="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden p-1 shadow-inner">
+          <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
@@ -109,10 +109,15 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       {/* Collapse Toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 w-6 h-6 bg-slate-800 border border-slate-600 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors"
+        className="absolute -right-3 top-20 w-6 h-6 bg-slate-800 border border-slate-600 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors z-20 shadow-lg"
       >
         {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
       </button>
+
+      {/* Sidebar Watermark */}
+      <div className="absolute bottom-0 left-0 w-full opacity-5 pointer-events-none overflow-hidden -z-10 flex justify-center pb-8">
+         <img src="/logo.png" alt="" className="w-48 h-48 object-contain scale-150" />
+      </div>
     </aside>
   );
 };

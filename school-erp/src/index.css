@@ -13,16 +13,16 @@
     @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200;
   }
   .sidebar-link-active {
-    @apply bg-slate-800 text-white shadow-sm;
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border border-white/5;
   }
   .sidebar-link-inactive {
     @apply text-slate-300 hover:bg-slate-700/50 hover:text-white;
   }
   .card {
-    @apply bg-white rounded-xl border border-slate-200 shadow-sm;
+    @apply bg-white rounded-xl border border-slate-200/60 shadow-md shadow-slate-200/40 hover:shadow-lg transition-shadow duration-300;
   }
   .btn-primary {
-    @apply bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors duration-200 inline-flex items-center gap-2;
+    @apply bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition-all duration-300 inline-flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95;
   }
   .btn-secondary {
     @apply bg-white text-slate-700 px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 hover:bg-slate-50 transition-colors duration-200 inline-flex items-center gap-2;
