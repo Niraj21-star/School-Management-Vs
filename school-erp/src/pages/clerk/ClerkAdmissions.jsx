@@ -8,7 +8,7 @@ import { createStudent, getClasses, getAdmissionFormHtml } from '../../services/
 
 const ClerkAdmissions = () => {
   const [form, setForm] = useState({
-    name: '', fatherName: '', motherName: '', dob: '', gender: '',
+    grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '',
     class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '',
     caste: '', subCaste: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '',
     surname: '', isTcIssued: false,
@@ -26,12 +26,15 @@ const ClerkAdmissions = () => {
 
     try {
       const classes = await getClasses();
-      const options = classes.flatMap((item) =>
-        (item.sections || []).map((section) => {
+      const options = classes.flatMap((item) => {
+        if (!item.sections || item.sections.length === 0) {
+          return [{ value: item.name, label: item.name }];
+        }
+        return item.sections.map((section) => {
           const value = `${item.name}-${section}`;
           return { value, label: value };
-        })
-      );
+        });
+      });
 
       setClassOptions(options);
     } catch (err) {
@@ -108,7 +111,7 @@ const ClerkAdmissions = () => {
 
       setLastStudent(createdStudent);
       setSubmitted(true);
-      setForm({ name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '', caste: '', subCaste: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '', surname: '', isTcIssued: false });
+      setForm({ grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '', caste: '', subCaste: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '', surname: '', isTcIssued: false });
     } catch (err) {
       setError(err.message || 'Unable to submit admission.');
     } finally {
@@ -158,6 +161,7 @@ const ClerkAdmissions = () => {
       <form onSubmit={handleSubmit} className="card p-6">
         <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2"><UserPlus className="w-5 h-5" /> New Admission Form</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <FormInput label="General Register No. (GR No.)" value={form.grNo} onChange={(e) => setForm({ ...form, grNo: e.target.value })} required />
           <FormInput label="Student Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <FormInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
 

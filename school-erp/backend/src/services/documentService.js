@@ -222,6 +222,7 @@ const generateBonafideHtml = async (student) => {
     '{{dob_mm}}': escapeHtml(dobMm),
     '{{dob_yyyy}}': escapeHtml(dobYyyy),
     '{{issue_date}}': escapeHtml(issueDate),
+    '{{gr_no}}': escapeHtml(student.generalRegisterNumber || student.studentId || ''),
   };
 
   for (const [key, value] of Object.entries(replacements)) {
@@ -269,7 +270,7 @@ const buildTcPlaceholders = (student, extras = {}) => {
   const currentYear = now.getFullYear();
 
   return {
-    register_no: student.studentId || '',
+    register_no: student.generalRegisterNumber || student.studentId || '',
     roll_no: student.academic?.rollNumber || '',
     year: String(currentYear),
     surname: student.name ? student.name.split(' ').pop() : '',
@@ -473,7 +474,7 @@ const generateFeeReceipt = async (student, payment, fee) => {
     student_name: student.name || '',
     class: student.academic?.class || '',
     division: student.academic?.section || '',
-    gr_no: student.studentId || '',
+    gr_no: student.generalRegisterNumber || student.studentId || '',
     roll_no: student.academic?.rollNumber || '',
     father_name: student.parent?.fatherName || '',
 
@@ -544,7 +545,7 @@ const generateAdmissionFormHtml = (student) => {
     father_education: student.fatherEducation || '',
     mother_education: student.motherEducation || '',
     division: student.academic?.section || '',
-    office_reg_no: student.studentId || '',
+    office_reg_no: student.generalRegisterNumber || student.studentId || '',
     admission_class: student.academic?.class || '',
     term_from: String(admissionYear).slice(-2),
     term_to: String(admissionYear + 1).slice(-2),
@@ -560,7 +561,7 @@ const generateAdmissionFormHtml = (student) => {
   }
 
   // 2. Form & Registration number boxes (8-digit padding)
-  const rawId = (student.studentId || '').replace(/[^0-9]/g, '');
+  const rawId = (student.generalRegisterNumber || student.studentId || '').replace(/[^0-9]/g, '');
   const idNumber = rawId.padStart(8, '0').slice(-8);
   for (let i = 0; i < 8; i++) {
     placeholders[`form_no_${i + 1}`] = idNumber[i] || '0';

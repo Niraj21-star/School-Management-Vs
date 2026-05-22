@@ -21,12 +21,18 @@ const TeacherAttendance = () => {
 
     try {
       const classes = await getClasses();
-      const options = classes.flatMap((item) =>
-        (item.sections || []).map((section) => ({
+      const options = classes.flatMap((item) => {
+        if (!item.sections || item.sections.length === 0) {
+          return [{
+            value: `${item.id}::`,
+            label: item.name,
+          }];
+        }
+        return item.sections.map((section) => ({
           value: `${item.id}::${section}`,
           label: `${item.name}-${section}`,
-        }))
-      );
+        }));
+      });
 
       setClassOptions(options);
       setSelectedClass((prev) => prev || options[0]?.value || '');

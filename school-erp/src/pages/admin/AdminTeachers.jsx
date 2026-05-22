@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { createStaff, getTeachers, updateStaffById, deleteStaffById } from '../../services/api';
+import { createStaff, getClasses, getTeachers, updateStaffById, deleteStaffById } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
@@ -10,22 +10,40 @@ import Button from '../../components/Button';
 import { Plus, Download, Pencil, Trash2 } from 'lucide-react';
 import { exportRowsToPdf } from '../../utils/pdfExport';
 
-const CLASS_OPTIONS = Array.from({ length: 10 }, (_, index) => {
-  const classNumber = index + 1;
-  return {
-    value: `Class ${classNumber}`,
-    label: `Class ${classNumber}`,
-  };
-});
-
 const AdminTeachers = () => {
   const [teachers, setTeachers] = useState([]);
+  const [classOptions, setClassOptions] = useState([]);
+  const [loadingClasses, setLoadingClasses] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editTeacher, setEditTeacher] = useState(null);
   const [form, setForm] = useState({ name: '', subject: '', assignedClass: '', phone: '', email: '', password: '', status: 'Active' });
+
+  const loadClasses = useCallback(async () => {
+    setLoadingClasses(true);
+    setError('');
+
+    try {
+      const classes = await getClasses();
+      const options = classes.flatMap((item) => {
+        if (!item.sections || item.sections.length === 0) {
+          return [{ value: item.name, label: item.name }];
+        }
+        return item.sections.map((section) => {
+          const value = `${item.name}-${section}`;
+          return { value, label: value };
+        });
+      });
+
+      setClassOptions(options);
+    } catch (err) {
+      setError(err.message || 'Unable to load classes.');
+    } finally {
+      setLoadingClasses(false);
+    }
+  }, []);
 
   const loadTeachers = useCallback(async () => {
     setLoading(true);
@@ -40,6 +58,10 @@ const AdminTeachers = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    loadClasses();
+  }, [loadClasses]);
 
   useEffect(() => {
     loadTeachers();
@@ -180,7 +202,7 @@ const AdminTeachers = () => {
     });
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800" /></div>;
+  if (loading || loadingClasses) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800" /></div>;
 
   return (
     <div>
@@ -204,7 +226,7 @@ const AdminTeachers = () => {
             value={form.assignedClass}
             onChange={(e) => setForm({ ...form, assignedClass: e.target.value })}
             placeholder="Select class"
-            options={CLASS_OPTIONS}
+            options={classOptions}
           />
           <FormInput label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
           {!editTeacher && (

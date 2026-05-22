@@ -12,6 +12,13 @@ const studentSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    generalRegisterNumber: {
+      type: String,
+      required: [true, 'General Register Number is required'],
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
     name: {
       type: String,
       required: true,

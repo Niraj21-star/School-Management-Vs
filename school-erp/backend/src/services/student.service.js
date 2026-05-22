@@ -62,7 +62,7 @@ const buildStudentListOptions = (query) => {
 };
 
 const normalizeStudentPayload = (payload, forUpdate = false) => {
-  const requiredTopLevel = ['name', 'dob', 'gender', 'contact', 'address', 'parent', 'academic'];
+  const requiredTopLevel = ['generalRegisterNumber', 'name', 'dob', 'gender', 'contact', 'address', 'parent', 'academic'];
 
   if (!forUpdate) {
     const missingFields = requiredTopLevel.filter((field) => payload[field] === undefined);
@@ -74,6 +74,8 @@ const normalizeStudentPayload = (payload, forUpdate = false) => {
   }
 
   const updates = {};
+
+  if (payload.generalRegisterNumber !== undefined) updates.generalRegisterNumber = String(payload.generalRegisterNumber).trim();
 
   if (payload.name !== undefined) updates.name = String(payload.name).trim();
   if (payload.dob !== undefined) updates.dob = payload.dob;

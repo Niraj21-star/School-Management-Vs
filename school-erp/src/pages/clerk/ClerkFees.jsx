@@ -39,12 +39,15 @@ const ClerkFees = () => {
 
     try {
       const classes = await getClasses();
-      const options = classes.flatMap((item) =>
-        (item.sections || []).map((section) => {
+      const options = classes.flatMap((item) => {
+        if (!item.sections || item.sections.length === 0) {
+          return [{ value: item.name, label: item.name }];
+        }
+        return item.sections.map((section) => {
           const value = `${item.name}-${section}`;
           return { value, label: value };
-        })
-      );
+        });
+      });
 
       setClassOptions(options);
     } catch (err) {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getFees, recordPayment, getStudents, downloadFeeReceipt } from '../../services/api';
+import { getFees, getClasses, recordPayment, getStudents, downloadFeeReceipt } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
@@ -11,20 +11,11 @@ import { Plus, Download, Printer } from 'lucide-react';
 import { formatCurrency } from '../../utils/helpers';
 import { exportRowsToPdf } from '../../utils/pdfExport';
 
-const DEFAULT_CLASS_OPTIONS = [
-  { value: '10-A', label: '10-A' },
-  { value: '10-B', label: '10-B' },
-  { value: '9-A', label: '9-A' },
-  { value: '9-B', label: '9-B' },
-  { value: '8-A', label: '8-A' },
-  { value: '8-B', label: '8-B' },
-  { value: '7-A', label: '7-A' },
-  { value: '7-B', label: '7-B' },
-];
-
 const AdminFees = () => {
   const [fees, setFees] = useState([]);
+  const [classOptions, setClassOptions] = useState([]);
   const [selectedClass, setSelectedClass] = useState('All Classes');
+  const [loadingClasses, setLoadingClasses] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -36,6 +27,30 @@ const AdminFees = () => {
 
   const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '', status: 'Pending', breakdown: { ...defaultBreakdown } });
   const [classStudents, setClassStudents] = useState([]);
+
+  const loadClasses = useCallback(async () => {
+    setLoadingClasses(true);
+    setError('');
+
+    try {
+      const classes = await getClasses();
+      const options = classes.flatMap((item) => {
+        if (!item.sections || item.sections.length === 0) {
+          return [{ value: item.name, label: item.name }];
+        }
+        return item.sections.map((section) => {
+          const value = `${item.name}-${section}`;
+          return { value, label: value };
+        });
+      });
+
+      setClassOptions(options);
+    } catch (err) {
+      setError(err.message || 'Unable to load classes.');
+    } finally {
+      setLoadingClasses(false);
+    }
+  }, []);
 
   const loadFees = useCallback(async () => {
     setLoading(true);
@@ -50,6 +65,10 @@ const AdminFees = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    loadClasses();
+  }, [loadClasses]);
 
   useEffect(() => {
     loadFees();
@@ -108,14 +127,6 @@ const AdminFees = () => {
       setSelectedClass('All Classes');
     }
   }, [classTabs, selectedClass]);
-
-  const classOptions = useMemo(() => {
-    const derivedOptions = classTabs
-      .filter((tab) => tab.name !== 'All Classes')
-      .map((tab) => ({ value: tab.name, label: tab.name }));
-
-    return derivedOptions.length ? derivedOptions : DEFAULT_CLASS_OPTIONS;
-  }, [classTabs]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -209,9 +220,7 @@ const AdminFees = () => {
     });
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800" /></div>;
-
-
+  if (loading || loadingClasses) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800" /></div>;
 
   return (
     <div>

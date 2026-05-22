@@ -32,15 +32,18 @@ const AdminExams = () => {
 
       setExams(examData);
 
-      const options = classData.flatMap((item) =>
-        (item.sections || []).map((section) => {
+      const options = classData.flatMap((item) => {
+        if (!item.sections || item.sections.length === 0) {
+          return [{ value: item.name, label: item.name }];
+        }
+        return item.sections.map((section) => {
           const classLabel = `${item.name}-${section}`;
           return {
             value: classLabel,
             label: classLabel,
           };
-        })
-      );
+        });
+      });
 
       setClassOptions(options);
       setSelectedResultClass((prev) => prev || options[0]?.value || '');

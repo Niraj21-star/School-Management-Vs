@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   getStudents,
+  getClasses,
   createStudent,
   updateStudentById,
   deleteStudentById,
@@ -20,6 +21,8 @@ import { exportRowsToPdf } from '../../utils/pdfExport';
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
   const [selectedClass, setSelectedClass] = useState('All Classes');
+  const [classOptions, setClassOptions] = useState([]);
+  const [loadingClasses, setLoadingClasses] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -28,6 +31,7 @@ const AdminStudents = () => {
   const [submitted, setSubmitted] = useState(false);
   const [lastStudent, setLastStudent] = useState(null);
   const [form, setForm] = useState({
+    grNo: '',
     name: '',
     surname: '',
     class: '',
@@ -44,6 +48,30 @@ const AdminStudents = () => {
   });
   const navigate = useNavigate();
 
+  const loadClasses = useCallback(async () => {
+    setLoadingClasses(true);
+    setError('');
+
+    try {
+      const classes = await getClasses();
+      const options = classes.flatMap((item) => {
+        if (!item.sections || item.sections.length === 0) {
+          return [{ value: item.name, label: item.name }];
+        }
+        return item.sections.map((section) => {
+          const value = `${item.name}-${section}`;
+          return { value, label: value };
+        });
+      });
+
+      setClassOptions(options);
+    } catch (err) {
+      setError(err.message || 'Unable to load classes.');
+    } finally {
+      setLoadingClasses(false);
+    }
+  }, []);
+
   const loadStudents = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -57,6 +85,10 @@ const AdminStudents = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    loadClasses();
+  }, [loadClasses]);
 
   useEffect(() => {
     loadStudents();
@@ -139,6 +171,7 @@ const AdminStudents = () => {
 
   const resetForm = () => {
     setForm({
+      grNo: '',
       name: '',
       surname: '',
       class: '',
@@ -161,6 +194,7 @@ const AdminStudents = () => {
   const openEdit = (student) => {
     setEditStudent(student);
     setForm({
+      grNo: student.grNo || '',
       name: student.name,
       surname: student.raw?.surname || '',
       class: student.class,
@@ -195,6 +229,7 @@ const AdminStudents = () => {
   };
 
   const columns = [
+    { key: 'grNo', label: 'GR No' },
     { key: 'rollNo', label: 'Roll No' },
     { key: 'name', label: 'Student Name' },
     { key: 'class', label: 'Class' },
@@ -244,6 +279,7 @@ const AdminStudents = () => {
         `Fee Pending: ${selectedClassStats.feePending}`,
       ],
       columns: [
+        { header: 'GR No', key: 'grNo' },
         { header: 'Roll No', key: 'rollNo' },
         { header: 'Student Name', key: 'name' },
         { header: 'Class', key: 'class' },
@@ -256,7 +292,7 @@ const AdminStudents = () => {
     });
   };
 
-  if (loading) {
+  if (loading || loadingClasses) {
     return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800" /></div>;
   }
 
@@ -362,15 +398,11 @@ const AdminStudents = () => {
 
       <Modal isOpen={modalOpen} onClose={resetForm} title={editStudent ? 'Edit Student' : 'Add New Student'} size="lg">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormInput label="General Register No. (GR No.)" value={form.grNo} onChange={(e) => setForm({ ...form, grNo: e.target.value })} required />
           <FormInput label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <FormInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
           <FormInput label="Roll No" value={form.rollNo} onChange={(e) => setForm({ ...form, rollNo: e.target.value })} required />
-          <SelectInput label="Class" value={form.class} onChange={(e) => setForm({ ...form, class: e.target.value })} placeholder="Select class" options={[
-            { value: '10-A', label: '10-A' }, { value: '10-B', label: '10-B' },
-            { value: '9-A', label: '9-A' }, { value: '9-B', label: '9-B' },
-            { value: '8-A', label: '8-A' }, { value: '8-B', label: '8-B' },
-            { value: '7-A', label: '7-A' }, { value: '7-B', label: '7-B' },
-          ]} required />
+          <SelectInput label="Class" value={form.class} onChange={(e) => setForm({ ...form, class: e.target.value })} placeholder="Select class" options={classOptions} required />
           <SelectInput label="Gender" value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })} placeholder="Select gender" options={[
             { value: 'Male', label: 'Male' }, { value: 'Female', label: 'Female' },
           ]} required />

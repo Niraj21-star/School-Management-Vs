@@ -38,6 +38,7 @@ const mapStudent = (student) => {
   return {
     id: student?._id,
     studentId: student?.studentId,
+    grNo: student?.generalRegisterNumber || student?.studentId,
     rollNo: student?.academic?.rollNumber || '-',
     name: student?.name || '-',
     surname: student?.surname || '',
@@ -149,6 +150,7 @@ export const createStudent = async (formData) => {
     const defaultDob = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
 
     const payload = {
+      generalRegisterNumber: formData.grNo || formData.generalRegisterNumber,
       name: formData.name,
       surname: formData.surname || '',
       dob: formData.dob || defaultDob.toISOString().split('T')[0],
@@ -192,6 +194,7 @@ export const updateStudentById = async (id, formData) => {
     const section = classParts[1] || 'A';
 
     const payload = {
+      generalRegisterNumber: formData.grNo || formData.generalRegisterNumber,
       name: formData.name,
       surname: formData.surname,
       contact: formData.phone,

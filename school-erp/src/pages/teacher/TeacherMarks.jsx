@@ -48,9 +48,12 @@ const TeacherMarks = () => {
     try {
       const [classes, exams, subjects] = await Promise.all([getClasses(), getExams(), getSubjects()]);
 
-      const classesList = classes.flatMap((item) =>
-        (item.sections || []).map((sec) => `${item.name}-${sec}`)
-      );
+      const classesList = classes.flatMap((item) => {
+        if (!item.sections || item.sections.length === 0) {
+          return [item.name];
+        }
+        return item.sections.map((sec) => `${item.name}-${sec}`);
+      });
 
       setClassOptions(classesList);
       setExamOptions(exams.map((exam) => exam.name));
