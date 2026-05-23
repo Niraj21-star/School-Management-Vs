@@ -11,7 +11,7 @@ const AdminAdmissions = () => {
     grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '',
     class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '',
     caste: '', subCaste: '', religion: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '',
-    surname: '', isTcIssued: false,
+    surname: '', isTcIssued: false, aadhaarNumber: '', penNumber: '',
   });
   const [classOptions, setClassOptions] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
@@ -111,7 +111,7 @@ const AdminAdmissions = () => {
 
       setLastStudent(createdStudent);
       setSubmitted(true);
-      setForm({ grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '', caste: '', subCaste: '', religion: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '', surname: '', isTcIssued: false });
+      setForm({ grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '', caste: '', subCaste: '', religion: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '', surname: '', isTcIssued: false, aadhaarNumber: '', penNumber: '' });
     } catch (err) {
       setError(err.message || 'Unable to submit admission.');
     } finally {
@@ -207,6 +207,10 @@ const AdminAdmissions = () => {
                 className="mt-2 h-20 w-20 rounded-md object-cover border border-slate-200"
               />
             )}
+          </div>
+          <div className="sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
+            <FormInput label="Student Aadhaar Number" value={form.aadhaarNumber} onChange={(e) => setForm({ ...form, aadhaarNumber: e.target.value })} />
+            <FormInput label="Student P.E.N Number" value={form.penNumber} onChange={(e) => setForm({ ...form, penNumber: e.target.value })} />
           </div>
           <div className="sm:col-span-2 lg:col-span-3">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Address</label>
