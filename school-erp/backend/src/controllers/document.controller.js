@@ -708,8 +708,12 @@ const getFeeReceipt = async (req, res) => {
 
     return sendPdfResponse(res, pdfBuffer, `fee-receipt-${student.studentId}.pdf`);
   } catch (error) {
-    console.error('[getFeeReceipt] Receipt generation error:', error.message, error.stack);
-    return sendError(res, error);
+    console.error('[getFeeReceipt] Receipt generation error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 

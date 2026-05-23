@@ -470,7 +470,7 @@ const getLogoBase64 = () => {
   }
 };
 
-const generateFeeReceipt = async (student, payment, fee) => {
+const generateFeeReceipt = async (student = {}, payment = {}, fee = {}) => {
   console.log('[generateFeeReceipt] Starting fee receipt generation...');
   const templatePath = path.join(__dirname, '..', 'templates', 'fee_receipt_template.html');
   let html = readTemplateFile(templatePath);
@@ -478,13 +478,13 @@ const generateFeeReceipt = async (student, payment, fee) => {
 
   const now = new Date();
   const currentYear = now.getFullYear();
-  const paymentAmount = splitRsPs(payment.amount);
+  const paymentAmount = splitRsPs(payment?.amount);
 
   // Inject logo directly (raw, not HTML-escaped) before processing other placeholders
   const logoBase64 = getLogoBase64();
   html = html.replace(/\{\{logo_base64\}\}/g, logoBase64);
 
-  const breakdown = payment.breakdown || {};
+  const breakdown = payment?.breakdown || {};
   const getFeeVal = (key) => breakdown[key] ? splitRsPs(breakdown[key]) : { rs: '-', ps: '-' };
 
   const admission = getFeeVal('admission');
@@ -505,21 +505,21 @@ const generateFeeReceipt = async (student, payment, fee) => {
   // Build all other placeholders (these ARE escaped to prevent injection)
   const placeholders = {
     // Receipt metadata
-    receipt_no: String(payment.receiptNo || payment._id),
+    receipt_no: String(payment?.receiptNo || payment?._id || ''),
     academic_year: `${currentYear - 1}-${currentYear}`,
-    date: formatDate(payment.date || now),
-    payment_mode: String(payment.mode || '').toUpperCase(),
-    transaction_id: String(payment._id || ''),
+    date: formatDate(payment?.date || now),
+    payment_mode: String(payment?.mode || '').toUpperCase(),
+    transaction_id: String(payment?._id || ''),
     lp_no: '',
     cashier_name: '',
 
     // Student info
-    student_name: student.name || '',
-    class: student.academic?.class || '',
-    division: student.academic?.section || '',
-    gr_no: student.generalRegisterNumber || student.studentId || '',
-    roll_no: student.academic?.rollNumber || '',
-    father_name: student.parent?.fatherName || '',
+    student_name: student?.surname ? `${student?.name || ''} ${student?.surname || ''}`.trim() : (student?.name || ''),
+    class: student?.academic?.class || '',
+    division: student?.academic?.section || '',
+    gr_no: student?.generalRegisterNumber || student?.studentId || '',
+    roll_no: student?.academic?.rollNumber || '',
+    father_name: student?.parent?.fatherName || '',
 
     // Individual fee items (from breakdown)
     admission_fee: admission.rs, admission_fee_ps: admission.ps,
@@ -540,7 +540,7 @@ const generateFeeReceipt = async (student, payment, fee) => {
     discount: discount.rs, discount_ps: discount.ps,
     total_amount: paymentAmount.rs,
     total_amount_ps: paymentAmount.ps,
-    amount_in_words: `Rupees ${numberToWords(Math.floor(Number(payment.amount) || 0))} Only`,
+    amount_in_words: `Rupees ${numberToWords(Math.floor(Number(payment?.amount) || 0))} Only`,
   };
 
   for (const [key, value] of Object.entries(placeholders)) {
