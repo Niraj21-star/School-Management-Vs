@@ -45,10 +45,17 @@ const AdminStudents = () => {
     religion: '',
     placeOfBirth: '',
     nationality: 'Indian',
+    fatherEducation: '',
     motherEducation: '',
     isTcIssued: false,
     aadhaarNumber: '',
     penNumber: '',
+    dob: '',
+    fatherName: '',
+    motherName: '',
+    previousSchool: '',
+    admissionDate: '',
+    address: '',
   });
   const navigate = useNavigate();
 
@@ -198,6 +205,12 @@ const AdminStudents = () => {
       isTcIssued: false,
       aadhaarNumber: '',
       penNumber: '',
+      dob: '',
+      fatherName: '',
+      motherName: '',
+      previousSchool: '',
+      admissionDate: '',
+      address: '',
     });
     setEditStudent(null);
     setModalOpen(false);
@@ -223,7 +236,13 @@ const AdminStudents = () => {
       motherEducation: student.raw?.motherEducation || '',
       aadhaarNumber: student.raw?.aadhaarNumber || '',
       penNumber: student.raw?.penNumber || '',
-      isTcIssued: false, // Don't show this field on edit, or reset it
+      isTcIssued: false,
+      dob: student.raw?.dob ? new Date(student.raw.dob).toISOString().split('T')[0] : '',
+      fatherName: student.raw?.parent?.fatherName || '',
+      motherName: student.raw?.parent?.motherName || '',
+      previousSchool: student.raw?.previousSchool || '',
+      admissionDate: student.raw?.academic?.admissionDate ? new Date(student.raw.academic.admissionDate).toISOString().split('T')[0] : '',
+      address: student.raw?.address || '',
     });
     setModalOpen(true);
   };
@@ -433,7 +452,13 @@ const AdminStudents = () => {
           <SelectInput label="Gender" value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })} placeholder="Select gender" options={[
             { value: 'Male', label: 'Male' }, { value: 'Female', label: 'Female' },
           ]} required />
+          <FormInput label="Date of Birth" type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} required />
+          <FormInput label="Date of Admission" type="date" value={form.admissionDate} onChange={(e) => setForm({ ...form, admissionDate: e.target.value })} required />
+          <FormInput label="Father's Name" value={form.fatherName} onChange={(e) => setForm({ ...form, fatherName: e.target.value })} required />
+          <FormInput label="Mother's Name" value={form.motherName} onChange={(e) => setForm({ ...form, motherName: e.target.value })} required />
           <FormInput label="Phone" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <FormInput label="Last School Attended" value={form.previousSchool} onChange={(e) => setForm({ ...form, previousSchool: e.target.value })} />
+          <FormInput label="Residential Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} required />
           <SelectInput label="Status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} options={[
             { value: 'Active', label: 'Active' }, { value: 'Inactive', label: 'Inactive' },
           ]} />

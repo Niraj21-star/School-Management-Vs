@@ -11,6 +11,8 @@ import {
 import PageHeader from '../../components/PageHeader';
 import Modal from '../../components/Modal';
 import Button from '../../components/Button';
+import FormInput from '../../components/FormInput';
+import SelectInput from '../../components/SelectInput';
 import {
   FileText, Printer, AlertTriangle, CheckCircle2, Clock,
   Eye, History, ShieldCheck, Upload, X, Search,
@@ -76,6 +78,80 @@ export default function AdminTC() {
   const [dupSubmitting, setDupSubmitting] = useState(false);
   const [dupError, setDupError] = useState('');
 
+  // Edit TC Form Modal states
+  const [editTcModalOpen, setEditTcModalOpen] = useState(false);
+  const [editTcForm, setEditTcForm] = useState(null);
+  const [printingTc, setPrintingTc] = useState(false);
+
+  const openEditTcModal = (student, isDuplicate = false, requestId = null) => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const surname = student.raw?.surname || '';
+    const studentName = student.name || '';
+    const fullName = surname ? `${surname} ${studentName}`.trim() : studentName;
+
+    setEditTcForm({
+      studentId: student.id,
+      isDuplicate,
+      requestId,
+      register_no: student.grNo || student.studentId || '',
+      aadhaar_no: student.raw?.aadhaarNumber || '',
+      pen_no: student.raw?.penNumber || '',
+      udise_no: '',
+      full_name: fullName,
+      mother_name: student.raw?.parent?.motherName || '',
+      father_name: student.raw?.parent?.fatherName || '',
+      religion: student.raw?.religion || '',
+      nationality: student.raw?.nationality || 'Indian',
+      caste: student.raw?.caste || '',
+      subcaste: student.raw?.subCaste || '',
+      place_of_birth: student.raw?.placeOfBirth || student.raw?.address || '',
+      dob: student.raw?.dob ? new Date(student.raw.dob).toISOString().split('T')[0] : '',
+      last_school_attended: student.raw?.previousSchool || '',
+      date_of_admission: student.raw?.academic?.admissionDate ? new Date(student.raw.academic.admissionDate).toISOString().split('T')[0] : '',
+      standard: student.raw?.academic?.class || '',
+      division: student.raw?.academic?.section || '',
+      since_when: student.raw?.academic?.admissionDate ? new Date(student.raw.academic.admissionDate).toISOString().split('T')[0] : '',
+      progress: 'Good',
+      conduct: 'Good',
+      date_of_leaving: now.toISOString().split('T')[0],
+      reason_of_leaving: 'As per request',
+      remarks: '',
+      tc_number: '',
+    });
+    setEditTcModalOpen(true);
+  };
+
+  const handlePrintTC = async () => {
+    if (!editTcForm) return;
+    setPrintingTc(true);
+    setError('');
+    
+    try {
+      const { studentId, isDuplicate, requestId, ...overrides } = editTcForm;
+      let html = '';
+      
+      if (isDuplicate) {
+        html = await getDuplicateTCHtml(studentId, requestId, overrides);
+      } else {
+        html = await getTCHtml(studentId, overrides);
+      }
+      
+      openPrintWindow(html);
+      setEditTcModalOpen(false);
+      setEditTcForm(null);
+      
+      const studentObj = students.find(s => s.id === studentId);
+      if (studentObj) {
+        await loadTcStatus(studentObj.studentId, studentObj.id);
+      }
+    } catch (e) {
+      setError(e.message || 'Failed to print Transfer Certificate.');
+    } finally {
+      setPrintingTc(false);
+    }
+  };
+
   // Print logs modal
   const [logsModal, setLogsModal] = useState({ open: false, student: null, logs: [], loading: false });
 
@@ -137,19 +213,8 @@ export default function AdminTC() {
   );
 
   /* ─── Print Original TC ─── */
-  const handlePrintOriginal = async (student) => {
-    setError('');
-    setPrinting(student.studentId);
-    try {
-      const html = await getTCHtml(student.id);
-      openPrintWindow(html);
-      // Refresh status
-      await loadTcStatus(student.studentId, student.id);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setPrinting(null);
-    }
+  const handlePrintOriginal = (student) => {
+    openEditTcModal(student, false, null);
   };
 
   /* ─── Open Duplicate Modal ─── */
@@ -184,11 +249,9 @@ export default function AdminTC() {
         documentSize: dupForm.file.size,
       });
 
-      // Print the duplicate TC immediately
-      const html = await getDuplicateTCHtml(student.id, req.id);
-      openPrintWindow(html);
-
+      // Open the Edit TC modal instead of printing directly
       setDupModal({ open: false, student: null });
+      openEditTcModal(student, true, req.id);
       await loadTcStatus(student.studentId, student.id);
     } catch (e) {
       setDupError(e.message);
@@ -512,6 +575,77 @@ export default function AdminTC() {
             ))}
           </div>
         )}
+      </Modal>
+      {/* ── Edit & Print Transfer Certificate Modal ── */}
+      <Modal
+        isOpen={editTcModalOpen}
+        onClose={() => { setEditTcModalOpen(false); setEditTcForm(null); }}
+        title="Edit & Print Transfer Certificate"
+        size="lg"
+      >
+        {editTcForm && (
+          <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+            <p className="text-sm text-slate-500 mb-2">
+              Review and customize any field on the Transfer Certificate before printing. Overrides do not modify the main student database record.
+            </p>
+
+            <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-2">1. Office Reference</h4>
+            <div className="grid grid-cols-3 gap-3">
+              <FormInput label="PRN No." value={editTcForm.register_no} onChange={e => setEditTcForm({ ...editTcForm, register_no: e.target.value })} />
+              <FormInput label="Aadhaar No." value={editTcForm.aadhaar_no} onChange={e => setEditTcForm({ ...editTcForm, aadhaar_no: e.target.value })} />
+              <FormInput label="PEN No." value={editTcForm.pen_no} onChange={e => setEditTcForm({ ...editTcForm, pen_no: e.target.value })} />
+              <FormInput label="UDISE No." value={editTcForm.udise_no} onChange={e => setEditTcForm({ ...editTcForm, udise_no: e.target.value })} className="col-span-3" />
+            </div>
+
+            <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-4">2. Pupil's Personal Details</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput label="Full Name" value={editTcForm.full_name} onChange={e => setEditTcForm({ ...editTcForm, full_name: e.target.value })} className="col-span-2" />
+              <FormInput label="Father's Name" value={editTcForm.father_name} onChange={e => setEditTcForm({ ...editTcForm, father_name: e.target.value })} />
+              <FormInput label="Mother's Name" value={editTcForm.mother_name} onChange={e => setEditTcForm({ ...editTcForm, mother_name: e.target.value })} />
+            </div>
+
+            <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-4">3. Background Details</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput label="Religion" value={editTcForm.religion} onChange={e => setEditTcForm({ ...editTcForm, religion: e.target.value })} />
+              <FormInput label="Nationality" value={editTcForm.nationality} onChange={e => setEditTcForm({ ...editTcForm, nationality: e.target.value })} />
+              <FormInput label="Caste" value={editTcForm.caste} onChange={e => setEditTcForm({ ...editTcForm, caste: e.target.value })} />
+              <FormInput label="Subcaste" value={editTcForm.subcaste} onChange={e => setEditTcForm({ ...editTcForm, subcaste: e.target.value })} />
+            </div>
+
+            <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-4">4. Birth Record</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput label="Place of Birth" value={editTcForm.place_of_birth} onChange={e => setEditTcForm({ ...editTcForm, place_of_birth: e.target.value })} />
+              <FormInput label="Date of Birth" type="date" value={editTcForm.dob} onChange={e => setEditTcForm({ ...editTcForm, dob: e.target.value })} />
+            </div>
+
+            <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-4">5. Academic History</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput label="Last School Attended" value={editTcForm.last_school_attended} onChange={e => setEditTcForm({ ...editTcForm, last_school_attended: e.target.value })} className="col-span-2" />
+              <FormInput label="Date of Admission" type="date" value={editTcForm.date_of_admission} onChange={e => setEditTcForm({ ...editTcForm, date_of_admission: e.target.value })} />
+              <FormInput label="Standard" value={editTcForm.standard} onChange={e => setEditTcForm({ ...editTcForm, standard: e.target.value })} />
+              <FormInput label="Division" value={editTcForm.division} onChange={e => setEditTcForm({ ...editTcForm, division: e.target.value })} />
+              <FormInput label="Since When" type="date" value={editTcForm.since_when} onChange={e => setEditTcForm({ ...editTcForm, since_when: e.target.value })} />
+            </div>
+
+            <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-4">6. Leaving & Conduct Records</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <FormInput label="Progress" value={editTcForm.progress} onChange={e => setEditTcForm({ ...editTcForm, progress: e.target.value })} />
+              <FormInput label="Conduct" value={editTcForm.conduct} onChange={e => setEditTcForm({ ...editTcForm, conduct: e.target.value })} />
+              <FormInput label="Date of Leaving" type="date" value={editTcForm.date_of_leaving} onChange={e => setEditTcForm({ ...editTcForm, date_of_leaving: e.target.value })} />
+              <FormInput label="Reason for Leaving" value={editTcForm.reason_of_leaving} onChange={e => setEditTcForm({ ...editTcForm, reason_of_leaving: e.target.value })} />
+              <FormInput label="Remarks" value={editTcForm.remarks} onChange={e => setEditTcForm({ ...editTcForm, remarks: e.target.value })} className="col-span-2" />
+            </div>
+          </div>
+        )}
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+          <Button variant="secondary" onClick={() => { setEditTcModalOpen(false); setEditTcForm(null); }}>
+            Cancel
+          </Button>
+          <Button onClick={handlePrintTC} disabled={printingTc}>
+            <Printer className="w-4 h-4" />
+            {printingTc ? 'Generating…' : 'Generate & Print'}
+          </Button>
+        </div>
       </Modal>
     </div>
   );

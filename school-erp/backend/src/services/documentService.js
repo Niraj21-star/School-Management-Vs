@@ -307,36 +307,85 @@ const buildTcPlaceholders = (student, extras = {}) => {
   const now = new Date();
   const currentYear = now.getFullYear();
 
-  return {
+  // Determine DOB: default to student.dob, or use custom override if provided
+  const dobVal = extras.dob || student.dob;
+  const dobFormatted = formatDate(dobVal);
+  const dobInWords = dateToWords(dobVal);
+
+  // Format custom dates if they are passed in YYYY-MM-DD format
+  const formatCustomDate = (dateVal) => {
+    if (!dateVal) return '-';
+    // If it's already in a formatted string (like "15 Aug 2015"), don't format it again
+    if (String(dateVal).includes(' ') && String(dateVal).split(' ').length >= 2) {
+      return dateVal;
+    }
+    return formatDate(dateVal);
+  };
+
+  // Build full_name: combine surname + name, or just name
+  const surname = student.surname || '';
+  const studentName = student.name || '';
+  const computedFullName = surname ? `${surname} ${studentName}`.trim() : studentName;
+
+  // Filter extras: only keep non-empty string values to prevent empty overrides wiping defaults
+  const safeExtras = Object.fromEntries(
+    Object.entries(extras).filter(([, v]) => v !== undefined && v !== null && v !== '')
+  );
+
+  const placeholders = {
     register_no: student.generalRegisterNumber || student.studentId || '',
     roll_no: student.academic?.rollNumber || '',
     year: String(currentYear),
-    surname: student.name ? student.name.split(' ').pop() : '',
+    // New identity fields
+    full_name: computedFullName,
+    aadhaar_no: student.aadhaarNumber || '',
+    pen_no: student.penNumber || '',
+    udise_no: process.env.SCHOOL_UDISE_NO || '',
+    // Legacy fields kept for backward compatibility
+    surname: student.surname || (student.name ? student.name.split(' ').pop() : ''),
     student_name: student.name || '',
     father_name: student.parent?.fatherName || '',
     mother_name: student.parent?.motherName || '',
     religion: student.religion || '',
     nationality: student.nationality || 'Indian',
     caste: student.caste || '',
-    subcaste: student.subcaste || '',
+    subcaste: student.subCaste || '',
     place_of_birth: student.placeOfBirth || student.address || '',
-    dob: formatDate(student.dob),
-    dob_in_words: dateToWords(student.dob),
-    last_school_attended: student.lastSchoolAttended || '',
-    date_of_admission: formatDate(student.academic?.admissionDate),
+    dob: dobFormatted,
+    dob_in_words: dobInWords,
+    last_school_attended: student.previousSchool || '',
+    date_of_admission: formatCustomDate(extras.date_of_admission || student.academic?.admissionDate),
     standard: student.academic?.class || '',
     division: student.academic?.section || '',
-    since_when: formatDate(student.academic?.admissionDate),
+    since_when: formatCustomDate(extras.since_when || student.academic?.admissionDate),
     progress: student.progress || 'Good',
     conduct: student.conduct || 'Good',
-    date_of_leaving: formatDate(now),
+    date_of_leaving: formatCustomDate(extras.date_of_leaving || now),
     reason_of_leaving: student.reasonOfLeaving || 'As per request',
     remarks: student.remarks || '',
-    issue_date: formatDate(now),
+    issue_date: formatCustomDate(extras.issue_date || now),
     tc_number: '',
     verification_code: '',
-    ...extras,
+    // Override with safe (non-empty) extras last
+    ...safeExtras,
   };
+
+  // Ensure date overrides are always properly formatted
+  if (safeExtras.dob) {
+    placeholders.dob = formatCustomDate(safeExtras.dob);
+    placeholders.dob_in_words = dateToWords(safeExtras.dob);
+  }
+  if (safeExtras.date_of_admission) {
+    placeholders.date_of_admission = formatCustomDate(safeExtras.date_of_admission);
+  }
+  if (safeExtras.since_when) {
+    placeholders.since_when = formatCustomDate(safeExtras.since_when);
+  }
+  if (safeExtras.date_of_leaving) {
+    placeholders.date_of_leaving = formatCustomDate(safeExtras.date_of_leaving);
+  }
+
+  return placeholders;
 };
 
 const resolveLogoConditional = (html, logoBase64) => {

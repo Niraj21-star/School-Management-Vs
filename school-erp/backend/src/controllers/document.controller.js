@@ -309,7 +309,11 @@ const getTCHtml = async (req, res) => {
     const tcNumber = await getNextTcNumber();
     const verificationCode = makeVerificationCode(tcNumber);
 
-    const html = generateTCHtml(student, { tc_number: tcNumber, verification_code: verificationCode });
+    const html = generateTCHtml(student, { 
+      tc_number: tcNumber, 
+      verification_code: verificationCode,
+      ...req.query
+    });
 
     // Update student TC tracking
     const now = new Date();
@@ -421,6 +425,7 @@ const getDuplicateTCHtml = async (req, res) => {
     const html = generateDuplicateTCHtml(student, request, {
       tc_number: student.tcCertificate?.tcNumber || '',
       verification_code: makeVerificationCode(request.duplicateTcNumber),
+      ...req.query
     });
 
     // Mark request as consumed

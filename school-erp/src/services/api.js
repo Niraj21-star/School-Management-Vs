@@ -160,6 +160,8 @@ export const createStudent = async (formData) => {
       contact: formData.phone || '0000000000',
       address: formData.address || 'Not provided',
       passportPhoto: formData.passportPhoto || '',
+      religion: formData.religion || '',
+      previousSchool: formData.previousSchool || '',
       caste: formData.caste || '',
       subCaste: formData.subCaste || '',
       placeOfBirth: formData.placeOfBirth || '',
@@ -204,20 +206,29 @@ export const updateStudentById = async (id, formData) => {
       contact: formData.phone,
       gender: String(formData.gender || '').toLowerCase(),
       passportPhoto: formData.passportPhoto,
+      dob: formData.dob,
+      address: formData.address,
+      religion: formData.religion,
+      previousSchool: formData.previousSchool,
       caste: formData.caste,
       subCaste: formData.subCaste,
       placeOfBirth: formData.placeOfBirth,
       nationality: formData.nationality,
       fatherEducation: formData.fatherEducation,
       motherEducation: formData.motherEducation,
+      parent: {
+        fatherName: formData.fatherName,
+        motherName: formData.motherName,
+        parentContact: formData.parentContact || formData.phone || '0000000000',
+      },
       academic: {
         class: academicClass,
         section,
         rollNumber: formData.rollNo || formData.rollNumber,
+        admissionDate: formData.admissionDate,
       },
       status: String(formData.status || 'active').toLowerCase(),
     };
-
 
     const response = await apiClient.put(`/api/students/${id}`, payload);
     const data = unwrapResponse(response);
@@ -623,9 +634,10 @@ export const getTCStatus = async (studentId) => {
 };
 
 // Get TC as HTML string for print-window approach (original, one-time)
-export const getTCHtml = async (studentId) => {
+export const getTCHtml = async (studentId, params = {}) => {
   try {
     const response = await apiClient.get(`/api/documents/tc/${studentId}/html`, {
+      params,
       responseType: 'text',
     });
     return response.data; // raw HTML string
@@ -647,10 +659,10 @@ export const getAdmissionFormHtml = async (studentId) => {
 };
 
 // Get duplicate TC as HTML string for print-window
-export const getDuplicateTCHtml = async (studentId, requestId) => {
+export const getDuplicateTCHtml = async (studentId, requestId, params = {}) => {
   try {
     const response = await apiClient.get(`/api/documents/tc/${studentId}/duplicate-html`, {
-      params: { requestId },
+      params: { requestId, ...params },
       responseType: 'text',
     });
     return response.data;

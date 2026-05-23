@@ -86,6 +86,22 @@
       justify-content: center;
     }
 
+    .udise-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 8pt;
+      font-weight: bold;
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    .udise-badge span {
+      display: block;
+      font-weight: normal;
+      font-size: 9.5pt;
+    }
+
     .school-header .trust-name {
       font-size: 9pt;
       margin-bottom: 1mm;
@@ -108,7 +124,7 @@
       height: 22mm;
       margin: 2mm auto;
       display: block;
-      border: 1px solid #000;
+      border: none;
       border-radius: 50%;
       object-fit: contain;
       /* Fallback decorative circle when no image is provided */
@@ -116,7 +132,7 @@
       position: relative;
     }
 
-    /* Decorative dots around logo — mimics the original */
+    /* Decorative dots around logo — removed per user request */
     .logo-wrapper {
       position: absolute;
       left: -2mm;
@@ -132,11 +148,8 @@
 
     .logo-wrapper::before,
     .logo-wrapper::after {
-      content: '· · ·';
-      position: absolute;
-      font-size: 8pt;
-      letter-spacing: 2px;
-      color: #000;
+      content: '';
+      display: none;
     }
 
     .logo-wrapper::before {
@@ -155,7 +168,7 @@
       width: 22mm;
       height: 22mm;
       border-radius: 50%;
-      border: 1.5px solid #000;
+      border: none;
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -465,7 +478,13 @@
     <header class="school-header">
       <p class="trust-name">Shri Swami Vivekanand Pratisthan Gangapur,</p>
       <h1 class="school-name">Shree Swami Vivekanand English School</h1>
-      <p class="school-address">Siddhnath Wadgaon Tq.Gangapur Dist.Aurangabad</p>
+      <p class="school-address">Siddhnath Wadgaon Tq.Gangapur Dist.Chhatrapati Sambhajinagar </p>
+
+      <!-- UDISE Number top-right corner -->
+      <div class="udise-badge">
+        UDISE No.
+        <span>27190214904</span>
+      </div>
 
       <!-- School Logo (base64 embedded for reliable rendering) -->
       <div class="logo-wrapper">
@@ -493,7 +512,7 @@
          ============================================= -->
     <div class="office-use-row">
       <div class="field-cell">
-        <span class="field-label">Register No.</span>
+        <span class="field-label">PRN No.</span>
         <span class="field-value">{{register_no}}</span>
       </div>
       <div class="field-cell">
@@ -501,12 +520,12 @@
         <span class="field-value" style="font-weight:bold; color:#c0392b;">{{duplicate_tc_number}}</span>
       </div>
       <div class="field-cell">
-        <span class="field-label">Issue Date</span>
-        <span class="field-value">{{duplicate_issue_date}}</span>
+        <span class="field-label">Aadhaar No.</span>
+        <span class="field-value">{{aadhaar_no}}</span>
       </div>
       <div class="field-cell" style="border-right:none;">
-        <span class="field-label">Original TC No.</span>
-        <span class="field-value">{{tc_number}}</span>
+        <span class="field-label">PEN No.</span>
+        <span class="field-value">{{pen_no}}</span>
       </div>
     </div>
 
@@ -515,22 +534,11 @@
          ============================================= -->
     <section class="student-details">
 
-      <!-- 1. Name of Pupil -->
-      <div class="detail-row" style="align-items: flex-start; flex-direction: column; padding-left: 7mm;">
-        <div style="display:flex; align-items:flex-end; margin-bottom:3.5mm; font-size:10pt; width:100%;">
-          <span class="sno">1.</span>
-          <span class="label">Name of the Pupile in full name : Surname</span>
-          <span class="value-line">{{surname}}</span>
-        </div>
-        <div
-          style="display:flex; align-items:flex-end; margin-bottom:3.5mm; font-size:10pt; width:100%; padding-left:20mm;">
-          <span class="label">Student Name</span>
-          <span class="value-line">{{student_name}}</span>
-        </div>
-        <div style="display:flex; align-items:flex-end; font-size:10pt; width:100%; padding-left:20mm;">
-          <span class="label">Father's Name</span>
-          <span class="value-line">{{father_name}}</span>
-        </div>
+      <!-- 1. Full Name of Pupil -->
+      <div class="detail-row">
+        <span class="sno">1.</span>
+        <span class="label">Full Name of the Pupil</span>
+        <span class="value-line">{{full_name}}</span>
       </div>
 
       <!-- 2. Mother's Name -->
