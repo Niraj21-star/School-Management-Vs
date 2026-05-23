@@ -105,6 +105,7 @@ const ClerkAdmissions = () => {
     try {
       const createdStudent = await createStudent({
         ...form,
+        generalRegisterNumber: form.grNo,
         parentContact: form.phone,
         admissionDate: new Date().toISOString().split('T')[0],
       });

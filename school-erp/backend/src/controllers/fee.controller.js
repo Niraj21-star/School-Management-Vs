@@ -63,7 +63,7 @@ const createFeeStructure = async (req, res) => {
 const getAllFees = async (req, res) => {
   try {
     const fees = await Fee.find()
-      .populate('studentId', 'studentId name academic status')
+      .populate('studentId', 'studentId name surname academic status')
       .sort({ updatedAt: -1, createdAt: -1 })
       .lean();
 
@@ -212,7 +212,7 @@ const getStudentFees = async (req, res) => {
 
     await ensureStudentExists(studentId);
 
-    const fee = await Fee.findOne({ studentId }).populate('studentId', 'studentId name academic status');
+    const fee = await Fee.findOne({ studentId }).populate('studentId', 'studentId name surname academic status');
     if (!fee) {
       const error = new Error('Fee structure not found');
       error.statusCode = 404;
@@ -235,7 +235,7 @@ const getStudentFees = async (req, res) => {
 const getDefaulters = async (req, res) => {
   try {
     const defaulters = await Fee.find({ status: { $in: ['unpaid', 'partial'] } })
-      .populate('studentId', 'studentId name academic')
+      .populate('studentId', 'studentId name surname academic')
       .sort({ dueAmount: -1, updatedAt: -1 })
       .lean();
 

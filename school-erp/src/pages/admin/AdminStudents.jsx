@@ -143,12 +143,14 @@ const AdminStudents = () => {
     setError('');
 
     try {
+      const payload = { ...form, generalRegisterNumber: form.grNo };
+
       if (editStudent) {
-        const updated = await updateStudentById(editStudent.id, form);
+        const updated = await updateStudentById(editStudent.id, payload);
         setStudents((prev) => prev.map((s) => (s.id === editStudent.id ? updated : s)));
         resetForm();
       } else {
-        const created = await createStudent(form);
+        const created = await createStudent(payload);
         setStudents((prev) => [created, ...prev]);
         setLastStudent(created);
         setSubmitted(true);
