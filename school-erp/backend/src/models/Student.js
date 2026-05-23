@@ -14,10 +14,8 @@ const studentSchema = new mongoose.Schema(
     },
     generalRegisterNumber: {
       type: String,
-      required: [true, 'General Register Number is required'],
-      unique: true,
-      sparse: true,
       trim: true,
+      default: '',
     },
     name: {
       type: String,
@@ -82,6 +80,11 @@ const studentSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: 'Indian',
+    },
+    religion: {
+      type: String,
+      trim: true,
+      default: '',
     },
     fatherEducation: {
       type: String,

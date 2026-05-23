@@ -71,7 +71,7 @@ const mapFeeRecord = (feeDetails) => {
   return {
     id: fee?._id,
     studentId: student?._id,
-    studentName: student?.name || '-',
+    studentName: student?.surname ? `${student.name} ${student.surname}` : (student?.name || '-'),
     class: section ? `${className}-${section}` : className,
     amount: fee?.totalAmount || 0,
     paid: fee?.paidAmount || 0,

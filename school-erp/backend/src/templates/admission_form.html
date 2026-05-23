@@ -16,7 +16,7 @@
 
     body {
       font-family: "Times New Roman", Times, serif;
-      font-size: 12pt;
+      font-size: 13pt;
       color: #000;
       background: #fff;
       -webkit-print-color-adjust: exact;
@@ -24,22 +24,24 @@
     }
 
     @page {
-      size: A4 portrait;
-      margin: 8mm 10mm 8mm 10mm;
+      size: 216mm 356mm portrait;
+      margin: 7mm 9mm 7mm 9mm;
     }
 
     @media print {
 
       html,
       body {
-        width: 210mm;
+        width: 216mm;
       }
 
       .page {
         box-shadow: none;
         border: none;
         margin: 0;
-        padding: 5mm 10mm 6mm 10mm;
+        padding: 6mm 9mm 6mm 9mm;
+        width: 216mm;
+        min-height: 356mm;
       }
 
       * {
@@ -48,20 +50,19 @@
       }
     }
 
-    /* PAGE WRAPPER */
     .page {
-      width: 210mm;
-      min-height: 297mm;
+      width: 216mm;
+      min-height: 356mm;
       margin: 0 auto;
-      padding: 5mm 10mm 6mm 10mm;
+      padding: 6mm 9mm 6mm 9mm;
       background: #fff;
     }
 
-    /* ===== HEADER TOP: From No / Registration No ===== */
+    /* ===== FROM / REG NO TOP ===== */
     .header-top {
       display: flex;
       justify-content: flex-end;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
     }
 
     .from-reg-table {
@@ -86,38 +87,35 @@
     }
 
     .char-box {
-      width: 16px;
-      height: 16px;
+      width: 17px;
+      height: 17px;
       border: 1px solid #000;
       display: inline-block;
       text-align: center;
       font-size: 9pt;
-      line-height: 16px;
+      line-height: 17px;
     }
 
-    /* ===== MAIN HEADER BAND ===== */
+    /* ===== HEADER BAND ===== */
     .header-band {
       display: flex;
       align-items: center;
       border-top: 3px solid #000;
       border-bottom: 3px solid #000;
-      padding: 5px 0;
-      margin-bottom: 6px;
+      padding: 6px 0;
+      margin-bottom: 10px;
       gap: 10px;
     }
 
     .school-logo-wrap {
-      width: 95px;
-      height: 95px;
+      width: 90px;
+      height: 90px;
       flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .school-logo-wrap img {
-      width: 95px;
-      height: 95px;
+      width: 90px;
+      height: 90px;
       object-fit: contain;
       display: block;
     }
@@ -128,101 +126,114 @@
     }
 
     .school-name {
-      font-size: 22pt;
+      font-size: 18pt;
       font-weight: 900;
-      letter-spacing: 0.5px;
-      line-height: 1.15;
+      letter-spacing: 0.3px;
+      line-height: 1.1;
       text-transform: uppercase;
-      font-family: "Times New Roman", Times, serif;
       white-space: nowrap;
     }
 
     .school-addr {
-      font-size: 11.5pt;
+      font-size: 12pt;
       font-weight: bold;
-      margin-top: 3px;
+      margin-top: 5px;
     }
 
-    /* ===== FORM TITLE ROW (To: block | Oval title | Photo box) ===== */
+    /* ===== TITLE + TO + PHOTO ===== */
     .title-photo-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 8px;
-      margin-bottom: 6px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .to-block {
-      font-size: 11pt;
-      line-height: 1.7;
-      min-width: 200px;
+      font-size: 12pt;
+      line-height: 1.85;
+      min-width: 215px;
       flex-shrink: 0;
     }
 
     .oval-wrap {
+      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 8px;
-      margin-bottom: 12px;
+      padding-top: 6px;
     }
 
     .form-title-oval {
       border: 2px solid #000;
-      border-radius: 30px;
-      padding: 5px 30px;
-      font-size: 14pt;
+      border-radius: 34px;
+      padding: 7px 34px;
+      font-size: 15pt;
       font-weight: bold;
       letter-spacing: 1px;
       white-space: nowrap;
     }
 
     .photo-box {
-      width: 72px;
-      height: 90px;
+      width: 80px;
+      height: 100px;
       border: 1px solid #000;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       font-size: 10pt;
-      line-height: 1.5;
+      line-height: 1.7;
       text-align: center;
       flex-shrink: 0;
     }
 
     /* ===== DEAR SIR ===== */
     .dear-sir {
-      font-size: 11.5pt;
-      line-height: 1.65;
-      margin-bottom: 7px;
+      font-size: 12.5pt;
+      line-height: 1.85;
+      margin-bottom: 11px;
     }
 
-    .dear-sir .indent {
-      padding-left: 30px;
+    .dear-sir .body-text {
       display: block;
+      padding-left: 36px;
     }
 
-    .dear-sir .std-line {
-      padding-left: 0;
+    .inline-fill {
+      display: inline-block;
+      border-bottom: 1px dotted #000;
+      vertical-align: baseline;
+      position: relative;
+      top: 3px;
+      min-width: 32px;
     }
 
-    /* ===== FIELD SECTIONS ===== */
+    .inline-fill-lg {
+      display: inline-block;
+      border-bottom: 1px dotted #000;
+      vertical-align: baseline;
+      position: relative;
+      top: 3px;
+      min-width: 155px;
+    }
+
+    /* ===== SECTIONS ===== */
     .section {
-      margin-bottom: 6px;
+      margin-bottom: 9px;
     }
 
     .field-row {
       display: flex;
       align-items: flex-end;
-      margin-bottom: 5px;
-      font-size: 11.5pt;
+      margin-bottom: 8px;
+      font-size: 12.5pt;
       line-height: 1;
       gap: 0;
     }
 
     .fnum {
-      min-width: 20px;
+      min-width: 24px;
       font-weight: bold;
       flex-shrink: 0;
     }
@@ -233,85 +244,87 @@
     }
 
     .fdash {
-      margin: 0 5px;
+      margin: 0 6px;
       flex-shrink: 0;
     }
 
     .fval {
       flex: 1;
       border-bottom: 1px dotted #000;
-      height: 17px;
+      height: 19px;
       min-width: 40px;
     }
 
-    /* Name char boxes row */
+    /* Name char boxes */
     .char-name-row {
       display: flex;
       flex-shrink: 0;
     }
 
     .ncb {
-      width: 17px;
-      height: 18px;
+      width: 18px;
+      height: 20px;
       border: 1px solid #000;
       text-align: center;
       font-size: 10pt;
-      line-height: 18px;
+      line-height: 20px;
       flex-shrink: 0;
       display: inline-block;
     }
 
-    /* sub-rows indented under section 1 */
     .sub-row {
       display: flex;
       align-items: flex-end;
-      margin-bottom: 5px;
-      font-size: 11.5pt;
+      margin-bottom: 8px;
+      font-size: 12.5pt;
       line-height: 1;
-      padding-left: 20px;
+      padding-left: 24px;
       gap: 0;
     }
 
     .sub-label {
-      min-width: 118px;
+      min-width: 130px;
       flex-shrink: 0;
     }
 
-    /* Marathi row */
-    .marathi-row {
+    /* Religion */
+    .religion-row {
       display: flex;
       align-items: flex-end;
-      padding-left: 20px;
-      gap: 4px;
-      margin-bottom: 5px;
-      font-size: 11.5pt;
+      padding-left: 24px;
+      gap: 0;
+      margin-bottom: 8px;
+      font-size: 12.5pt;
     }
 
-    .marathi-label {
+    .religion-label {
       white-space: nowrap;
       flex-shrink: 0;
+      min-width: 130px;
     }
 
-    .marathi-line {
+    .religion-val {
       flex: 1;
-      border-bottom: 1px dashed #000;
-      height: 17px;
+      border-bottom: 1px dotted #000;
+      height: 19px;
+      min-width: 60px;
+      margin-left: 6px;
     }
 
-    /* Sex / Nationality row */
+    /* Sex / Nationality */
     .two-col-row {
       display: flex;
       align-items: flex-end;
-      padding-left: 20px;
-      gap: 20px;
-      margin-bottom: 5px;
-      font-size: 11.5pt;
+      padding-left: 24px;
+      gap: 28px;
+      margin-bottom: 8px;
+      font-size: 12.5pt;
     }
 
     .tc-item {
       display: flex;
       align-items: flex-end;
-      gap: 5px;
+      gap: 6px;
       flex: 1;
     }
 
@@ -323,67 +336,58 @@
     .tc-val {
       flex: 1;
       border-bottom: 1px dotted #000;
-      height: 17px;
+      height: 19px;
       min-width: 60px;
     }
 
-    /* Address section */
+    /* Address */
     .addr-row {
       display: flex;
       align-items: flex-end;
-      font-size: 11.5pt;
-      margin-bottom: 5px;
+      font-size: 12.5pt;
+      margin-bottom: 8px;
       gap: 0;
-    }
-
-    .addr-full {
-      display: block;
-      border-bottom: 1px dotted #000;
-      height: 17px;
-      width: 100%;
-      margin-bottom: 5px;
-      margin-left: 20px;
     }
 
     .phone-row {
       display: flex;
       align-items: flex-end;
-      gap: 20px;
-      font-size: 11.5pt;
-      margin-left: 20px;
-      margin-bottom: 5px;
+      gap: 28px;
+      font-size: 12.5pt;
+      margin-left: 24px;
+      margin-bottom: 8px;
     }
 
     .ph-item {
       display: flex;
       align-items: flex-end;
-      gap: 5px;
+      gap: 6px;
       flex: 1;
     }
 
     .ph-val {
       flex: 1;
       border-bottom: 1px dotted #000;
-      height: 17px;
+      height: 19px;
       min-width: 60px;
     }
 
-    /* DOB section */
+    /* DOB */
     .dob-words-row {
       display: flex;
       align-items: flex-end;
-      font-size: 11.5pt;
-      margin-bottom: 5px;
+      font-size: 12.5pt;
+      margin-bottom: 8px;
       gap: 0;
     }
 
     .dob-figure-row {
       display: flex;
       align-items: center;
-      font-size: 11.5pt;
-      gap: 6px;
-      padding-left: 24px;
-      margin-bottom: 5px;
+      font-size: 12.5pt;
+      gap: 8px;
+      padding-left: 28px;
+      margin-bottom: 8px;
     }
 
     .dob-box-group {
@@ -391,52 +395,49 @@
     }
 
     .dbox {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border: 1px solid #000;
       text-align: center;
       font-size: 10pt;
-      line-height: 20px;
+      line-height: 22px;
       display: inline-block;
       flex-shrink: 0;
     }
 
-    /* Previous school table */
+    /* Prev school table */
     .prev-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 11.5pt;
-      margin-top: 3px;
+      font-size: 12.5pt;
+      margin-top: 4px;
     }
 
     .prev-table th {
       border: 1px solid #000;
-      padding: 4px 6px;
+      padding: 6px 6px;
       font-weight: bold;
       text-align: center;
-      background: #fff;
     }
 
     .prev-table td {
       border: 1px solid #000;
-      padding: 2px 6px;
-      height: 25px;
+      padding: 3px 6px;
+      height: 30px;
     }
 
     .tc-y {
-      width: 58px;
+      width: 65px;
       text-align: center;
     }
 
-    .tc-s {}
-
     .tc-c {
-      width: 58px;
+      width: 65px;
       text-align: center;
     }
 
     .tc-m {
-      width: 70px;
+      width: 80px;
       text-align: center;
     }
 
@@ -444,8 +445,8 @@
     .parent-row {
       display: flex;
       align-items: flex-end;
-      font-size: 11.5pt;
-      margin-bottom: 6px;
+      font-size: 12.5pt;
+      margin-bottom: 9px;
       gap: 0;
     }
 
@@ -457,37 +458,37 @@
     .parent-val {
       flex: 1;
       border-bottom: 1px dotted #000;
-      height: 17px;
+      height: 19px;
       min-width: 60px;
-      margin-left: 5px;
+      margin-left: 6px;
     }
 
     /* Signature */
     .sig-section {
       display: flex;
       justify-content: flex-end;
-      margin-top: 12px;
-      margin-bottom: 6px;
+      margin-top: 16px;
+      margin-bottom: 8px;
     }
 
     .sig-block {
       text-align: center;
-      font-size: 11.5pt;
+      font-size: 12.5pt;
     }
 
     .sig-line {
       display: block;
       border-bottom: 1px dotted #000;
-      width: 160px;
-      height: 30px;
-      margin: 4px auto 3px auto;
+      width: 175px;
+      height: 36px;
+      margin: 6px auto 5px auto;
     }
 
     /* Office use */
     .office-divider {
       border: none;
       border-top: 2px solid #000;
-      margin: 10px 0 7px 0;
+      margin: 14px 0 10px 0;
     }
 
     .office-title {
@@ -495,46 +496,37 @@
       font-size: 14pt;
       font-weight: bold;
       letter-spacing: 2px;
-      margin-bottom: 8px;
+      margin-bottom: 11px;
     }
 
     .office-row {
       display: flex;
       align-items: flex-end;
-      font-size: 11.5pt;
-      margin-bottom: 6px;
-      gap: 4px;
+      font-size: 12.5pt;
+      margin-bottom: 10px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
     .oval {
       display: inline-block;
       border-bottom: 1px dotted #000;
-      height: 17px;
-      min-width: 100px;
+      height: 19px;
+      min-width: 130px;
     }
 
     .oval-sm {
       display: inline-block;
       border-bottom: 1px dotted #000;
-      height: 17px;
-      min-width: 70px;
+      height: 19px;
+      min-width: 85px;
     }
 
     .oval-md {
       display: inline-block;
       border-bottom: 1px dotted #000;
-      height: 17px;
-      min-width: 120px;
-    }
-
-    /* utility */
-    .pl20 {
-      padding-left: 20px;
-    }
-
-    .mb4 {
-      margin-bottom: 4px;
+      height: 19px;
+      min-width: 140px;
     }
 
     .nowrap {
@@ -544,17 +536,21 @@
     .bold {
       font-weight: bold;
     }
+
+    .mb4 {
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 
 <body>
   <div class="page">
 
-    <!-- ===== SCHOOL HEADER SECTION ===== -->
+    <!-- ===== SCHOOL HEADER ===== -->
     <div class="header-top">
       <table class="from-reg-table">
         <tr>
-          <td class="lbl">From No.</td>
+          <td class="lbl">Form No.</td>
           <td>
             <div class="char-box-row">
               <span class="char-box">{{form_no_1}}</span><span class="char-box">{{form_no_2}}</span><span
@@ -565,7 +561,7 @@
           </td>
         </tr>
         <tr>
-          <td class="lbl">Registration No.</td>
+          <td class="lbl">General Registration No.</td>
           <td>
             <div class="char-box-row">
               <span class="char-box">{{reg_no_1}}</span><span class="char-box">{{reg_no_2}}</span><span
@@ -576,10 +572,6 @@
           </td>
         </tr>
       </table>
-    </div>
-
-    <div class="oval-wrap">
-      <div class="form-title-oval">Admission Form</div>
     </div>
 
     <div class="header-band">
@@ -593,15 +585,18 @@
         <div class="school-addr">Siddhnath Wadgaon, Tal.Gangapur Dist.Chh.Sambhajinagar</div>
       </div>
     </div>
-    <!-- END SCHOOL HEADER -->
 
-    <!-- ===== FORM TITLE + TO BLOCK + PHOTO ===== -->
+    <!-- ===== FORM TITLE + TO + PHOTO ===== -->
     <div class="title-photo-row">
       <div class="to-block">
         To,<br>
         The Principal,<br>
         Shree Swami Vivekanand English School<br>
-        Siddhnath Wadgaon, Tal.Gangapur Dist.Chh.Sambhajinagar
+        Siddhnath Wadgaon, Tal.Gangapur<br>
+        Dist.Chh.Sambhajinagar
+      </div>
+      <div class="oval-wrap">
+        <div class="form-title-oval">Admission Form</div>
       </div>
       <div class="photo-box">
         Passport<br>Size<br>Photo
@@ -611,26 +606,19 @@
     <!-- ===== DEAR SIR ===== -->
     <div class="dear-sir">
       Dear Sir,<br>
-      <div style="text-indent: 30px; margin-top: 4px; line-height: 1.8;">
-        I request that my son / daughter / ward whose particulars are given below be admitted in your
-        school as a Day - Scholar with effect from the term commencing 20<span
-          style="display:inline-block;border-bottom:1px dotted #000;min-width:28px;height:14px;vertical-align:bottom;">{{term_from}}</span>&nbsp;-
-        20<span
-          style="display:inline-block;border-bottom:1px dotted #000;min-width:28px;height:14px;vertical-align:bottom;">{{term_to}}</span>
-        in std <span
-          style="display:inline-block;border-bottom:1px dotted #000;min-width:130px;height:14px;vertical-align:bottom;">{{admission_class}}</span>
-      </div>
+      <span class="body-text">I request that my son / daughter / ward whose particulars are given below be admitted in
+        your school as a Day - Scholar with effect from the term commencing 20<span
+          class="inline-fill">{{term_from}}</span>&nbsp;- 20<span class="inline-fill">{{term_to}}</span>&nbsp; in std
+        <span class="inline-fill-lg">{{admission_class}}</span></span>
     </div>
 
     <!-- ===== STUDENT INFORMATION SECTION ===== -->
-    <!-- 1. Name -->
     <div class="section">
       <div class="field-row">
         <span class="fnum">1.</span>
         <span class="bold">Name (Block Letters)</span>
       </div>
 
-      <!-- a) Surname -->
       <div class="sub-row">
         <span class="sub-label">a)&nbsp;Surname</span>
         <span class="fdash">&ndash;</span>
@@ -643,7 +631,6 @@
         </div>
       </div>
 
-      <!-- b) First Name -->
       <div class="sub-row">
         <span class="sub-label">b)&nbsp;First Name</span>
         <span class="fdash">&ndash;</span>
@@ -656,7 +643,6 @@
         </div>
       </div>
 
-      <!-- c) Father Name -->
       <div class="sub-row">
         <span class="sub-label">c)&nbsp;Father's Name</span>
         <span class="fdash">&ndash;</span>
@@ -669,7 +655,6 @@
         </div>
       </div>
 
-      <!-- d) Mother Name -->
       <div class="sub-row">
         <span class="sub-label">d)&nbsp;Mother's Name</span>
         <span class="fdash">&ndash;</span>
@@ -682,7 +667,12 @@
         </div>
       </div>
 
-
+      <!-- e) Religion -->
+      <div class="religion-row">
+        <span class="religion-label">e)&nbsp;Religion</span>
+        <span class="fdash">&ndash;</span>
+        <span class="religion-val">{{religion}}</span>
+      </div>
 
       <!-- f) Sex  g) Nationality -->
       <div class="two-col-row">
@@ -696,17 +686,14 @@
         </div>
       </div>
     </div>
-    <!-- END STUDENT INFO -->
 
     <!-- ===== ADDRESS SECTION ===== -->
     <div class="section">
       <div class="addr-row">
         <span class="fnum">2.</span>
-        <span class="flabel" style="min-width:130px;">Residential Address&nbsp;:</span>
-        <span class="fval">{{residential_address_1}}</span>
+        <span class="flabel" style="min-width:140px;">Residential Address&nbsp;:</span>
+        <span class="fval">{{residential_address}}</span>
       </div>
-      <span class="addr-full">{{residential_address_2}}</span>
-      <span class="addr-full">{{residential_address_3}}</span>
       <div class="phone-row">
         <div class="ph-item">
           <span class="nowrap">Phone No.</span>
@@ -718,13 +705,12 @@
         </div>
       </div>
     </div>
-    <!-- END ADDRESS -->
 
     <!-- ===== DOB SECTION ===== -->
     <div class="section">
       <div class="dob-words-row">
         <span class="fnum">3.</span>
-        <span class="flabel" style="min-width:168px;">Date of Birth (In words)&nbsp;:</span>
+        <span class="flabel" style="min-width:182px;">Date of Birth (In words)&nbsp;:</span>
         <span class="fval">{{dob_words}}</span>
       </div>
       <div class="dob-figure-row">
@@ -743,29 +729,28 @@
         </div>
       </div>
     </div>
-    <!-- END DOB -->
 
-    <!-- Place of Birth -->
+    <!-- 4. Place of Birth -->
     <div class="section">
       <div class="field-row">
         <span class="fnum">4.</span>
-        <span class="flabel" style="min-width:110px;">Place of Birth&nbsp;:</span>
+        <span class="flabel" style="min-width:118px;">Place of Birth&nbsp;:</span>
         <span class="fval">{{place_of_birth}}</span>
       </div>
     </div>
 
-    <!-- Caste & Sub Caste -->
+    <!-- 5. Caste & Sub Caste -->
     <div class="section">
-      <div class="field-row" style="flex-wrap:wrap; gap:0;">
+      <div class="field-row" style="flex-wrap:wrap;">
         <span class="fnum">5.</span>
-        <span class="flabel" style="min-width:138px;">Caste &amp; Sub Caste&nbsp;:</span>
+        <span class="flabel" style="min-width:150px;">Caste &amp; Sub Caste&nbsp;:</span>
         <span class="fval" style="min-width:100px;">{{caste}}&nbsp;&nbsp;{{sub_caste}}</span>
-        <span style="font-size:9.5pt; padding-left:8px; white-space:nowrap; align-self:flex-end;">(Photostat copy of
+        <span style="font-size:10pt; padding-left:8px; white-space:nowrap; align-self:flex-end;">(Photostat copy of
           original certificate)</span>
       </div>
     </div>
 
-    <!-- ===== PREVIOUS SCHOOL TABLE SECTION ===== -->
+    <!-- ===== PREVIOUS SCHOOL TABLE ===== -->
     <div class="section">
       <div class="field-row mb4">
         <span class="fnum">6.</span>
@@ -775,7 +760,7 @@
         <thead>
           <tr>
             <th class="tc-y">Years</th>
-            <th class="tc-s">Name of School</th>
+            <th>Name of School</th>
             <th class="tc-c">Class</th>
             <th class="tc-m">Medium</th>
           </tr>
@@ -784,26 +769,26 @@
           {{#each previous_schools}}
           <tr>
             <td class="tc-y">{{this.years}}</td>
-            <td class="tc-s">{{this.school_name}}</td>
+            <td>{{this.school_name}}</td>
             <td class="tc-c">{{this.class}}</td>
             <td class="tc-m">{{this.medium}}</td>
           </tr>
           {{else}}
           <tr>
             <td class="tc-y">&nbsp;</td>
-            <td class="tc-s">&nbsp;</td>
+            <td>&nbsp;</td>
             <td class="tc-c">&nbsp;</td>
             <td class="tc-m">&nbsp;</td>
           </tr>
           <tr>
             <td class="tc-y">&nbsp;</td>
-            <td class="tc-s">&nbsp;</td>
+            <td>&nbsp;</td>
             <td class="tc-c">&nbsp;</td>
             <td class="tc-m">&nbsp;</td>
           </tr>
           <tr>
             <td class="tc-y">&nbsp;</td>
-            <td class="tc-s">&nbsp;</td>
+            <td>&nbsp;</td>
             <td class="tc-c">&nbsp;</td>
             <td class="tc-m">&nbsp;</td>
           </tr>
@@ -811,10 +796,9 @@
         </tbody>
       </table>
     </div>
-    <!-- END PREVIOUS SCHOOL TABLE -->
 
-    <!-- ===== PARENT DETAILS SECTION ===== -->
-    <div class="section" style="margin-top:6px;">
+    <!-- ===== PARENT DETAILS ===== -->
+    <div class="section" style="margin-top:10px;">
       <div class="parent-row">
         <span class="fnum">7.</span>
         <span class="parent-label">Full Name of Parents or guardians&nbsp;:</span>
@@ -830,14 +814,13 @@
         <span class="parent-label">Education of parents&nbsp;: Father's&nbsp;:</span>
         <span class="parent-val">{{father_education}}</span>
       </div>
-      <div class="parent-row" style="padding-left:20px;">
-        <span class="parent-label" style="min-width:80px;">Mother's&nbsp;:</span>
+      <div class="parent-row" style="padding-left:24px;">
+        <span class="parent-label" style="min-width:88px;">Mother's&nbsp;:</span>
         <span class="parent-val">{{mother_education}}</span>
       </div>
     </div>
-    <!-- END PARENT DETAILS -->
 
-    <!-- ===== SIGNATURE SECTION ===== -->
+    <!-- ===== SIGNATURE ===== -->
     <div class="sig-section">
       <div class="sig-block">
         <div>Your's Faithfully</div>
@@ -845,15 +828,14 @@
         <div>Signature of Parents</div>
       </div>
     </div>
-    <!-- END SIGNATURE -->
 
-    <!-- ===== OFFICE USE SECTION ===== -->
+    <!-- ===== OFFICE USE ===== -->
     <hr class="office-divider">
     <div class="office-title">-: FOR OFFICE USE :-</div>
 
     <div class="office-row">
       <span class="nowrap">Ku./Kumari</span>
-      <span class="oval" style="min-width:160px;">{{student_first_name}}&nbsp;{{student_surname}}</span>
+      <span class="oval" style="min-width:180px;">{{student_first_name}}&nbsp;{{student_surname}}</span>
       <span class="nowrap">.....is admitted as Boarder/day-</span>
     </div>
 
@@ -862,10 +844,9 @@
       <span class="oval-sm">{{admission_class}}</span>
       <span class="nowrap">Div</span>
       <span class="oval-sm">{{division}}</span>
-      <span class="nowrap">with Reg.No.</span>
+      <span class="nowrap">with PRN.No.</span>
       <span class="oval-md">{{office_reg_no}}</span>
     </div>
-    <!-- END OFFICE USE -->
 
   </div>
 </body>

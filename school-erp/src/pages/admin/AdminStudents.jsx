@@ -21,6 +21,7 @@ import { exportRowsToPdf } from '../../utils/pdfExport';
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
   const [selectedClass, setSelectedClass] = useState('All Classes');
+  const [selectedStatus, setSelectedStatus] = useState('All Status');
   const [classOptions, setClassOptions] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -41,6 +42,7 @@ const AdminStudents = () => {
     status: 'Active',
     caste: '',
     subCaste: '',
+    religion: '',
     placeOfBirth: '',
     nationality: 'Indian',
     motherEducation: '',
@@ -108,12 +110,15 @@ const AdminStudents = () => {
   }, [students]);
 
   const visibleStudents = useMemo(() => {
-    if (selectedClass === 'All Classes') {
-      return students;
+    let filtered = students;
+    if (selectedClass !== 'All Classes') {
+      filtered = filtered.filter((student) => student.class === selectedClass);
     }
-
-    return students.filter((student) => student.class === selectedClass);
-  }, [students, selectedClass]);
+    if (selectedStatus !== 'All Status') {
+      filtered = filtered.filter((student) => String(student.status).toLowerCase() === selectedStatus.toLowerCase());
+    }
+    return filtered;
+  }, [students, selectedClass, selectedStatus]);
 
   const selectedClassStats = useMemo(() => {
     const totalStudents = visibleStudents.length;
@@ -181,6 +186,7 @@ const AdminStudents = () => {
       status: 'Active',
       caste: '',
       subCaste: '',
+      religion: '',
       placeOfBirth: '',
       nationality: 'Indian',
       fatherEducation: '',
@@ -204,6 +210,7 @@ const AdminStudents = () => {
       status: student.status,
       caste: student.raw?.caste || '',
       subCaste: student.raw?.subCaste || '',
+      religion: student.raw?.religion || '',
       placeOfBirth: student.raw?.placeOfBirth || '',
       nationality: student.raw?.nationality || 'Indian',
       fatherEducation: student.raw?.fatherEducation || '',
@@ -274,6 +281,7 @@ const AdminStudents = () => {
       fileName: `students-${selectedClass.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.pdf`,
       summaryLines: [
         `Class Filter: ${selectedClass}`,
+        `Status Filter: ${selectedStatus}`,
         `Total Students: ${selectedClassStats.totalStudents}`,
         `Active Students: ${selectedClassStats.activeStudents}`,
         `Fee Pending: ${selectedClassStats.feePending}`,
@@ -342,13 +350,24 @@ const AdminStudents = () => {
       )}
 
       <div className="card p-4 mb-6">
-        <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="text-base font-semibold text-slate-800">Class view</h3>
             <p className="text-sm text-slate-500">Select a class tab to see only the students in that class.</p>
           </div>
-          <div className="text-sm text-slate-500">
-            Showing <span className="font-semibold text-slate-800">{visibleStudents.length}</span> students
+          <div className="flex items-center gap-4">
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="border border-slate-200 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 bg-white"
+            >
+              <option value="All Status">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <div className="text-sm text-slate-500">
+              Showing <span className="font-semibold text-slate-800">{visibleStudents.length}</span> students
+            </div>
           </div>
         </div>
 
@@ -398,7 +417,7 @@ const AdminStudents = () => {
 
       <Modal isOpen={modalOpen} onClose={resetForm} title={editStudent ? 'Edit Student' : 'Add New Student'} size="lg">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormInput label="General Register No. (GR No.)" value={form.grNo} onChange={(e) => setForm({ ...form, grNo: e.target.value })} required />
+          <FormInput label="General Register No. (GR No.)" value={form.grNo} onChange={(e) => setForm({ ...form, grNo: e.target.value })} />
           <FormInput label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <FormInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
           <FormInput label="Roll No" value={form.rollNo} onChange={(e) => setForm({ ...form, rollNo: e.target.value })} required />
@@ -412,6 +431,7 @@ const AdminStudents = () => {
           ]} />
           <FormInput label="Nationality" value={form.nationality} onChange={(e) => setForm({ ...form, nationality: e.target.value })} />
           <FormInput label="Place of Birth" value={form.placeOfBirth} onChange={(e) => setForm({ ...form, placeOfBirth: e.target.value })} />
+          <FormInput label="Religion" value={form.religion} onChange={(e) => setForm({ ...form, religion: e.target.value })} />
           <FormInput label="Caste" value={form.caste} onChange={(e) => setForm({ ...form, caste: e.target.value })} />
           <FormInput label="Sub-Caste" value={form.subCaste} onChange={(e) => setForm({ ...form, subCaste: e.target.value })} />
           <FormInput label="Father's Education" value={form.fatherEducation} onChange={(e) => setForm({ ...form, fatherEducation: e.target.value })} />

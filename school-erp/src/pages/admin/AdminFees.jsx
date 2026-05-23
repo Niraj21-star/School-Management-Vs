@@ -303,7 +303,7 @@ const AdminFees = () => {
               setForm({ ...form, studentId, amount: feeRecord ? String(feeRecord.due || feeRecord.amount || '') : '', paid: '', breakdown: { ...defaultBreakdown } });
             }}
             placeholder={form.class ? 'Select student' : 'Select a class first'}
-            options={classStudents.map(s => ({ value: s.id, label: `${s.name} (${s.rollNo})` }))}
+            options={classStudents.map(s => ({ value: s.id, label: s.surname ? `${s.name} ${s.surname} (${s.rollNo})` : `${s.name} (${s.rollNo})` }))}
             disabled={!form.class}
             required
           />

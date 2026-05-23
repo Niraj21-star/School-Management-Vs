@@ -10,7 +10,7 @@ const ClerkAdmissions = () => {
   const [form, setForm] = useState({
     grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '',
     class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '',
-    caste: '', subCaste: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '',
+    caste: '', subCaste: '', religion: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '',
     surname: '', isTcIssued: false,
   });
   const [classOptions, setClassOptions] = useState([]);
@@ -111,7 +111,7 @@ const ClerkAdmissions = () => {
 
       setLastStudent(createdStudent);
       setSubmitted(true);
-      setForm({ grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '', caste: '', subCaste: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '', surname: '', isTcIssued: false });
+      setForm({ grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '', caste: '', subCaste: '', religion: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '', surname: '', isTcIssued: false });
     } catch (err) {
       setError(err.message || 'Unable to submit admission.');
     } finally {
@@ -161,7 +161,7 @@ const ClerkAdmissions = () => {
       <form onSubmit={handleSubmit} className="card p-6">
         <h3 className="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2"><UserPlus className="w-5 h-5" /> New Admission Form</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FormInput label="General Register No. (GR No.)" value={form.grNo} onChange={(e) => setForm({ ...form, grNo: e.target.value })} required />
+          <FormInput label="General Register No. (GR No.)" value={form.grNo} onChange={(e) => setForm({ ...form, grNo: e.target.value })} />
           <FormInput label="Student Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <FormInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
 
@@ -183,6 +183,7 @@ const ClerkAdmissions = () => {
           <FormInput label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           <FormInput label="Nationality" value={form.nationality} onChange={(e) => setForm({ ...form, nationality: e.target.value })} />
           <FormInput label="Place of Birth" value={form.placeOfBirth} onChange={(e) => setForm({ ...form, placeOfBirth: e.target.value })} />
+          <FormInput label="Religion" value={form.religion} onChange={(e) => setForm({ ...form, religion: e.target.value })} />
           <FormInput label="Caste" value={form.caste} onChange={(e) => setForm({ ...form, caste: e.target.value })} />
           <FormInput label="Sub-Caste" value={form.subCaste} onChange={(e) => setForm({ ...form, subCaste: e.target.value })} />
           <FormInput label="Father's Education" value={form.fatherEducation} onChange={(e) => setForm({ ...form, fatherEducation: e.target.value })} />

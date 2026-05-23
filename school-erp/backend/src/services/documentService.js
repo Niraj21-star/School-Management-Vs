@@ -585,6 +585,7 @@ const generateAdmissionFormHtml = (student) => {
     mobile_no: student.parent?.parentContact || '',
     dob_words: student.dob ? dateToWords(student.dob).toUpperCase() : '',
     place_of_birth: student.placeOfBirth || '',
+    religion: student.religion || '',
     caste: student.caste || '',
     sub_caste: student.subCaste || '',
     parent_full_name: student.parent?.fatherName || '',
@@ -592,7 +593,7 @@ const generateAdmissionFormHtml = (student) => {
     father_education: student.fatherEducation || '',
     mother_education: student.motherEducation || '',
     division: student.academic?.section || '',
-    office_reg_no: student.generalRegisterNumber || student.studentId || '',
+    office_reg_no: student.generalRegisterNumber || '',
     admission_class: student.academic?.class || '',
     term_from: String(admissionYear).slice(-2),
     term_to: String(admissionYear + 1).slice(-2),
@@ -608,11 +609,16 @@ const generateAdmissionFormHtml = (student) => {
   }
 
   // 2. Form & Registration number boxes (8-digit padding)
-  const rawId = (student.generalRegisterNumber || student.studentId || '').replace(/[^0-9]/g, '');
-  const idNumber = rawId.padStart(8, '0').slice(-8);
+  const formNumMatch = (student.studentId || '').match(/-(\d+)$/);
+  const formNum = formNumMatch ? parseInt(formNumMatch[1], 10).toString() : '1';
+  const formIdPadded = formNum.padStart(8, '0').slice(-8);
+
+  const grNoRaw = (student.generalRegisterNumber || '').replace(/[^0-9]/g, '');
+  const regIdPadded = grNoRaw ? grNoRaw.padStart(8, '0').slice(-8) : '        ';
+
   for (let i = 0; i < 8; i++) {
-    placeholders[`form_no_${i + 1}`] = idNumber[i] || '0';
-    placeholders[`reg_no_${i + 1}`] = idNumber[i] || '0';
+    placeholders[`form_no_${i + 1}`] = formIdPadded[i] || '0';
+    placeholders[`reg_no_${i + 1}`] = regIdPadded[i] || ' ';
   }
 
   // 3. DOB splits
@@ -630,8 +636,9 @@ const generateAdmissionFormHtml = (student) => {
   placeholders.dob_year_3 = yearStr[2];
   placeholders.dob_year_4 = yearStr[3];
 
-  // 4. Address split
+  // 4. Address
   const address = student.address || '';
+  placeholders.residential_address = address;
   placeholders.residential_address_1 = address.slice(0, 30);
   placeholders.residential_address_2 = address.slice(30, 60);
   placeholders.residential_address_3 = address.slice(60, 90);
