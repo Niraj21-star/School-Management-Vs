@@ -196,6 +196,8 @@ const AdminStudents = () => {
       fatherEducation: '',
       motherEducation: '',
       isTcIssued: false,
+      aadhaarNumber: '',
+      penNumber: '',
     });
     setEditStudent(null);
     setModalOpen(false);
