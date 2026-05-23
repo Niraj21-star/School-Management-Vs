@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getFees, getClasses, recordPayment, getStudents, getFeeReceiptHtml } from '../../services/api';
+import {
+  getFees,
+  getClasses,
+  recordPayment,
+  getStudents,
+  getFeeReceiptHtml,
+  getClassFees,
+  getClassFeeByPattern,
+  saveClassFee,
+  deleteClassFee,
+} from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
@@ -7,7 +17,7 @@ import Modal from '../../components/Modal';
 import FormInput from '../../components/FormInput';
 import SelectInput from '../../components/SelectInput';
 import Button from '../../components/Button';
-import { Plus, Download, Printer } from 'lucide-react';
+import { Plus, Download, Printer, Settings, Trash2, Edit } from 'lucide-react';
 import { formatCurrency } from '../../utils/helpers';
 import { exportRowsToPdf } from '../../utils/pdfExport';
 
@@ -27,6 +37,69 @@ const AdminFees = () => {
 
   const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '', status: 'Pending', mode: 'cash', breakdown: { ...defaultBreakdown } });
   const [classStudents, setClassStudents] = useState([]);
+
+  const [configModalOpen, setConfigModalOpen] = useState(false);
+  const [classFees, setClassFees] = useState([]);
+  const [loadingConfig, setLoadingConfig] = useState(false);
+  const [configFormOpen, setConfigFormOpen] = useState(false);
+  const [configForm, setConfigForm] = useState({ id: '', classPattern: '', totalAmount: '', breakdown: { ...defaultBreakdown } });
+
+  const loadClassFees = useCallback(async () => {
+    setLoadingConfig(true);
+    try {
+      const data = await getClassFees();
+      setClassFees(data);
+    } catch (err) {
+      setError(err.message || 'Unable to load class fees.');
+    } finally {
+      setLoadingConfig(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (configModalOpen) {
+      loadClassFees();
+    }
+  }, [configModalOpen, loadClassFees]);
+
+  useEffect(() => {
+    const sum = [
+      'admission', 'bdf', 'tuition', 'exam', 'computer', 'sport',
+      'medical', 'craft', 'library', 'laboratory', 'misc', 'other'
+    ].reduce((acc, key) => acc + (Number(configForm.breakdown[key]) || 0), 0);
+    
+    if (sum !== Number(configForm.totalAmount) && (sum > 0 || configForm.totalAmount !== '')) {
+      setConfigForm(prev => ({ ...prev, totalAmount: sum > 0 ? String(sum) : '' }));
+    }
+  }, [configForm.breakdown]);
+
+  const handleSaveClassFee = async () => {
+    setSaving(true);
+    setError('');
+
+    try {
+      await saveClassFee(configForm);
+      await loadClassFees();
+      setConfigForm({ id: '', classPattern: '', totalAmount: '', breakdown: { ...defaultBreakdown } });
+      setConfigFormOpen(false);
+    } catch (err) {
+      setError(err.message || 'Unable to save class fee structure.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteClassFee = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this class fee structure?')) return;
+    setError('');
+
+    try {
+      await deleteClassFee(id);
+      await loadClassFees();
+    } catch (err) {
+      setError(err.message || 'Unable to delete class fee structure.');
+    }
+  };
 
   const loadClasses = useCallback(async () => {
     setLoadingClasses(true);
@@ -235,7 +308,8 @@ const AdminFees = () => {
         subtitle={selectedClass === 'All Classes' ? 'Manage student fee records class wise' : `Fee records for ${selectedClass}`}
       >
         <Button variant="secondary" onClick={handleExport}><Download className="w-4 h-4" /> Export</Button>
-        <Button onClick={() => setModalOpen(true)}><Plus className="w-4 h-4" /> Record Payment</Button>
+        <Button variant="secondary" onClick={() => setConfigModalOpen(true)} className="flex items-center gap-1.5"><Settings className="w-4 h-4" /> Class Fees Config</Button>
+        <Button onClick={() => setModalOpen(true)} className="flex items-center gap-1.5"><Plus className="w-4 h-4" /> Record Payment</Button>
       </PageHeader>
 
       <div className="card p-4 mb-6">
@@ -300,7 +374,49 @@ const AdminFees = () => {
             onChange={(e) => {
               const studentId = e.target.value;
               const feeRecord = fees.find((f) => f.studentId === studentId);
-              setForm({ ...form, studentId, amount: feeRecord ? String(feeRecord.due || feeRecord.amount || '') : '', paid: '', breakdown: { ...defaultBreakdown } });
+              if (feeRecord) {
+                setForm({
+                  ...form,
+                  studentId,
+                  amount: String(feeRecord.due !== undefined ? feeRecord.due : (feeRecord.amount || '')),
+                  paid: '',
+                  breakdown: { ...defaultBreakdown }
+                });
+              } else if (studentId) {
+                getClassFeeByPattern(form.class)
+                  .then((classFeeConfig) => {
+                    if (classFeeConfig) {
+                      setForm({
+                        ...form,
+                        studentId,
+                        amount: String(classFeeConfig.totalAmount),
+                        paid: '',
+                        breakdown: {
+                          ...defaultBreakdown,
+                          admission: String(classFeeConfig.breakdown?.admission ?? ''),
+                          bdf: String(classFeeConfig.breakdown?.bdf ?? ''),
+                          tuition: String(classFeeConfig.breakdown?.tuition ?? ''),
+                          exam: String(classFeeConfig.breakdown?.exam ?? ''),
+                          computer: String(classFeeConfig.breakdown?.computer ?? ''),
+                          sport: String(classFeeConfig.breakdown?.sport ?? ''),
+                          medical: String(classFeeConfig.breakdown?.medical ?? ''),
+                          craft: String(classFeeConfig.breakdown?.craft ?? ''),
+                          library: String(classFeeConfig.breakdown?.library ?? ''),
+                          laboratory: String(classFeeConfig.breakdown?.laboratory ?? ''),
+                          misc: String(classFeeConfig.breakdown?.misc ?? ''),
+                          other: String(classFeeConfig.breakdown?.other ?? ''),
+                        }
+                      });
+                    } else {
+                      setForm({ ...form, studentId, amount: '', paid: '', breakdown: { ...defaultBreakdown } });
+                    }
+                  })
+                  .catch(() => {
+                    setForm({ ...form, studentId, amount: '', paid: '', breakdown: { ...defaultBreakdown } });
+                  });
+              } else {
+                setForm({ ...form, studentId: '', amount: '', paid: '', breakdown: { ...defaultBreakdown } });
+              }
             }}
             placeholder={form.class ? 'Select student' : 'Select a class first'}
             options={classStudents.map(s => ({ value: s.id, label: s.surname ? `${s.name} ${s.surname} (${s.rollNo})` : `${s.name} (${s.rollNo})` }))}
@@ -363,6 +479,139 @@ const AdminFees = () => {
         <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
           <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
           <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Payment'}</Button>
+        </div>
+      </Modal>
+
+      {/* Class Fee List Configuration Modal */}
+      <Modal isOpen={configModalOpen} onClose={() => setConfigModalOpen(false)} title="Class-wise Fees Configuration">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-sm text-slate-500">Configure standard class-wise fee structures.</p>
+            <Button onClick={() => {
+              setConfigForm({ id: '', classPattern: '', totalAmount: '', breakdown: { ...defaultBreakdown } });
+              setConfigFormOpen(true);
+            }} className="flex items-center gap-1">
+              <Plus className="w-4 h-4" /> Add New
+            </Button>
+          </div>
+          {loadingConfig ? (
+            <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-800" /></div>
+          ) : (
+            <DataTable
+              columns={[
+                { key: 'classPattern', label: 'Class & Section' },
+                { key: 'totalAmount', label: 'Total Standard Fee', render: (val) => formatCurrency(val) },
+                {
+                  key: 'actions',
+                  label: 'Actions',
+                  render: (_, row) => (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setConfigForm({
+                            id: row._id,
+                            classPattern: row.classPattern,
+                            totalAmount: String(row.totalAmount),
+                            breakdown: {
+                              ...defaultBreakdown,
+                              admission: String(row.breakdown?.admission ?? ''),
+                              bdf: String(row.breakdown?.bdf ?? ''),
+                              tuition: String(row.breakdown?.tuition ?? ''),
+                              exam: String(row.breakdown?.exam ?? ''),
+                              computer: String(row.breakdown?.computer ?? ''),
+                              sport: String(row.breakdown?.sport ?? ''),
+                              medical: String(row.breakdown?.medical ?? ''),
+                              craft: String(row.breakdown?.craft ?? ''),
+                              library: String(row.breakdown?.library ?? ''),
+                              laboratory: String(row.breakdown?.laboratory ?? ''),
+                              misc: String(row.breakdown?.misc ?? ''),
+                              other: String(row.breakdown?.other ?? ''),
+                            }
+                          });
+                          setConfigFormOpen(true);
+                        }}
+                        className="p-1 rounded hover:bg-slate-100 text-blue-600 transition-colors"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClassFee(row._id)}
+                        className="p-1 rounded hover:bg-slate-100 text-red-600 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )
+                }
+              ]}
+              data={classFees}
+              searchable={true}
+              pageSize={5}
+            />
+          )}
+        </div>
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+          <Button variant="secondary" onClick={() => setConfigModalOpen(false)}>Close</Button>
+        </div>
+      </Modal>
+
+      {/* Add/Edit Class Fee Structure Modal */}
+      <Modal isOpen={configFormOpen} onClose={() => setConfigFormOpen(false)} title={configForm.id ? "Edit Class Fee Structure" : "Add Class Fee Structure"}>
+        <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+          <SelectInput
+            label="Class Pattern"
+            value={configForm.classPattern}
+            onChange={(e) => setConfigForm({ ...configForm, classPattern: e.target.value })}
+            placeholder="Select Class & Section"
+            options={classOptions}
+            disabled={!!configForm.id}
+            required
+          />
+          
+          <div className="pt-2">
+            <h4 className="text-sm font-semibold text-slate-700 mb-3 border-b border-slate-100 pb-2">Block-Wise Fee Standard</h4>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { key: 'admission', label: 'Admission Fee' },
+                { key: 'bdf', label: 'B.D.F.' },
+                { key: 'tuition', label: 'Tuition Fee' },
+                { key: 'exam', label: 'Exam Fee' },
+                { key: 'computer', label: 'Computer Fee' },
+                { key: 'sport', label: 'Sport Fee' },
+                { key: 'medical', label: 'Medical Charges' },
+                { key: 'craft', label: 'Craft Fee' },
+                { key: 'library', label: 'Library' },
+                { key: 'laboratory', label: 'Laboratories' },
+                { key: 'misc', label: 'Misc.' },
+                { key: 'other', label: 'Other' },
+              ].map(field => (
+                <FormInput
+                  key={field.key}
+                  label={field.label}
+                  type="number"
+                  value={configForm.breakdown[field.key]}
+                  onChange={(e) => setConfigForm(f => ({ ...f, breakdown: { ...f.breakdown, [field.key]: e.target.value } }))}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <div className="pt-3 border-t border-slate-100 mt-2">
+            <FormInput
+              label="Total Class Fee (₹) [Auto-calculated]"
+              type="number"
+              value={configForm.totalAmount}
+              readOnly
+              required
+              className="bg-slate-50 font-bold"
+            />
+          </div>
+        </div>
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+          <Button variant="secondary" onClick={() => setConfigFormOpen(false)}>Cancel</Button>
+          <Button onClick={handleSaveClassFee} disabled={saving}>{saving ? 'Saving...' : 'Save Structure'}</Button>
         </div>
       </Modal>
     </div>

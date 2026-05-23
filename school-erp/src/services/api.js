@@ -1067,4 +1067,41 @@ export const updateSchoolSettings = async (payload) => {
   }
 };
 
+export const getClassFees = async () => {
+  try {
+    const response = await apiClient.get('/api/class-fees');
+    return unwrapResponse(response) || [];
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to fetch class fee list.'));
+  }
+};
+
+export const getClassFeeByPattern = async (classPattern) => {
+  try {
+    const response = await apiClient.get(`/api/class-fees/${classPattern}`);
+    return unwrapResponse(response);
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to fetch class fee structure.'));
+  }
+};
+
+export const saveClassFee = async (payload) => {
+  try {
+    const response = await apiClient.post('/api/class-fees', payload);
+    return unwrapResponse(response);
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to save class fee structure.'));
+  }
+};
+
+export const deleteClassFee = async (id) => {
+  try {
+    const response = await apiClient.delete(`/api/class-fees/${id}`);
+    return unwrapResponse(response);
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to delete class fee structure.'));
+  }
+};
+
+
 

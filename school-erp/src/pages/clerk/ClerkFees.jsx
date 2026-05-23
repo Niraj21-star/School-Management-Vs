@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { getFees, getClasses, recordPayment, getStudents, getFeeReceiptHtml } from '../../services/api';
+import { getFees, getClasses, recordPayment, getStudents, getFeeReceiptHtml, getClassFeeByPattern } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
@@ -217,7 +217,49 @@ const ClerkFees = () => {
             onChange={(e) => {
               const studentId = e.target.value;
               const feeRecord = fees.find((f) => f.studentId === studentId);
-              setForm({ ...form, studentId, amount: feeRecord ? String(feeRecord.due || feeRecord.amount || '') : '', paid: '', breakdown: { ...defaultBreakdown } });
+              if (feeRecord) {
+                setForm({
+                  ...form,
+                  studentId,
+                  amount: String(feeRecord.due !== undefined ? feeRecord.due : (feeRecord.amount || '')),
+                  paid: '',
+                  breakdown: { ...defaultBreakdown }
+                });
+              } else if (studentId) {
+                getClassFeeByPattern(form.class)
+                  .then((classFeeConfig) => {
+                    if (classFeeConfig) {
+                      setForm({
+                        ...form,
+                        studentId,
+                        amount: String(classFeeConfig.totalAmount),
+                        paid: '',
+                        breakdown: {
+                          ...defaultBreakdown,
+                          admission: String(classFeeConfig.breakdown?.admission ?? ''),
+                          bdf: String(classFeeConfig.breakdown?.bdf ?? ''),
+                          tuition: String(classFeeConfig.breakdown?.tuition ?? ''),
+                          exam: String(classFeeConfig.breakdown?.exam ?? ''),
+                          computer: String(classFeeConfig.breakdown?.computer ?? ''),
+                          sport: String(classFeeConfig.breakdown?.sport ?? ''),
+                          medical: String(classFeeConfig.breakdown?.medical ?? ''),
+                          craft: String(classFeeConfig.breakdown?.craft ?? ''),
+                          library: String(classFeeConfig.breakdown?.library ?? ''),
+                          laboratory: String(classFeeConfig.breakdown?.laboratory ?? ''),
+                          misc: String(classFeeConfig.breakdown?.misc ?? ''),
+                          other: String(classFeeConfig.breakdown?.other ?? ''),
+                        }
+                      });
+                    } else {
+                      setForm({ ...form, studentId, amount: '', paid: '', breakdown: { ...defaultBreakdown } });
+                    }
+                  })
+                  .catch(() => {
+                    setForm({ ...form, studentId, amount: '', paid: '', breakdown: { ...defaultBreakdown } });
+                  });
+              } else {
+                setForm({ ...form, studentId: '', amount: '', paid: '', breakdown: { ...defaultBreakdown } });
+              }
             }}
             placeholder={form.class ? 'Select student' : 'Select a class first'}
             options={classStudents.map(s => ({ value: s.id, label: s.surname ? `${s.name} ${s.surname} (${s.rollNo})` : `${s.name} (${s.rollNo})` }))}
