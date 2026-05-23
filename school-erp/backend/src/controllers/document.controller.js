@@ -13,6 +13,7 @@ const {
   generateTCHtml,
   generateDuplicateTCHtml,
   generateFeeReceipt,
+  generateFeeReceiptHtml,
   generateAdmissionFormHtml,
 } = require('../services/documentService');
 
