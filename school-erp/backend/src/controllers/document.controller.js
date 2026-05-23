@@ -40,9 +40,11 @@ const sendSuccess = (res, statusCode, message, data) => {
 
 const sendError = (res, error) => {
   const statusCode = error.statusCode || 500;
+  console.error(`[sendError] ${statusCode} — ${error.message}`, statusCode >= 500 ? error.stack : '');
   return res.status(statusCode).json({
     success: false,
     message: error.message || 'Internal Server Error',
+    stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     data: null,
   });
 };
@@ -673,16 +675,19 @@ const getFeeReceipt = async (req, res) => {
   try {
     const { studentId } = req.params;
     const { paymentId } = req.query;
+    console.log(`[getFeeReceipt] Route entered — studentId: ${studentId}, paymentId: ${paymentId || 'latest'}`);
 
     const student = await findStudent(studentId);
     if (!student) {
       return res.status(404).json({ success: false, message: 'Student not found', data: null });
     }
+    console.log(`[getFeeReceipt] Student found: ${student.name} (${student._id})`);
 
     const fee = await Fee.findOne({ studentId: student._id });
     if (!fee) {
       return res.status(404).json({ success: false, message: 'Fee record not found', data: null });
     }
+    console.log(`[getFeeReceipt] Fee record found: ${fee._id}`);
 
     let payment = null;
 
@@ -695,11 +700,15 @@ const getFeeReceipt = async (req, res) => {
     if (!payment) {
       return res.status(404).json({ success: false, message: 'Payment not found', data: null });
     }
+    console.log(`[getFeeReceipt] Payment found: ${payment._id}, amount: ${payment.amount}`);
 
+    console.log('[getFeeReceipt] Starting PDF generation...');
     const pdfBuffer = await generateFeeReceipt(student, payment, fee);
+    console.log(`[getFeeReceipt] PDF generated successfully (${pdfBuffer.length} bytes), sending response`);
 
     return sendPdfResponse(res, pdfBuffer, `fee-receipt-${student.studentId}.pdf`);
   } catch (error) {
+    console.error('[getFeeReceipt] Receipt generation error:', error.message, error.stack);
     return sendError(res, error);
   }
 };

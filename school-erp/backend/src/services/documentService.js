@@ -5,6 +5,17 @@ const path = require('path');
 const SCHOOL_NAME = process.env.SCHOOL_NAME || 'School ERP Public School';
 const SCHOOL_ADDRESS = process.env.SCHOOL_ADDRESS || '123 Education Street, City, State';
 
+/**
+ * Read a template file with existence validation.
+ * Throws a descriptive error if the file is missing (instead of a cryptic ENOENT).
+ */
+const readTemplateFile = (templatePath) => {
+  if (!fs.existsSync(templatePath)) {
+    throw new Error(`Template not found: ${templatePath}`);
+  }
+  return fs.readFileSync(templatePath, 'utf-8');
+};
+
 const escapeHtml = (value) =>
   String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -173,16 +184,39 @@ const studentDetailsRows = (student) => `
 `;
 
 const renderPdf = async (html, pdfOptions = {}) => {
-  const browser = await puppeteer.launch({
+  console.log('[renderPdf] Launching Chromium browser...');
+
+  const launchOptions = {
     headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--single-process',
+    ],
+  };
+
+  // Use system-installed Chromium when available (Render / Docker)
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    console.log(`[renderPdf] Using custom executablePath: ${launchOptions.executablePath}`);
+  }
+
+  let browser;
+  try {
+    browser = await puppeteer.launch(launchOptions);
+  } catch (launchError) {
+    console.error('[renderPdf] Failed to launch Chromium:', launchError.message);
+    throw new Error(`PDF generation failed — could not launch browser: ${launchError.message}`);
+  }
 
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
-    return await page.pdf({
+    console.log('[renderPdf] Generating PDF...');
+    const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
       margin: {
@@ -193,14 +227,18 @@ const renderPdf = async (html, pdfOptions = {}) => {
       },
       ...pdfOptions,
     });
+
+    console.log(`[renderPdf] PDF generated successfully (${pdfBuffer.length} bytes)`);
+    return pdfBuffer;
   } finally {
     await browser.close();
   }
 };
 
 const generateBonafideHtml = async (student) => {
+  console.log('[generateBonafideHtml] Loading bonafide template...');
   const templatePath = path.join(__dirname, '../templates/bonafide_certificate.html');
-  let html = fs.readFileSync(templatePath, 'utf8');
+  let html = readTemplateFile(templatePath);
 
   let academicYear = new Date().getFullYear() + '-' + (new Date().getFullYear() + 1);
   if (student.academic && student.academic.admissionDate) {
@@ -317,7 +355,7 @@ const resolveLogoConditional = (html, logoBase64) => {
 };
 
 const fillTcTemplate = (templatePath, placeholders) => {
-  let html = fs.readFileSync(templatePath, 'utf-8');
+  let html = readTemplateFile(templatePath);
 
   // 1. Embed logo directly (raw — not HTML-escaped)
   const logoBase64 = getLogoBase64();
@@ -333,6 +371,7 @@ const fillTcTemplate = (templatePath, placeholders) => {
 };
 
 const generateTC = async (student, extras = {}) => {
+  console.log('[generateTC] Loading TC template...');
   const templatePath = path.join(__dirname, '..', 'templates', 'tc_template.html');
   const placeholders = buildTcPlaceholders(student, extras);
   const html = fillTcTemplate(templatePath, placeholders);
@@ -344,6 +383,7 @@ const generateTC = async (student, extras = {}) => {
 
 // Returns HTML string for print-window approach (no PDF)
 const generateTCHtml = (student, extras = {}) => {
+  console.log('[generateTCHtml] Loading TC template...');
   const templatePath = path.join(__dirname, '..', 'templates', 'tc_template.html');
   const placeholders = buildTcPlaceholders(student, extras);
   return fillTcTemplate(templatePath, placeholders);
@@ -351,6 +391,7 @@ const generateTCHtml = (student, extras = {}) => {
 
 // Returns HTML string for duplicate TC print-window
 const generateDuplicateTCHtml = (student, duplicateRequest, extras = {}) => {
+  console.log('[generateDuplicateTCHtml] Loading duplicate TC template...');
   const templatePath = path.join(__dirname, '..', 'templates', 'tc_template_duplicate.html');
   const now = new Date();
   const placeholders = buildTcPlaceholders(student, {
@@ -430,8 +471,10 @@ const getLogoBase64 = () => {
 };
 
 const generateFeeReceipt = async (student, payment, fee) => {
+  console.log('[generateFeeReceipt] Starting fee receipt generation...');
   const templatePath = path.join(__dirname, '..', 'templates', 'fee_receipt_template.html');
-  let html = fs.readFileSync(templatePath, 'utf-8');
+  let html = readTemplateFile(templatePath);
+  console.log('[generateFeeReceipt] Template loaded successfully');
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -505,14 +548,18 @@ const generateFeeReceipt = async (student, payment, fee) => {
   }
 
   // Use zero margins since the template handles its own A4 layout
-  return renderPdf(html, {
+  console.log('[generateFeeReceipt] Sending HTML to PDF renderer...');
+  const pdfBuffer = await renderPdf(html, {
     margin: { top: '0', right: '0', bottom: '0', left: '0' },
   });
+  console.log('[generateFeeReceipt] Fee receipt PDF generated successfully');
+  return pdfBuffer;
 };
 
 const generateAdmissionFormHtml = (student) => {
+  console.log('[generateAdmissionFormHtml] Loading admission form template...');
   const templatePath = path.join(__dirname, '..', 'templates', 'admission_form.html');
-  let html = fs.readFileSync(templatePath, 'utf-8');
+  let html = readTemplateFile(templatePath);
 
   // 1. Process Names & Letter Character Boxes
   const nameParts = (student.name || '').trim().split(/\s+/);
