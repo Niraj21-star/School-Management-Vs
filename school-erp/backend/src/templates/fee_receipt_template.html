@@ -152,14 +152,14 @@
     .header-text {}
 
     .header-text .school-name {
-      font-size: 13pt;
+      font-size: 16pt;
       font-weight: bold;
       color: #c0392b;
       line-height: 1.15;
     }
 
     .header-text .school-address {
-      font-size: 7pt;
+      font-size: 9.5pt;
       color: #000;
       margin-top: 0.8mm;
     }
@@ -424,7 +424,7 @@
         </div>
         <div class="header-text">
           <div class="school-name">Shree Swami Vivekanand English School</div>
-          <div class="school-address">Siddhnath Wadgaon, Tq.Gangapur Dist.Aurangabad (M.S.)</div>
+          <div class="school-address">Siddhnath Wadgaon, Tq.Gangapur Dist.Chhatrapati Sambhajinagar (M.S.)</div>
         </div>
       </div>
 
@@ -456,10 +456,7 @@
             <span class="lbl">PRN No.</span>
             <span class="val">{{gr_no}}</span>
           </div>
-          <div class="info-field">
-            <span class="lbl">Roll No.</span>
-            <span class="val">{{roll_no}}</span>
-          </div>
+
         </div>
         <div class="info-row">
           <div class="info-field">
@@ -473,10 +470,6 @@
           </div>
         </div>
 
-        <div class="info-field" style="flex:2;">
-          <span class="lbl">Txn. ID</span>
-          <span class="val">{{transaction_id}}</span>
-        </div>
       </div>
 
       <!-- FEE TABLE SECTION -->
@@ -638,7 +631,7 @@
         </div>
         <div class="header-text">
           <div class="school-name">Shree Swami Vivekanand English School</div>
-          <div class="school-address">Siddhnath Wadgaon, Tq.Gangapur Dist.Aurangabad (M.S.)</div>
+          <div class="school-address">Siddhnath Wadgaon, Tq.Gangapur Dist.Chhatrapati Sambhajinagar (M.S.)</div>
         </div>
       </div>
 
@@ -670,10 +663,7 @@
             <span class="lbl">PRN No.</span>
             <span class="val">{{gr_no}}</span>
           </div>
-          <div class="info-field">
-            <span class="lbl">Roll No.</span>
-            <span class="val">{{roll_no}}</span>
-          </div>
+
         </div>
         <div class="info-row">
           <div class="info-field">
@@ -688,155 +678,153 @@
         </div>
         <div class="info-row">
 
-          <div class="info-field" style="flex:2;">
-            <span class="lbl">Txn. ID</span>
-            <span class="val">{{transaction_id}}</span>
-          </div>
+
         </div>
+      </div>
 
-        <!-- FEE TABLE SECTION -->
-        <table class="fee-table">
-          <thead>
-            <tr>
-              <th class="c-sn" rowspan="2">S.N.</th>
-              <th class="c-part" rowspan="2">Particulars</th>
-              <th class="c-dots" rowspan="2"></th>
-              <th colspan="2" class="amt-super">Amount</th>
-            </tr>
-            <tr>
-              <th class="c-rs">Rs.</th>
-              <th class="c-ps">Ps.</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="c-sn">1</td>
-              <td class="c-part">Admission Fee</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{admission_fee}}</td>
-              <td class="c-ps">{{admission_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">2</td>
-              <td class="c-part">B.D.F.</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{bdf_fee}}</td>
-              <td class="c-ps">{{bdf_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">3</td>
-              <td class="c-part">Tuition Fee</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{tuition_fee}}</td>
-              <td class="c-ps">{{tuition_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">4</td>
-              <td class="c-part">Exam Fee</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{exam_fee}}</td>
-              <td class="c-ps">{{exam_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">5</td>
-              <td class="c-part">Computer Fee</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{computer_fee}}</td>
-              <td class="c-ps">{{computer_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">6</td>
-              <td class="c-part">Sport Fee</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{sport_fee}}</td>
-              <td class="c-ps">{{sport_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">7</td>
-              <td class="c-part">Medical Charges</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{medical_fee}}</td>
-              <td class="c-ps">{{medical_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">8</td>
-              <td class="c-part">Craft Fee</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{craft_fee}}</td>
-              <td class="c-ps">{{craft_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">9</td>
-              <td class="c-part">Library</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{library_fee}}</td>
-              <td class="c-ps">{{library_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">10</td>
-              <td class="c-part">Laboratories</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{laboratory_fee}}</td>
-              <td class="c-ps">{{laboratory_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">11</td>
-              <td class="c-part">Misc.</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{misc_fee}}</td>
-              <td class="c-ps">{{misc_fee_ps}}</td>
-            </tr>
-            <tr>
-              <td class="c-sn">12</td>
-              <td class="c-part">Other</td>
-              <td class="c-dots">------------</td>
-              <td class="c-rs">{{other_fee}}</td>
-              <td class="c-ps">{{other_fee_ps}}</td>
-            </tr>
-          </tbody>
-          <!-- TOTALS SECTION -->
-          <tfoot>
-            <tr class="sub-row">
-              <td colspan="3" class="sub-label">Late Fee</td>
-              <td class="c-rs">{{late_fee}}</td>
-              <td class="c-ps">{{late_fee_ps}}</td>
-            </tr>
-            <tr class="sub-row">
-              <td colspan="3" class="sub-label">Discount</td>
-              <td class="c-rs">{{discount}}</td>
-              <td class="c-ps">{{discount_ps}}</td>
-            </tr>
-            <tr class="total-row">
-              <td colspan="2" class="words-cell">{{amount_in_words}}</td>
-              <td class="total-label">Total</td>
-              <td class="total-rs">{{total_amount}}</td>
-              <td class="total-ps">{{total_amount_ps}}</td>
-            </tr>
-          </tfoot>
-        </table>
+      <!-- FEE TABLE SECTION -->
+      <table class="fee-table">
+        <thead>
+          <tr>
+            <th class="c-sn" rowspan="2">S.N.</th>
+            <th class="c-part" rowspan="2">Particulars</th>
+            <th class="c-dots" rowspan="2"></th>
+            <th colspan="2" class="amt-super">Amount</th>
+          </tr>
+          <tr>
+            <th class="c-rs">Rs.</th>
+            <th class="c-ps">Ps.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="c-sn">1</td>
+            <td class="c-part">Admission Fee</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{admission_fee}}</td>
+            <td class="c-ps">{{admission_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">2</td>
+            <td class="c-part">B.D.F.</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{bdf_fee}}</td>
+            <td class="c-ps">{{bdf_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">3</td>
+            <td class="c-part">Tuition Fee</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{tuition_fee}}</td>
+            <td class="c-ps">{{tuition_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">4</td>
+            <td class="c-part">Exam Fee</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{exam_fee}}</td>
+            <td class="c-ps">{{exam_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">5</td>
+            <td class="c-part">Computer Fee</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{computer_fee}}</td>
+            <td class="c-ps">{{computer_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">6</td>
+            <td class="c-part">Sport Fee</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{sport_fee}}</td>
+            <td class="c-ps">{{sport_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">7</td>
+            <td class="c-part">Medical Charges</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{medical_fee}}</td>
+            <td class="c-ps">{{medical_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">8</td>
+            <td class="c-part">Craft Fee</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{craft_fee}}</td>
+            <td class="c-ps">{{craft_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">9</td>
+            <td class="c-part">Library</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{library_fee}}</td>
+            <td class="c-ps">{{library_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">10</td>
+            <td class="c-part">Laboratories</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{laboratory_fee}}</td>
+            <td class="c-ps">{{laboratory_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">11</td>
+            <td class="c-part">Misc.</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{misc_fee}}</td>
+            <td class="c-ps">{{misc_fee_ps}}</td>
+          </tr>
+          <tr>
+            <td class="c-sn">12</td>
+            <td class="c-part">Other</td>
+            <td class="c-dots">------------</td>
+            <td class="c-rs">{{other_fee}}</td>
+            <td class="c-ps">{{other_fee_ps}}</td>
+          </tr>
+        </tbody>
+        <!-- TOTALS SECTION -->
+        <tfoot>
+          <tr class="sub-row">
+            <td colspan="3" class="sub-label">Late Fee</td>
+            <td class="c-rs">{{late_fee}}</td>
+            <td class="c-ps">{{late_fee_ps}}</td>
+          </tr>
+          <tr class="sub-row">
+            <td colspan="3" class="sub-label">Discount</td>
+            <td class="c-rs">{{discount}}</td>
+            <td class="c-ps">{{discount_ps}}</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="2" class="words-cell">{{amount_in_words}}</td>
+            <td class="total-label">Total</td>
+            <td class="total-rs">{{total_amount}}</td>
+            <td class="total-ps">{{total_amount_ps}}</td>
+          </tr>
+        </tfoot>
+      </table>
 
-        <!-- SIGNATURE SECTION -->
-        <div class="signature-section">
-          <div class="sig-block">
-            <span class="sig-space"></span>
-            <div class="sig-line"></div>
-            <div class="sig-title">Acct. Clerk</div>
-          </div>
-          <div class="sig-block">
-            <span class="sig-space">{{cashier_name}}</span>
-            <div class="sig-line"></div>
-            <div class="sig-title">Cashier</div>
-          </div>
+      <!-- SIGNATURE SECTION -->
+      <div class="signature-section">
+        <div class="sig-block">
+          <span class="sig-space"></span>
+          <div class="sig-line"></div>
+          <div class="sig-title">Acct. Clerk</div>
         </div>
+        <div class="sig-block">
+          <span class="sig-space">{{cashier_name}}</span>
+          <div class="sig-line"></div>
+          <div class="sig-title">Cashier</div>
+        </div>
+      </div>
 
-      </div><!-- /.right -->
+    </div><!-- /.right -->
 
-    </div><!-- /.page-body -->
-    <script>
-      window.onload = function () {
-        window.print();
-      };
-    </script>
+  </div><!-- /.page-body -->
+  <script>
+    window.onload = function () {
+      window.print();
+    };
+  </script>
 </body>
 
 </html>
