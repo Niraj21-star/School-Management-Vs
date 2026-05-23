@@ -82,7 +82,7 @@ const ClerkFees = () => {
   useEffect(() => {
     if (form.class) {
       const [className, section = 'A'] = String(form.class).split('-');
-      getStudents({ class: className, section, limit: 200, status: 'all' })
+      getStudents({ class: className, section, limit: 200, status: 'active' })
         .then(setClassStudents)
         .catch(() => setClassStudents([]));
     } else {

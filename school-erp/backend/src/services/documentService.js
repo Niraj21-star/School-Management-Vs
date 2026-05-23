@@ -252,13 +252,10 @@ const generateBonafideHtml = async (student) => {
   const dobYyyy = !Number.isNaN(dob.getTime()) ? String(dob.getFullYear()) : '';
   const issueDate = new Date().toLocaleDateString('en-GB');
 
-  const fullName = [student.name, student.parent?.fatherName, student.surname].filter(Boolean).join(' ');
-  const classWithSection = student.academic ? `${student.academic.class} - ${student.academic.section}` : '';
-
   const replacements = {
-    '{{student_name}}': escapeHtml(fullName),
+    '{{student_name}}': escapeHtml(student.name),
     '{{academic_year}}': escapeHtml(academicYear),
-    '{{class}}': escapeHtml(classWithSection),
+    '{{class}}': escapeHtml(student.academic?.class || ''),
     '{{dob_dd}}': escapeHtml(dobDd),
     '{{dob_mm}}': escapeHtml(dobMm),
     '{{dob_yyyy}}': escapeHtml(dobYyyy),
@@ -510,7 +507,7 @@ const generateFeeReceiptHtml = (student = {}, payment = {}, fee = {}) => {
     document_title: `Fee Receipt - ${student?.surname ? `${student?.name || ''} ${student?.surname || ''}`.trim() : (student?.name || '')}`,
     // Receipt metadata
     receipt_no: String(payment?.receiptNo || payment?._id || ''),
-    academic_year: `${currentYear - 1}-${currentYear}`,
+    academic_year: `${currentYear + 1}-${currentYear}`,
     date: formatDate(payment?.date || now),
     payment_mode: String(payment?.mode || '').toUpperCase(),
     transaction_id: String(payment?._id || ''),
@@ -556,7 +553,7 @@ const generateFeeReceiptHtml = (student = {}, payment = {}, fee = {}) => {
 
 const generateFeeReceipt = async (student = {}, payment = {}, fee = {}) => {
   const html = generateFeeReceiptHtml(student, payment, fee);
-  
+
   // Use zero margins since the template handles its own A4 layout
   console.log('[generateFeeReceipt] Sending HTML to PDF renderer...');
   const pdfBuffer = await renderPdf(html, {
@@ -639,7 +636,7 @@ const generateAdmissionFormHtml = (student) => {
   const dayStr = String(dobDate.getDate()).padStart(2, '0');
   const monthStr = String(dobDate.getMonth() + 1).padStart(2, '0');
   const yearStr = String(dobDate.getFullYear()).padStart(4, '0');
-  
+
   placeholders.dob_day_1 = dayStr[0];
   placeholders.dob_day_2 = dayStr[1];
   placeholders.dob_month_1 = monthStr[0];
