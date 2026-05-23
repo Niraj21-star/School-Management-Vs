@@ -151,6 +151,8 @@ export const createStudent = async (formData) => {
 
     const payload = {
       generalRegisterNumber: formData.grNo || formData.generalRegisterNumber,
+      aadhaarNumber: formData.aadhaarNumber,
+      penNumber: formData.penNumber,
       name: formData.name,
       surname: formData.surname || '',
       dob: formData.dob || defaultDob.toISOString().split('T')[0],
@@ -195,6 +197,8 @@ export const updateStudentById = async (id, formData) => {
 
     const payload = {
       generalRegisterNumber: formData.grNo || formData.generalRegisterNumber,
+      aadhaarNumber: formData.aadhaarNumber,
+      penNumber: formData.penNumber,
       name: formData.name,
       surname: formData.surname,
       contact: formData.phone,
