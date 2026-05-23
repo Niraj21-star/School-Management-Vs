@@ -47,6 +47,8 @@ const AdminStudents = () => {
     nationality: 'Indian',
     motherEducation: '',
     isTcIssued: false,
+    aadhaarNumber: '',
+    penNumber: '',
   });
   const navigate = useNavigate();
 
@@ -217,6 +219,8 @@ const AdminStudents = () => {
       nationality: student.raw?.nationality || 'Indian',
       fatherEducation: student.raw?.fatherEducation || '',
       motherEducation: student.raw?.motherEducation || '',
+      aadhaarNumber: student.raw?.aadhaarNumber || '',
+      penNumber: student.raw?.penNumber || '',
       isTcIssued: false, // Don't show this field on edit, or reset it
     });
     setModalOpen(true);
@@ -431,6 +435,8 @@ const AdminStudents = () => {
           <SelectInput label="Status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} options={[
             { value: 'Active', label: 'Active' }, { value: 'Inactive', label: 'Inactive' },
           ]} />
+          <FormInput label="Student Aadhaar Number" value={form.aadhaarNumber} onChange={(e) => setForm({ ...form, aadhaarNumber: e.target.value })} />
+          <FormInput label="Student P.E.N Number" value={form.penNumber} onChange={(e) => setForm({ ...form, penNumber: e.target.value })} />
           <FormInput label="Nationality" value={form.nationality} onChange={(e) => setForm({ ...form, nationality: e.target.value })} />
           <FormInput label="Place of Birth" value={form.placeOfBirth} onChange={(e) => setForm({ ...form, placeOfBirth: e.target.value })} />
           <FormInput label="Religion" value={form.religion} onChange={(e) => setForm({ ...form, religion: e.target.value })} />

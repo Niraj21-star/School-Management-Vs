@@ -76,6 +76,8 @@ const normalizeStudentPayload = (payload, forUpdate = false) => {
   const updates = {};
 
   if (payload.generalRegisterNumber !== undefined) updates.generalRegisterNumber = String(payload.generalRegisterNumber).trim();
+  if (payload.aadhaarNumber !== undefined) updates.aadhaarNumber = String(payload.aadhaarNumber).trim();
+  if (payload.penNumber !== undefined) updates.penNumber = String(payload.penNumber).trim();
 
   if (payload.name !== undefined) updates.name = String(payload.name).trim();
   if (payload.dob !== undefined) updates.dob = payload.dob;

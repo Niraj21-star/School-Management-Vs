@@ -17,6 +17,22 @@ const studentSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    prnNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
+      index: true,
+    },
+    aadhaarNumber: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    penNumber: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     name: {
       type: String,
       required: true,
@@ -182,6 +198,22 @@ studentSchema.pre('validate', async function generateStudentId() {
   );
 
   this.studentId = `SCH${currentYear}-${String(counter.seq).padStart(3, '0')}`;
+});
+
+studentSchema.pre('validate', async function generatePrnNumber() {
+  if (!this.isNew || this.prnNumber) {
+    return;
+  }
+
+  const counterKey = `prnNumber:global`;
+
+  const counter = await StudentCounter.findOneAndUpdate(
+    { _id: counterKey },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  this.prnNumber = `SSVES-${String(counter.seq).padStart(3, '0')}`;
 });
 
 studentSchema.index(
