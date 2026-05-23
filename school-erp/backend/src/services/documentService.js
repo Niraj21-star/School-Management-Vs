@@ -252,10 +252,13 @@ const generateBonafideHtml = async (student) => {
   const dobYyyy = !Number.isNaN(dob.getTime()) ? String(dob.getFullYear()) : '';
   const issueDate = new Date().toLocaleDateString('en-GB');
 
+  const fullName = [student.name, student.parent?.fatherName, student.surname].filter(Boolean).join(' ');
+  const classWithSection = student.academic ? `${student.academic.class} - ${student.academic.section}` : '';
+
   const replacements = {
-    '{{student_name}}': escapeHtml(student.name),
+    '{{student_name}}': escapeHtml(fullName),
     '{{academic_year}}': escapeHtml(academicYear),
-    '{{class}}': escapeHtml(student.academic?.class || ''),
+    '{{class}}': escapeHtml(classWithSection),
     '{{dob_dd}}': escapeHtml(dobDd),
     '{{dob_mm}}': escapeHtml(dobMm),
     '{{dob_yyyy}}': escapeHtml(dobYyyy),

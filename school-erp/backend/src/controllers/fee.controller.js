@@ -63,11 +63,17 @@ const createFeeStructure = async (req, res) => {
 const getAllFees = async (req, res) => {
   try {
     const fees = await Fee.find()
-      .populate('studentId', 'studentId name surname academic status')
+      .populate({
+        path: 'studentId',
+        select: 'studentId name surname academic status',
+        match: { status: 'active' }
+      })
       .sort({ updatedAt: -1, createdAt: -1 })
       .lean();
 
-    const studentIds = fees.map((fee) => fee.studentId?._id).filter(Boolean);
+    const activeFees = fees.filter(fee => fee.studentId !== null);
+
+    const studentIds = activeFees.map((fee) => fee.studentId?._id).filter(Boolean);
 
     const payments = await Payment.find({ studentId: { $in: studentIds } })
       .sort({ date: -1, createdAt: -1 })
@@ -84,7 +90,7 @@ const getAllFees = async (req, res) => {
       return accumulator;
     }, {});
 
-    const result = fees.map((fee) => ({
+    const result = activeFees.map((fee) => ({
       fee,
       paymentHistory: paymentsByStudent[String(fee.studentId?._id)] || [],
     }));
