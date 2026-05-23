@@ -470,8 +470,8 @@ const getLogoBase64 = () => {
   }
 };
 
-const generateFeeReceipt = async (student = {}, payment = {}, fee = {}) => {
-  console.log('[generateFeeReceipt] Starting fee receipt generation...');
+const generateFeeReceiptHtml = (student = {}, payment = {}, fee = {}) => {
+  console.log('[generateFeeReceiptHtml] Starting fee receipt HTML generation...');
   const templatePath = path.join(__dirname, '..', 'templates', 'fee_receipt_template.html');
   let html = readTemplateFile(templatePath);
   console.log('[generateFeeReceipt] Template loaded successfully');
@@ -504,6 +504,7 @@ const generateFeeReceipt = async (student = {}, payment = {}, fee = {}) => {
 
   // Build all other placeholders (these ARE escaped to prevent injection)
   const placeholders = {
+    document_title: `Fee Receipt - ${student?.surname ? `${student?.name || ''} ${student?.surname || ''}`.trim() : (student?.name || '')}`,
     // Receipt metadata
     receipt_no: String(payment?.receiptNo || payment?._id || ''),
     academic_year: `${currentYear - 1}-${currentYear}`,
@@ -547,6 +548,12 @@ const generateFeeReceipt = async (student = {}, payment = {}, fee = {}) => {
     html = html.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), escapeHtml(value));
   }
 
+  return html;
+};
+
+const generateFeeReceipt = async (student = {}, payment = {}, fee = {}) => {
+  const html = generateFeeReceiptHtml(student, payment, fee);
+  
   // Use zero margins since the template handles its own A4 layout
   console.log('[generateFeeReceipt] Sending HTML to PDF renderer...');
   const pdfBuffer = await renderPdf(html, {
@@ -691,6 +698,7 @@ module.exports = {
   generateTC,
   generateTCHtml,
   generateDuplicateTCHtml,
+  generateFeeReceiptHtml,
   generateFeeReceipt,
   generateAdmissionFormHtml,
 };

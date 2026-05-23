@@ -680,6 +680,18 @@ export const downloadFeeReceipt = async (studentId, paymentId) => {
   }
 };
 
+export const getFeeReceiptHtml = async (studentId, paymentId) => {
+  try {
+    const response = await apiClient.get(`/api/documents/receipt/${studentId}/html`, {
+      params: paymentId ? { paymentId } : undefined,
+      responseType: 'text',
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error, 'Unable to fetch fee receipt HTML.'));
+  }
+};
+
 const mapDocumentRecord = (record) => ({
   id: record?._id,
   name: record?.name || '-',

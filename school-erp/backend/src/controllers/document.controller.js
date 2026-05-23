@@ -717,6 +717,45 @@ const getFeeReceipt = async (req, res) => {
   }
 };
 
+const getFeeReceiptHtml = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { paymentId } = req.query;
+
+    const student = await findStudent(studentId);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found', data: null });
+    }
+
+    const fee = await Fee.findOne({ studentId: student._id });
+    if (!fee) {
+      return res.status(404).json({ success: false, message: 'Fee record not found', data: null });
+    }
+
+    let payment = null;
+
+    if (paymentId) {
+      payment = await Payment.findOne({ _id: paymentId, studentId: student._id });
+    } else {
+      payment = await Payment.findOne({ studentId: student._id }).sort({ date: -1, createdAt: -1 });
+    }
+
+    if (!payment) {
+      return res.status(404).json({ success: false, message: 'Payment not found', data: null });
+    }
+
+    const html = generateFeeReceiptHtml(student, payment, fee);
+    return res.status(200).send(html);
+  } catch (error) {
+    console.error('[getFeeReceiptHtml] Receipt HTML generation error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
 const getAdmissionFormHtml = async (req, res) => {
   try {
     const { studentId } = req.params;
@@ -746,5 +785,6 @@ module.exports = {
   reviewDuplicateTCRequest,
   getTCPrintLogs,
   getFeeReceipt,
+  getFeeReceiptHtml,
   getAdmissionFormHtml,
 };

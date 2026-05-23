@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getFees, getClasses, recordPayment, getStudents, downloadFeeReceipt } from '../../services/api';
+import { getFees, getClasses, recordPayment, getStudents, getFeeReceiptHtml } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
@@ -145,15 +145,15 @@ const ClerkFees = () => {
         <button
           onClick={async () => {
             try {
-              const blob = await downloadFeeReceipt(row.studentId);
-              const url = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = `Fee_Receipt_${row.studentName}.pdf`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              window.URL.revokeObjectURL(url);
+              const html = await getFeeReceiptHtml(row.studentId);
+              const printWindow = window.open('', '_blank', 'width=1000,height=800');
+              if (printWindow) {
+                printWindow.document.open();
+                printWindow.document.write(html);
+                printWindow.document.close();
+              } else {
+                alert('Please allow popups for this site to print the receipt.');
+              }
             } catch (err) {
               alert(err.message || 'Error generating receipt');
             }

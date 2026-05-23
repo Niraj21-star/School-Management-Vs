@@ -14,6 +14,7 @@ const {
   reviewDuplicateTCRequest,
   getTCPrintLogs,
   getFeeReceipt,
+  getFeeReceiptHtml,
   getAdmissionFormHtml,
 } = require('../controllers/document.controller');
 const { verifyToken, allowRoles } = require('../middleware/auth.middleware');
@@ -38,6 +39,7 @@ router.get('/bonafide/:studentId', allowRoles('admin', 'clerk'), getBonafide);
    FEE RECEIPT (admin + clerk)
    ================================================ */
 router.get('/receipt/:studentId', allowRoles('admin', 'clerk'), getFeeReceipt);
+router.get('/receipt/:studentId/html', allowRoles('admin', 'clerk'), getFeeReceiptHtml);
 
 /* ================================================
    ADMISSION FORM (admin + clerk)

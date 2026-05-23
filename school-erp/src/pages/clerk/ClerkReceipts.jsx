@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useCallback, useEffect } from 'react';
-import { downloadFeeReceipt, getFees } from '../../services/api';
+import { getFeeReceiptHtml, getFees } from '../../services/api';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
 import { Printer, Download } from 'lucide-react';
@@ -11,17 +11,6 @@ const ClerkReceipts = () => {
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState('');
   const [error, setError] = useState('');
-
-  const saveBlob = (blob, fileName) => {
-    const url = window.URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = fileName;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.URL.revokeObjectURL(url);
-  };
 
   const loadReceipts = useCallback(async () => {
     setLoading(true);
@@ -60,8 +49,15 @@ const ClerkReceipts = () => {
     setDownloadingId(receipt.id);
 
     try {
-      const blob = await downloadFeeReceipt(receipt.studentId, receipt.id);
-      saveBlob(blob, `receipt-${receipt.id}.pdf`);
+      const html = await getFeeReceiptHtml(receipt.studentId, receipt.id);
+      const printWindow = window.open('', '_blank', 'width=1000,height=800');
+      if (printWindow) {
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+      } else {
+        alert('Please allow popups for this site to print the receipt.');
+      }
     } catch (err) {
       setError(err.message || 'Unable to download receipt.');
     } finally {

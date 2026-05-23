@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Fee Receipt</title>
+  <title>{{document_title}}</title>
   <style>
     /* =============================================
        PAGE & PRINT SETUP — LANDSCAPE A4
@@ -847,6 +847,11 @@
     </div><!-- /.right -->
 
   </div><!-- /.page-body -->
+  <script>
+    window.onload = function() {
+      window.print();
+    };
+  </script>
 </body>
 
 </html>
