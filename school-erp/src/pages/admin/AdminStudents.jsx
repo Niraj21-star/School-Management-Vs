@@ -21,7 +21,7 @@ import { exportRowsToPdf } from '../../utils/pdfExport';
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
   const [selectedClass, setSelectedClass] = useState('All Classes');
-  const [selectedStatus, setSelectedStatus] = useState('All Status');
+  const [selectedStatus, setSelectedStatus] = useState('Active');
   const [classOptions, setClassOptions] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -171,7 +171,7 @@ const AdminStudents = () => {
 
       try {
         await deleteStudentById(id);
-        setStudents((prev) => prev.filter((s) => s.id !== id));
+        setStudents((prev) => prev.map((s) => s.id === id ? { ...s, status: 'Inactive' } : s));
       } catch (err) {
         setError(err.message || 'Unable to delete student.');
       }
