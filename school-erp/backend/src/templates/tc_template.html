@@ -13,7 +13,7 @@
 
     @page {
       size: A4 portrait;
-      margin: 8mm 8mm 8mm 8mm;
+      margin: 6mm 8mm 6mm 8mm;
     }
 
     * {
@@ -42,8 +42,9 @@
       min-height: 281mm;
       margin: 0 auto;
       border: 2px solid #000;
-      padding: 6mm 10mm 8mm 10mm;
+      padding: 4mm 10mm 5mm 10mm;
       position: relative;
+      page-break-inside: avoid;
     }
 
     /* =============================================
@@ -78,8 +79,8 @@
       position: relative;
       text-align: center;
       border-bottom: 1.5px solid #000;
-      padding-bottom: 4mm;
-      margin-bottom: 3mm;
+      padding-bottom: 3mm;
+      margin-bottom: 2mm;
       min-height: 26mm;
       display: flex;
       flex-direction: column;
@@ -104,19 +105,19 @@
 
     .school-header .trust-name {
       font-size: 14pt;
-      margin-bottom: 1.5mm;
+      margin-bottom: 1mm;
     }
 
     .school-header .school-name {
       font-size: 22pt;
       font-weight: bold;
-      line-height: 1.2;
-      margin-bottom: 1.5mm;
+      line-height: 1.1;
+      margin-bottom: 1mm;
     }
 
     .school-header .school-address {
       font-size: 12.5pt;
-      margin-bottom: 2.5mm;
+      margin-bottom: 1.5mm;
     }
 
     .school-header .logo {
@@ -189,7 +190,7 @@
        ============================================= */
     .cert-title {
       text-align: center;
-      margin-bottom: 1mm;
+      margin-bottom: 0.5mm;
     }
 
     .cert-title h2 {
@@ -220,8 +221,8 @@
       justify-content: space-between;
       align-items: flex-end;
       border: 1px solid #000;
-      padding: 3mm 4mm;
-      margin: 4mm 0;
+      padding: 2mm 4mm;
+      margin: 2mm 0;
       font-size: 10.5pt;
     }
 
@@ -254,15 +255,15 @@
        STUDENT DETAILS SECTION
        ============================================= */
     .student-details {
-      margin-top: 3mm;
+      margin-top: 2mm;
     }
 
     .detail-row {
       display: flex;
       align-items: flex-end;
-      margin-bottom: 5.5mm;
+      margin-bottom: 4mm;
       font-size: 11pt;
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     .detail-row .sno {
@@ -284,13 +285,13 @@
 
     /* Multi-part rows (e.g., name split into surname / student name / father name) */
     .name-block {
-      margin-bottom: 1.5mm;
+      margin-bottom: 1mm;
     }
 
     .name-block .name-row {
       display: flex;
       align-items: flex-end;
-      margin-bottom: 4.5mm;
+      margin-bottom: 3.5mm;
       font-size: 11pt;
     }
 
@@ -332,7 +333,7 @@
 
     /* Standard in which studying + Since When */
     .study-block {
-      margin-bottom: 4.5mm;
+      margin-bottom: 3.5mm;
     }
 
     .study-block .row1,
@@ -340,7 +341,7 @@
       display: flex;
       align-items: flex-end;
       font-size: 11pt;
-      margin-bottom: 4.5mm;
+      margin-bottom: 3.5mm;
     }
 
     .study-block .row1 .label,
@@ -361,7 +362,7 @@
     .separator-line {
       border: none;
       border-top: 1px solid #000;
-      margin: 4mm 0;
+      margin: 3mm 0;
     }
 
     /* =============================================
@@ -370,10 +371,10 @@
     .certification-statement {
       font-size: 10pt;
       text-align: left;
-      margin-top: 5mm;
+      margin-top: 3mm;
       font-style: italic;
       border-top: 1px solid #000;
-      padding-top: 3mm;
+      padding-top: 2mm;
     }
 
     /* =============================================
@@ -383,8 +384,8 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      margin-top: 10mm;
-      padding-top: 3mm;
+      margin-top: 6mm;
+      padding-top: 2mm;
     }
 
     .signatures-section .date-block {
