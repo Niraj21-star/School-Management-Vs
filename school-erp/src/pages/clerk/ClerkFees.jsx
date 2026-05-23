@@ -14,7 +14,7 @@ import { formatCurrency } from '../../utils/helpers';
 const ClerkFees = () => {
   const [fees, setFees] = useState([]);
   const [classOptions, setClassOptions] = useState([]);
-  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedClass, setSelectedClass] = useState('All Classes');
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -26,12 +26,14 @@ const ClerkFees = () => {
     craft: '', library: '', laboratory: '', misc: '', other: '', late: '', discount: ''
   };
   
-  const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '', breakdown: { ...defaultBreakdown } });
+  const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '', mode: 'cash', breakdown: { ...defaultBreakdown } });
   const [classStudents, setClassStudents] = useState([]);
 
-  const filteredFees = selectedClass
-    ? fees.filter((fee) => fee.class === selectedClass)
-    : [];
+  const filteredFees = useMemo(() => {
+    return selectedClass && selectedClass !== 'All Classes'
+      ? fees.filter((fee) => fee.class === selectedClass)
+      : fees;
+  }, [fees, selectedClass]);
 
   const loadClasses = useCallback(async () => {
     setLoadingClasses(true);
@@ -121,7 +123,7 @@ const ClerkFees = () => {
         return next;
       });
 
-      setForm({ studentId: '', class: '', amount: '', paid: '', breakdown: { ...defaultBreakdown } });
+      setForm({ studentId: '', class: '', amount: '', paid: '', mode: 'cash', breakdown: { ...defaultBreakdown } });
       setModalOpen(false);
     } catch (err) {
       setError(err.message || 'Unable to record payment.');
@@ -180,7 +182,7 @@ const ClerkFees = () => {
 
       <PageHeader
         title="Fee Collection"
-        subtitle={selectedClass ? `Showing fee records for ${selectedClass}` : 'Select a class to view fee records'}
+        subtitle={selectedClass && selectedClass !== 'All Classes' ? `Showing fee records for ${selectedClass}` : 'Showing all fee records'}
       >
         <Button onClick={() => setModalOpen(true)}><Plus className="w-4 h-4" /> Collect Fee</Button>
       </PageHeader>
@@ -191,19 +193,13 @@ const ClerkFees = () => {
             label="Select Class"
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            options={classOptions}
+            options={[{ value: 'All Classes', label: 'All Classes' }, ...classOptions]}
             placeholder="Choose class"
           />
         </div>
       </div>
 
-      {selectedClass ? (
-        <DataTable columns={columns} data={filteredFees} />
-      ) : (
-        <div className="card p-8 text-center text-slate-500 text-sm">
-          Please select a class to display class-wise fee records.
-        </div>
-      )}
+      <DataTable columns={columns} data={filteredFees} />
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Collect Fee">
         <div className="space-y-4">
@@ -234,6 +230,17 @@ const ClerkFees = () => {
             value={form.amount}
             onChange={(e) => setForm({ ...form, amount: e.target.value })}
             readOnly={!!form.studentId && fees.some((f) => f.studentId === form.studentId)}
+          />
+          <SelectInput
+            label="Payment Mode"
+            value={form.mode}
+            onChange={(e) => setForm({ ...form, mode: e.target.value })}
+            options={[
+              { value: 'cash', label: 'Cash' },
+              { value: 'upi', label: 'UPI' },
+              { value: 'bank', label: 'Bank Transfer' },
+            ]}
+            required
           />
           
           <div className="pt-2">

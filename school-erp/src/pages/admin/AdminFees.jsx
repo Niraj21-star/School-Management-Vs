@@ -25,7 +25,7 @@ const AdminFees = () => {
     craft: '', library: '', laboratory: '', misc: '', other: '', late: '', discount: ''
   };
 
-  const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '', status: 'Pending', breakdown: { ...defaultBreakdown } });
+  const [form, setForm] = useState({ studentId: '', class: '', amount: '', paid: '', status: 'Pending', mode: 'cash', breakdown: { ...defaultBreakdown } });
   const [classStudents, setClassStudents] = useState([]);
 
   const loadClasses = useCallback(async () => {
@@ -143,7 +143,7 @@ const AdminFees = () => {
         return next;
       });
 
-      setForm({ studentId: '', class: '', amount: '', paid: '', status: 'Pending', breakdown: { ...defaultBreakdown } });
+      setForm({ studentId: '', class: '', amount: '', paid: '', status: 'Pending', mode: 'cash', breakdown: { ...defaultBreakdown } });
       setModalOpen(false);
     } catch (err) {
       setError(err.message || 'Unable to save payment.');
@@ -313,6 +313,17 @@ const AdminFees = () => {
             value={form.amount}
             onChange={(e) => setForm({ ...form, amount: e.target.value })}
             readOnly={!!form.studentId && fees.some((f) => f.studentId === form.studentId)}
+          />
+          <SelectInput
+            label="Payment Mode"
+            value={form.mode}
+            onChange={(e) => setForm({ ...form, mode: e.target.value })}
+            options={[
+              { value: 'cash', label: 'Cash' },
+              { value: 'upi', label: 'UPI' },
+              { value: 'bank', label: 'Bank Transfer' },
+            ]}
+            required
           />
           
           <div className="pt-2">
