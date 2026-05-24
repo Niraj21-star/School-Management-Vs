@@ -221,6 +221,15 @@ studentSchema.index(
   { unique: true, partialFilterExpression: { status: 'active' } }
 );
 
+studentSchema.index(
+  { generalRegisterNumber: 1 },
+  { 
+    unique: true, 
+    partialFilterExpression: { generalRegisterNumber: { $gt: '' } },
+    name: 'unique_gr_number'
+  }
+);
+
 studentSchema.set('toJSON', {
   virtuals: true,
   transform: (doc, ret) => {
@@ -230,6 +239,11 @@ studentSchema.set('toJSON', {
 });
 
 const Student = mongoose.model('Student', studentSchema);
+
+// Automatically drop the orphaned unique index on generalRegisterNumber if it exists in the DB
+Student.collection.dropIndex('generalRegisterNumber_1').catch((err) => {
+  // Silently ignore if the index doesn't exist
+});
 
 module.exports = {
   Student,
