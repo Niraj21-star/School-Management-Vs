@@ -58,7 +58,17 @@ const createStudent = async (req, res) => {
   } catch (error) {
     if (error.code === 11000) {
       error.statusCode = 409;
-      error.message = 'Duplicate studentId detected. Please retry.';
+      const keyPattern = Object.keys(error.keyPattern || {})[0];
+      
+      if (keyPattern === 'studentId') {
+        error.message = 'Duplicate studentId detected. Please retry.';
+      } else if (keyPattern === 'prnNumber') {
+        error.message = `PRN Number is already in use.`;
+      } else if (error.keyPattern && error.keyPattern['academic.class']) {
+        error.message = `Roll number ${error.keyValue['academic.rollNumber']} is already assigned in class ${error.keyValue['academic.class']} ${error.keyValue['academic.section']}.`;
+      } else {
+        error.message = 'A duplicate record was detected.';
+      }
     }
 
     return sendError(res, error);

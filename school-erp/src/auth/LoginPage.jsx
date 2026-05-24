@@ -30,7 +30,7 @@ const LoginPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-50 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Immersive Background Watermark */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.05] bg-center bg-no-repeat bg-contain"
+        className="absolute inset-0 pointer-events-none opacity-[0.8] bg-center bg-no-repeat bg-contain"
         style={{ backgroundImage: 'url(/logo.png)' }}
       />
 
