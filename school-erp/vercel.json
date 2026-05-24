@@ -1,7 +1,7 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "routes": [
+  "rewrites": [
     {
       "src": "/assets/(.*)",
       "dest": "/assets/$1",
@@ -14,10 +14,9 @@
       "dest": "/favicon.ico"
     },
     {
-      "src": "/logo.png",
-      "dest": "/logo.png"
+      "src": "/logo1.png",
+      "dest": "/logo1.png"
     },
-
     {
       "src": "/(.*)",
       "dest": "/index.html"
