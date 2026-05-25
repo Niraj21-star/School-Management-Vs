@@ -14,6 +14,7 @@ const MENU_CONFIG = {
     { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
     { label: 'Student Admissions', path: '/admin/admissions', icon: UserCheck },
     { label: 'Students', path: '/admin/students', icon: Users },
+    { label: 'RTE Students', path: '/admin/rte', icon: Users },
     { label: 'Classes & Sections', path: '/admin/classes', icon: CalendarDays },
     { label: 'Teachers', path: '/admin/teachers', icon: GraduationCap },
     { label: 'Clerks', path: '/admin/clerks', icon: Users },

@@ -180,6 +180,10 @@ const studentSchema = new mongoose.Schema(
       enum: STATUSES,
       default: 'active',
     },
+    isRTE: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

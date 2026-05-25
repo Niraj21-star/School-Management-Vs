@@ -41,6 +41,10 @@ const buildStudentFilters = (query) => {
     filters.status = 'active';
   }
 
+  if (query.isRTE === 'true') {
+    filters.isRTE = true;
+  }
+
   return filters;
 };
 
@@ -115,6 +119,10 @@ const normalizeStudentPayload = (payload, forUpdate = false) => {
     }
 
     updates.status = payload.status;
+  }
+
+  if (payload.isRTE !== undefined) {
+    updates.isRTE = Boolean(payload.isRTE);
   }
 
   if (payload.parent !== undefined) {

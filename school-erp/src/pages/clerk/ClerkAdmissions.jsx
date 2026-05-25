@@ -11,7 +11,7 @@ const ClerkAdmissions = () => {
     grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '',
     class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '',
     caste: '', subCaste: '', religion: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '',
-    surname: '', isTcIssued: false, aadhaarNumber: '', penNumber: '',
+    surname: '', isTcIssued: false, aadhaarNumber: '', penNumber: '', isRTE: false,
   });
   const [classOptions, setClassOptions] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
@@ -112,7 +112,7 @@ const ClerkAdmissions = () => {
 
       setLastStudent(createdStudent);
       setSubmitted(true);
-      setForm({ grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '', caste: '', subCaste: '', religion: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '', surname: '', isTcIssued: false, aadhaarNumber: '', penNumber: '' });
+      setForm({ grNo: '', name: '', fatherName: '', motherName: '', dob: '', gender: '', class: '', phone: '', email: '', address: '', previousSchool: '', passportPhoto: '', caste: '', subCaste: '', religion: '', placeOfBirth: '', nationality: 'Indian', fatherEducation: '', motherEducation: '', surname: '', isTcIssued: false, aadhaarNumber: '', penNumber: '', isRTE: false });
     } catch (err) {
       setError(err.message || 'Unable to submit admission.');
     } finally {
@@ -193,6 +193,19 @@ const ClerkAdmissions = () => {
           <SelectInput label="TC Issued (Historical)" value={form.isTcIssued ? 'Yes' : 'No'} onChange={(e) => setForm({ ...form, isTcIssued: e.target.value === 'Yes' })} options={[
             { value: 'No', label: 'No' }, { value: 'Yes', label: 'Yes' }
           ]} />
+          
+          <div className="flex items-center mt-6">
+            <input
+              type="checkbox"
+              id="isRTE"
+              checked={form.isRTE}
+              onChange={(e) => setForm({ ...form, isRTE: e.target.checked })}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="isRTE" className="ml-2 text-sm font-medium text-slate-700">
+              Is this an RTE Admission?
+            </label>
+          </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Passport Size Photo</label>
             <input

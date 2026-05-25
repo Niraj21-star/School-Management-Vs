@@ -18,6 +18,7 @@ import AdminAdmissions from './pages/admin/AdminAdmissions';
 
 import AdminClasses from './pages/admin/AdminClasses';
 import AdminTC from './pages/admin/AdminTC';
+import AdminRTE from './pages/admin/AdminRTE';
 
 /* Clerk Pages */
 import ClerkDashboard from './pages/clerk/ClerkDashboard';
@@ -54,6 +55,7 @@ const App = () => {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="admissions" element={<AdminAdmissions />} />
             <Route path="students" element={<AdminStudents />} />
+            <Route path="rte" element={<AdminRTE />} />
             <Route path="classes" element={<AdminClasses />} />
             <Route path="teachers" element={<AdminTeachers />} />
             <Route path="clerks" element={<AdminClerks />} />
