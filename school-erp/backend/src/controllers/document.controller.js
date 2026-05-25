@@ -296,17 +296,8 @@ const getTCHtml = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Student not found', data: null });
     }
 
-    // Enforce one-time original print
-    if ((student.tcCertificate?.downloadCount || 0) >= 1) {
-      const error = new Error(
-        'Original TC has already been printed. Please use the Duplicate TC workflow.'
-      );
-      error.statusCode = 403;
-      throw error;
-    }
-
-    // Generate unique TC number and verification code
-    const tcNumber = await getNextTcNumber();
+    // If already printed, reuse the existing tcNumber, else generate a new one
+    const tcNumber = student.tcCertificate?.tcNumber || await getNextTcNumber();
     const verificationCode = makeVerificationCode(tcNumber);
 
     const html = generateTCHtml(student, { 
@@ -317,13 +308,20 @@ const getTCHtml = async (req, res) => {
 
     // Update student TC tracking
     const now = new Date();
+    const setFields = {
+      'tcCertificate.tcNumber': tcNumber,
+      'tcCertificate.lastDownloadedAt': now,
+      'tcCertificate.lastDownloadedBy': req.user._id,
+    };
+    
+    // Only set firstDownloadedAt if it hasn't been set yet
+    if (!student.tcCertificate?.firstDownloadedAt) {
+      setFields['tcCertificate.firstDownloadedAt'] = now;
+    }
+
     await Student.findByIdAndUpdate(student._id, {
       $inc: { 'tcCertificate.downloadCount': 1 },
-      $set: {
-        'tcCertificate.firstDownloadedAt': now,
-        'tcCertificate.lastDownloadedAt': now,
-        'tcCertificate.lastDownloadedBy': req.user._id,
-      },
+      $set: setFields,
     });
 
     // Record in print log

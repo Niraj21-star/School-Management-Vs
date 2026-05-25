@@ -168,15 +168,11 @@ const updateStudent = async (req, res) => {
   }
 };
 
-const softDeleteStudent = async (req, res) => {
+const deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const student = await Student.findOneAndUpdate(
-      resolveStudentQuery(id),
-      { status: 'inactive' },
-      { new: true }
-    );
+    const student = await Student.findOneAndDelete(resolveStudentQuery(id));
 
     if (!student) {
       const error = new Error('Student not found');
@@ -184,7 +180,7 @@ const softDeleteStudent = async (req, res) => {
       throw error;
     }
 
-    return sendSuccess(res, 200, 'Student deactivated successfully', student);
+    return sendSuccess(res, 200, 'Student deleted permanently', student);
   } catch (error) {
     return sendError(res, error);
   }
@@ -195,5 +191,5 @@ module.exports = {
   getAllStudents,
   getStudentById,
   updateStudent,
-  softDeleteStudent,
+  deleteStudent,
 };

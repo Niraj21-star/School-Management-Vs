@@ -157,6 +157,9 @@ const studentSchema = new mongoose.Schema(
       },
     ],
     tcCertificate: {
+      tcNumber: {
+        type: String,
+      },
       downloadCount: {
         type: Number,
         default: 0,

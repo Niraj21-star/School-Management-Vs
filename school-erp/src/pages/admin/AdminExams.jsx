@@ -69,7 +69,7 @@ const AdminExams = () => {
       return;
     }
 
-    const [className, section = 'A'] = String(selectedResultClass).split('-');
+    const [className, section] = String(selectedResultClass).split('-');
 
     setResultLoading(true);
     setError('');

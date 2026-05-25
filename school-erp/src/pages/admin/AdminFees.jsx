@@ -149,7 +149,7 @@ const AdminFees = () => {
 
   useEffect(() => {
     if (form.class) {
-      const [className, section = 'A'] = String(form.class).split('-');
+      const [className, section] = String(form.class).split('-');
       getStudents({ class: className, section, limit: 200, status: 'active' })
         .then(setClassStudents)
         .catch(() => setClassStudents([]));

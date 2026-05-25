@@ -126,21 +126,21 @@ export default function AdminTC() {
     if (!editTcForm) return;
     setPrintingTc(true);
     setError('');
-    
+
     try {
       const { studentId, isDuplicate, requestId, ...overrides } = editTcForm;
       let html = '';
-      
+
       if (isDuplicate) {
         html = await getDuplicateTCHtml(studentId, requestId, overrides);
       } else {
         html = await getTCHtml(studentId, overrides);
       }
-      
+
       openPrintWindow(html);
       setEditTcModalOpen(false);
       setEditTcForm(null);
-      
+
       const studentObj = students.find(s => s.id === studentId);
       if (studentObj) {
         await loadTcStatus(studentObj.studentId, studentObj.id);
@@ -372,28 +372,27 @@ export default function AdminTC() {
                     <td className="table-cell">
                       <div className="flex items-center gap-1">
                         {/* Print Original / Duplicate */}
-                        {st?.canPrintOriginal !== false ? (
-                          <button
-                            onClick={() => handlePrintOriginal(s)}
-                            disabled={isPrinting}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs font-medium hover:bg-slate-700 disabled:opacity-50 transition-colors"
-                            title="Print Original TC (one-time only)"
-                          >
-                            {isPrinting ? (
-                              <span className="animate-pulse">Generating…</span>
-                            ) : (
-                              <><Printer className="w-3.5 h-3.5" /> Print Original</>
-                            )}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => openDupModal(s)}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-medium hover:bg-amber-700 transition-colors"
-                            title="Print Duplicate TC"
-                          >
-                            <Printer className="w-3.5 h-3.5" /> Print Duplicate
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handlePrintOriginal(s)}
+                          disabled={isPrinting}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs font-medium hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                          title="Print Original TC"
+                        >
+                          {isPrinting ? (
+                            <span className="animate-pulse">Generating…</span>
+                          ) : (
+                            <><Printer className="w-3.5 h-3.5" /> Original</>
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => openDupModal(s)}
+                          disabled={st?.canPrintOriginal}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-medium hover:bg-amber-700 disabled:opacity-50 transition-colors"
+                          title={st?.canPrintOriginal ? "Print Original TC first" : "Print Duplicate TC"}
+                        >
+                          <Printer className="w-3.5 h-3.5" /> Duplicate
+                        </button>
 
                         {/* Logs */}
                         <button
@@ -591,16 +590,15 @@ export default function AdminTC() {
 
             <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-2">1. Office Reference</h4>
             <div className="grid grid-cols-3 gap-3">
-              <FormInput label="PRN No." value={editTcForm.register_no} onChange={e => setEditTcForm({ ...editTcForm, register_no: e.target.value })} />
+              <FormInput label="GR No." value={editTcForm.register_no} onChange={e => setEditTcForm({ ...editTcForm, register_no: e.target.value })} />
               <FormInput label="Aadhaar No." value={editTcForm.aadhaar_no} onChange={e => setEditTcForm({ ...editTcForm, aadhaar_no: e.target.value })} />
               <FormInput label="PEN No." value={editTcForm.pen_no} onChange={e => setEditTcForm({ ...editTcForm, pen_no: e.target.value })} />
               <FormInput label="UDISE No." value={editTcForm.udise_no} onChange={e => setEditTcForm({ ...editTcForm, udise_no: e.target.value })} className="col-span-3" />
             </div>
 
             <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-4">2. Pupil's Personal Details</h4>
-            <div className="grid grid-cols-2 gap-3">
-              <FormInput label="Full Name" value={editTcForm.full_name} onChange={e => setEditTcForm({ ...editTcForm, full_name: e.target.value })} className="col-span-2" />
-              <FormInput label="Father's Name" value={editTcForm.father_name} onChange={e => setEditTcForm({ ...editTcForm, father_name: e.target.value })} />
+            <div className="grid grid-cols-3 gap-3">
+              <FormInput label="Full Name" value={editTcForm.full_name} onChange={e => setEditTcForm({ ...editTcForm, full_name: e.target.value })} />
               <FormInput label="Mother's Name" value={editTcForm.mother_name} onChange={e => setEditTcForm({ ...editTcForm, mother_name: e.target.value })} />
             </div>
 
@@ -633,7 +631,7 @@ export default function AdminTC() {
               <FormInput label="Conduct" value={editTcForm.conduct} onChange={e => setEditTcForm({ ...editTcForm, conduct: e.target.value })} />
               <FormInput label="Date of Leaving" type="date" value={editTcForm.date_of_leaving} onChange={e => setEditTcForm({ ...editTcForm, date_of_leaving: e.target.value })} />
               <FormInput label="Reason for Leaving" value={editTcForm.reason_of_leaving} onChange={e => setEditTcForm({ ...editTcForm, reason_of_leaving: e.target.value })} />
-              <FormInput label="Remarks" value={editTcForm.remarks} onChange={e => setEditTcForm({ ...editTcForm, remarks: e.target.value })} className="col-span-2" />
+              <FormInput label="Remarks" value={editTcForm.remarks} onChange={e => setEditTcForm({ ...editTcForm, remarks: e.target.value })} />
             </div>
           </div>
         )}

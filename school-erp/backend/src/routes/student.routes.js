@@ -5,7 +5,7 @@ const {
   getAllStudents,
   getStudentById,
   updateStudent,
-  softDeleteStudent,
+  deleteStudent,
 } = require('../controllers/student.controller');
 const { verifyToken, allowRoles } = require('../middleware/auth.middleware');
 
@@ -17,6 +17,6 @@ router.get('/', allowRoles('admin', 'clerk', 'teacher'), getAllStudents);
 router.post('/', allowRoles('admin', 'clerk'), createStudent);
 router.get('/:id', allowRoles('admin', 'clerk', 'teacher'), getStudentById);
 router.put('/:id', allowRoles('admin', 'clerk'), updateStudent);
-router.delete('/:id', allowRoles('admin'), softDeleteStudent);
+router.delete('/:id', allowRoles('admin'), deleteStudent);
 
 module.exports = router;

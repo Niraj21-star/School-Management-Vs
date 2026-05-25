@@ -178,7 +178,7 @@ const AdminStudents = () => {
 
       try {
         await deleteStudentById(id);
-        setStudents((prev) => prev.map((s) => s.id === id ? { ...s, status: 'Inactive' } : s));
+        setStudents((prev) => prev.filter((s) => s.id !== id));
       } catch (err) {
         setError(err.message || 'Unable to delete student.');
       }

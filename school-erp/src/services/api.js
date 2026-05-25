@@ -185,6 +185,7 @@ export const createStudent = async (formData) => {
 
     const response = await apiClient.post('/api/students', payload);
     const data = unwrapResponse(response);
+    invalidateCache('students:');
     return mapStudent(data);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to create student.'));
@@ -232,6 +233,7 @@ export const updateStudentById = async (id, formData) => {
 
     const response = await apiClient.put(`/api/students/${id}`, payload);
     const data = unwrapResponse(response);
+    invalidateCache('students:');
     return mapStudent(data);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to update student.'));
@@ -241,6 +243,7 @@ export const updateStudentById = async (id, formData) => {
 export const deleteStudentById = async (id) => {
   try {
     const response = await apiClient.delete(`/api/students/${id}`);
+    invalidateCache('students:');
     return unwrapResponse(response);
   } catch (error) {
     throw new Error(getErrorMessage(error, 'Unable to delete student.'));
@@ -865,6 +868,18 @@ const withShortCache = async (key, ttlMs, fetcher) => {
   });
 
   return inFlight;
+};
+
+export const invalidateCache = (prefix) => {
+  if (!prefix) {
+    responseCache.clear();
+    return;
+  }
+  for (const key of responseCache.keys()) {
+    if (key.startsWith(prefix)) {
+      responseCache.delete(key);
+    }
+  }
 };
 
 export const getDashboardStats = async (role) => {
