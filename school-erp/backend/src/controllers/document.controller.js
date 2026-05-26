@@ -50,6 +50,32 @@ const sendError = (res, error) => {
   });
 };
 
+// Generate a friendly HTML page for print window when data is missing
+const noDataHtml = (title, message) => `
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>${title}</title>
+  <style>
+    body { margin: 0; padding: 60px 32px; font-family: Arial, sans-serif; background: #f8fafc; color: #1f2937; text-align: center; }
+    .card { max-width: 480px; margin: 0 auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 40px 32px; }
+    h1 { font-size: 22px; margin-bottom: 12px; color: #dc2626; }
+    p { font-size: 14px; color: #4b5563; line-height: 1.6; }
+    .btn { margin-top: 24px; display: inline-block; padding: 10px 28px; background: #1e293b; color: #fff; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+    .btn:hover { background: #334155; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>${title}</h1>
+    <p>${message}</p>
+    <button class="btn" onclick="window.close()">Close Window</button>
+  </div>
+</body>
+</html>
+`;
+
 // Generate a unique TC number: TC-2026-001
 const getNextTcNumber = async () => {
   const year = new Date().getFullYear();
@@ -228,7 +254,7 @@ const getBonafide = async (req, res) => {
 
     const student = await findStudent(studentId);
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found', data: null });
+      return res.status(200).send(noDataHtml('Student Not Found', 'The selected student could not be found in the system.'));
     }
 
     const html = await generateBonafideHtml(student);
@@ -236,7 +262,7 @@ const getBonafide = async (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     return res.status(200).send(html);
   } catch (error) {
-    return sendError(res, error);
+    return res.status(200).send(noDataHtml('Error', `An error occurred while generating the bonafide: ${error.message}`));
   }
 };
 
@@ -738,12 +764,12 @@ const getFeeReceiptHtml = async (req, res) => {
 
     const student = await findStudent(studentId);
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found', data: null });
+      return res.status(200).send(noDataHtml('Student Not Found', 'The selected student could not be found in the system.'));
     }
 
     const fee = await Fee.findOne({ studentId: student._id });
     if (!fee) {
-      return res.status(404).json({ success: false, message: 'Fee record not found', data: null });
+      return res.status(200).send(noDataHtml('No Fee Record', `No fee structure has been created for ${student.name || 'this student'} yet. Please set up fees first.`));
     }
 
     let payment = null;
@@ -755,18 +781,14 @@ const getFeeReceiptHtml = async (req, res) => {
     }
 
     if (!payment) {
-      return res.status(404).json({ success: false, message: 'Payment not found', data: null });
+      return res.status(200).send(noDataHtml('No Payment Found', `No payments have been recorded for ${student.name || 'this student'} yet. Please record a payment first.`));
     }
 
     const html = generateFeeReceiptHtml(student, payment, fee);
     return res.status(200).send(html);
   } catch (error) {
     console.error('[getFeeReceiptHtml] Receipt HTML generation error:', error);
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+    return res.status(200).send(noDataHtml('Error', `An error occurred while generating the receipt: ${error.message}`));
   }
 };
 
@@ -775,13 +797,13 @@ const getAdmissionFormHtml = async (req, res) => {
     const { studentId } = req.params;
     const student = await findStudent(studentId);
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found', data: null });
+      return res.status(200).send(noDataHtml('Student Not Found', 'The selected student could not be found in the system.'));
     }
 
     const html = generateAdmissionFormHtml(student);
     return res.status(200).send(html);
   } catch (error) {
-    return sendError(res, error);
+    return res.status(200).send(noDataHtml('Error', `An error occurred while generating the admission form: ${error.message}`));
   }
 };
 

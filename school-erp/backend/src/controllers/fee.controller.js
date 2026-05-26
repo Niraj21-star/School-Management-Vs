@@ -176,25 +176,43 @@ const recordPayment = async (req, res) => {
     };
 
     let paymentResult;
+    const MAX_RETRIES = 3;
 
-    const session = await mongoose.startSession();
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      const session = await mongoose.startSession();
 
-    try {
-      await session.withTransaction(async () => {
-        paymentResult = await applyPayment(session);
-      });
-    } catch (error) {
-      const transactionUnsupported = String(error.message || '').includes(
-        'Transaction numbers are only allowed on a replica set member or mongos'
-      );
+      try {
+        try {
+          await session.withTransaction(async () => {
+            paymentResult = await applyPayment(session);
+          });
+        } catch (error) {
+          const transactionUnsupported = String(error.message || '').includes(
+            'Transaction numbers are only allowed on a replica set member or mongos'
+          );
 
-      if (!transactionUnsupported) {
-        throw error;
+          if (!transactionUnsupported) {
+            throw error;
+          }
+
+          paymentResult = await applyPayment();
+        }
+
+        // Success — break out of retry loop
+        break;
+      } catch (retryError) {
+        // Retry only on E11000 duplicate key for receiptNo
+        const isDupKey = retryError.code === 11000
+          && String(retryError.message || '').includes('receiptNo');
+
+        if (!isDupKey || attempt === MAX_RETRIES) {
+          throw retryError;
+        }
+
+        console.warn(`[recordPayment] receiptNo duplicate key on attempt ${attempt}, retrying...`);
+      } finally {
+        await session.endSession();
       }
-
-      paymentResult = await applyPayment();
-    } finally {
-      await session.endSession();
     }
 
     return sendSuccess(res, 201, 'Payment recorded', {
