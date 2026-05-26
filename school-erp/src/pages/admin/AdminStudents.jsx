@@ -56,6 +56,7 @@ const AdminStudents = () => {
     previousSchool: '',
     admissionDate: '',
     address: '',
+    isRTE: false,
   });
   const navigate = useNavigate();
 
@@ -243,6 +244,7 @@ const AdminStudents = () => {
       previousSchool: student.raw?.previousSchool || '',
       admissionDate: student.raw?.academic?.admissionDate ? new Date(student.raw.academic.admissionDate).toISOString().split('T')[0] : '',
       address: student.raw?.address || '',
+      isRTE: student.raw?.isRTE || false,
     });
     setModalOpen(true);
   };
@@ -471,6 +473,9 @@ const AdminStudents = () => {
           <FormInput label="Sub-Caste" value={form.subCaste} onChange={(e) => setForm({ ...form, subCaste: e.target.value })} />
           <FormInput label="Father's Education" value={form.fatherEducation} onChange={(e) => setForm({ ...form, fatherEducation: e.target.value })} />
           <FormInput label="Mother's Education" value={form.motherEducation} onChange={(e) => setForm({ ...form, motherEducation: e.target.value })} />
+          <SelectInput label="RTE Admission" value={form.isRTE ? 'Yes' : 'No'} onChange={(e) => setForm({ ...form, isRTE: e.target.value === 'Yes' })} options={[
+            { value: 'No', label: 'No' }, { value: 'Yes', label: 'Yes' }
+          ]} />
           {!editStudent && (
             <SelectInput label="TC Issued (Historical)" value={form.isTcIssued ? 'Yes' : 'No'} onChange={(e) => setForm({ ...form, isTcIssued: e.target.value === 'Yes' })} options={[
               { value: 'No', label: 'No' }, { value: 'Yes', label: 'Yes' }
