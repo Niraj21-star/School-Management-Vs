@@ -56,6 +56,29 @@
       margin: 0 auto;
       padding: 6mm 9mm 6mm 9mm;
       background: #fff;
+      position: relative;
+    }
+
+    /* =============================================
+       LOGO WATERMARK
+       ============================================= */
+    .watermark-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      opacity: 0.08;
+      z-index: 9999 !important;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .watermark-overlay img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
     }
 
     /* ===== FROM / REG NO TOP ===== */
@@ -545,6 +568,12 @@
 
 <body>
   <div class="page">
+    
+    {{#logo_base64}}
+    <div class="watermark-overlay">
+      <img src="{{logo_base64}}" alt="watermark" />
+    </div>
+    {{/logo_base64}}
 
     <!-- ===== SCHOOL HEADER ===== -->
     <div class="header-top">

@@ -240,6 +240,11 @@ const generateBonafideHtml = async (student) => {
   const templatePath = path.join(__dirname, '../templates/bonafide_certificate.html');
   let html = readTemplateFile(templatePath);
 
+  const logoBase64 = getLogoBase64();
+  html = resolveLogoConditional(html, logoBase64);
+  html = html.replace(/\{\{logo_base64\}\}/g, logoBase64);
+
+
   let academicYear = new Date().getFullYear() + '-' + (new Date().getFullYear() + 1);
   if (student.academic && student.academic.admissionDate) {
     const startYear = new Date(student.academic.admissionDate).getFullYear();
@@ -531,6 +536,7 @@ const generateFeeReceiptHtml = (student = {}, payment = {}, fee = {}) => {
 
   // Inject logo directly (raw, not HTML-escaped) before processing other placeholders
   const logoBase64 = getLogoBase64();
+  html = resolveLogoConditional(html, logoBase64);
   html = html.replace(/\{\{logo_base64\}\}/g, logoBase64);
 
   const breakdown = payment?.breakdown || {};
@@ -616,6 +622,11 @@ const generateAdmissionFormHtml = (student) => {
   console.log('[generateAdmissionFormHtml] Loading admission form template...');
   const templatePath = path.join(__dirname, '..', 'templates', 'admission_form.html');
   let html = readTemplateFile(templatePath);
+
+  const logoBase64 = getLogoBase64();
+  html = resolveLogoConditional(html, logoBase64);
+  html = html.replace(/\{\{logo_base64\}\}/g, logoBase64);
+
 
   // 1. Process Names & Letter Character Boxes
   const nameParts = (student.name || '').trim().split(/\s+/);

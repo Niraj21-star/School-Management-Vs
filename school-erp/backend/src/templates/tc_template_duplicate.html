@@ -437,10 +437,31 @@
       z-index: 0;
     }
 
-    /* Keep content above watermark */
     .page-wrapper>* {
       position: relative;
       z-index: 1;
+    }
+
+    /* =============================================
+       LOGO WATERMARK
+       ============================================= */
+    .watermark-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      opacity: 0.08;
+      z-index: 9999 !important;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .watermark-overlay img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
     }
 
     /* =============================================
@@ -470,6 +491,12 @@
 <body>
 
   <div class="page-wrapper">
+
+    {{#logo_base64}}
+    <div class="watermark-overlay">
+      <img src="{{logo_base64}}" alt="watermark" />
+    </div>
+    {{/logo_base64}}
 
     <!-- =============================================
          TRIPLICATE BADGE

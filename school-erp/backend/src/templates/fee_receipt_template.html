@@ -399,6 +399,29 @@
         border-left: 1.5pt dashed #aaa !important;
       }
     }
+
+    /* =============================================
+       LOGO WATERMARK
+       ============================================= */
+    .watermark-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      opacity: 0.08;
+      z-index: 0;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .watermark-overlay img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
   </style>
 </head>
 
@@ -410,6 +433,11 @@
        ============================================================ -->
     <div class="receipt-copy left">
       <span class="copy-label">School Copy</span>
+
+      <div class="watermark-overlay">
+        <img src="{{logo_base64}}" alt="watermark" />
+      </div>
+
 
       <!-- SCHOOL HEADER SECTION -->
       <div class="school-header">
@@ -617,6 +645,11 @@
        ============================================================ -->
     <div class="receipt-copy right">
       <span class="copy-label">Student Copy</span>
+
+      <div class="watermark-overlay">
+        <img src="{{logo_base64}}" alt="watermark" />
+      </div>
+
 
       <!-- SCHOOL HEADER SECTION -->
       <div class="school-header">
