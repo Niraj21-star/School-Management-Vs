@@ -69,7 +69,7 @@ const ClerkDocuments = () => {
 
     try {
       const [className, section] = String(selectedClass).split('-');
-      const studentList = await getStudents({ class: className, section, limit: 200, status: 'all' });
+      const studentList = await getStudents({ class: className, section, limit: 1000, status: 'all' });
       setStudents(studentList);
     } catch (err) {
       setError(err.message || 'Unable to load students.');

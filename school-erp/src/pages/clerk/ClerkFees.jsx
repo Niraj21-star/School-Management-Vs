@@ -84,7 +84,7 @@ const ClerkFees = () => {
   useEffect(() => {
     if (form.class) {
       const [className, section] = String(form.class).split('-');
-      getStudents({ class: className, section, limit: 200, status: 'active' })
+      getStudents({ class: className, section, limit: 1000, status: 'active' })
         .then(setClassStudents)
         .catch(() => setClassStudents([]));
     } else {
@@ -146,6 +146,10 @@ const ClerkFees = () => {
       render: (_, row) => (
         <button
           onClick={async () => {
+            if (!row.paid || row.paid === 0) {
+              alert('No payments have been recorded for this student yet.');
+              return;
+            }
             try {
               const html = await getFeeReceiptHtml(row.studentId);
               const printWindow = window.open('', '_blank', 'width=1000,height=800');
@@ -160,8 +164,13 @@ const ClerkFees = () => {
               alert(err.message || 'Error generating receipt');
             }
           }}
-          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-          title="Print Last Receipt"
+          disabled={!row.paid || row.paid === 0}
+          className={`p-1.5 rounded-lg transition-colors ${
+            !row.paid || row.paid === 0 
+              ? 'opacity-50 cursor-not-allowed text-slate-300' 
+              : 'hover:bg-slate-100 text-slate-500'
+          }`}
+          title={!row.paid || row.paid === 0 ? "No payments recorded" : "Print Last Receipt"}
         >
           <Printer className="w-4 h-4" />
         </button>

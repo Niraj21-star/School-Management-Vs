@@ -72,7 +72,7 @@ const TeacherAttendance = () => {
       const selectedOption = classOptions.find((option) => option.value === selectedClass);
       const className = selectedOption?.label?.split('-')?.[0] || '';
 
-      const classStudents = await getStudents({ class: className, section, limit: 200 });
+      const classStudents = await getStudents({ class: className, section, limit: 1000 });
       setStudents(classStudents);
 
       setAttendance((prev) => {

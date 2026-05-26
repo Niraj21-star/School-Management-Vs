@@ -297,13 +297,19 @@ const getTCHtml = async (req, res) => {
     }
 
     // If already printed, reuse the existing tcNumber, else generate a new one
-    const tcNumber = student.tcCertificate?.tcNumber || await getNextTcNumber();
+    const manualTcNumber = req.query.tc_number;
+    if (!manualTcNumber) {
+      const error = new Error('TC Number is required.');
+      error.statusCode = 400;
+      throw error;
+    }
+    const tcNumber = manualTcNumber;
     const verificationCode = makeVerificationCode(tcNumber);
 
     const html = generateTCHtml(student, { 
+      ...req.query,
       tc_number: tcNumber, 
       verification_code: verificationCode,
-      ...req.query
     });
 
     // Update student TC tracking
@@ -413,17 +419,21 @@ const getDuplicateTCHtml = async (req, res) => {
       throw error;
     }
 
-    // Generate duplicate TC number if not yet assigned
-    if (!request.duplicateTcNumber) {
-      const originalPrintCount = student.tcCertificate?.downloadCount || 1;
-      request.duplicateTcNumber = `DUP-${student.studentId}-${String(request.duplicateCount + 1).padStart(2, '0')}`;
-      request.duplicateCount += 1;
+    const manualTcNumber = req.query.tc_number;
+    if (!manualTcNumber) {
+      const error = new Error('TC Number is required.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!request.duplicateTcNumber || request.duplicateTcNumber !== manualTcNumber) {
+      request.duplicateTcNumber = manualTcNumber;
     }
 
     const html = generateDuplicateTCHtml(student, request, {
-      tc_number: student.tcCertificate?.tcNumber || '',
+      ...req.query,
+      duplicate_tc_number: manualTcNumber,
       verification_code: makeVerificationCode(request.duplicateTcNumber),
-      ...req.query
     });
 
     // Mark request as consumed

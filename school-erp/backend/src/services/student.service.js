@@ -50,7 +50,7 @@ const buildStudentFilters = (query) => {
 
 const buildStudentListOptions = (query) => {
   const page = parsePositiveInt(query.page, 1);
-  const limit = Math.min(parsePositiveInt(query.limit, 10), 100);
+  const limit = Math.min(parsePositiveInt(query.limit, 10), 1000);
   const skip = (page - 1) * limit;
 
   const allowedSortFields = ['createdAt', 'updatedAt', 'name', 'studentId', 'dob'];

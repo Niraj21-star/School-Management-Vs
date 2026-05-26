@@ -76,7 +76,7 @@ const AdminExams = () => {
 
     try {
       const [studentsData, marksData] = await Promise.all([
-        getStudents({ class: className, section, limit: 200 }),
+        getStudents({ class: className, section, limit: 1000 }),
         getMarksByExamAndClass({ className, section, examName: selectedResultExam }),
       ]);
 

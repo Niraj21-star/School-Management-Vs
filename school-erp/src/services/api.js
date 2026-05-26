@@ -181,6 +181,7 @@ export const createStudent = async (formData) => {
       },
       status: String(formData.status || 'active').toLowerCase(),
       isTcIssued: formData.isTcIssued || false,
+      ...(formData.isRTE !== undefined && { isRTE: formData.isRTE }),
     };
 
     const response = await apiClient.post('/api/students', payload);
@@ -229,6 +230,7 @@ export const updateStudentById = async (id, formData) => {
         admissionDate: formData.admissionDate,
       },
       status: String(formData.status || 'active').toLowerCase(),
+      ...(formData.isRTE !== undefined && { isRTE: formData.isRTE }),
     };
 
     const response = await apiClient.put(`/api/students/${id}`, payload);

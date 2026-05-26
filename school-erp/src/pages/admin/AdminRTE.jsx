@@ -88,7 +88,7 @@ const AdminRTE = () => {
     setError('');
 
     try {
-      const data = await getStudents({ limit: 200, status: 'all', isRTE: true });
+      const data = await getStudents({ limit: 1000, status: 'all', isRTE: true });
       setStudents(data);
     } catch (err) {
       setError(err.message || 'Unable to load students.');
@@ -152,11 +152,17 @@ const AdminRTE = () => {
     setError('');
 
     try {
-      const payload = { ...form, generalRegisterNumber: form.grNo };
+      const payload = { ...form, generalRegisterNumber: form.grNo, isRTE: true };
 
       if (editStudent) {
         const updated = await updateStudentById(editStudent.id, payload);
         setStudents((prev) => prev.map((s) => (s.id === editStudent.id ? updated : s)));
+        resetForm();
+      } else {
+        const created = await createStudent(payload);
+        setStudents((prev) => [created, ...prev]);
+        setLastStudent(created);
+        setSubmitted(true);
         resetForm();
       }
     } catch (err) {

@@ -85,7 +85,7 @@ const TeacherMarks = () => {
       const [selectedClassName, selectedSection = 'A'] = String(selectedClass).split('-');
 
       const [studentsData, marksData] = await Promise.all([
-        getStudents({ class: selectedClassName, section: selectedSection, limit: 200 }),
+        getStudents({ class: selectedClassName, section: selectedSection, limit: 1000 }),
         getMarksByExamAndClass({ className: selectedClassName, section: selectedSection, examName: selectedExam, subjectName: selectedSubject }),
       ]);
 

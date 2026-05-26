@@ -88,7 +88,7 @@ const AdminStudents = () => {
     setError('');
 
     try {
-      const data = await getStudents({ limit: 200, status: 'all' });
+      const data = await getStudents({ limit: 1000, status: 'all' });
       setStudents(data);
     } catch (err) {
       setError(err.message || 'Unable to load students.');

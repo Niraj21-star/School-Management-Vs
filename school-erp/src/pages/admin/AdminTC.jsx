@@ -124,6 +124,12 @@ export default function AdminTC() {
 
   const handlePrintTC = async () => {
     if (!editTcForm) return;
+
+    if (!editTcForm.tc_number || !editTcForm.tc_number.trim()) {
+      setError('Please enter a TC Number manually before generating.');
+      return;
+    }
+
     setPrintingTc(true);
     setError('');
 
@@ -162,7 +168,7 @@ export default function AdminTC() {
   const loadStudents = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getStudents({ limit: 300, status: 'all' });
+      const data = await getStudents({ limit: 1000, status: 'all' });
       setStudents(data);
     } catch (e) {
       setError(e.message);
@@ -590,10 +596,11 @@ export default function AdminTC() {
 
             <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-2">1. Office Reference</h4>
             <div className="grid grid-cols-3 gap-3">
+              <FormInput label="TC Number" value={editTcForm.tc_number} onChange={e => setEditTcForm({ ...editTcForm, tc_number: e.target.value })} required />
               <FormInput label="GR No." value={editTcForm.register_no} onChange={e => setEditTcForm({ ...editTcForm, register_no: e.target.value })} />
               <FormInput label="Aadhaar No." value={editTcForm.aadhaar_no} onChange={e => setEditTcForm({ ...editTcForm, aadhaar_no: e.target.value })} />
               <FormInput label="PEN No." value={editTcForm.pen_no} onChange={e => setEditTcForm({ ...editTcForm, pen_no: e.target.value })} />
-              <FormInput label="UDISE No." value={editTcForm.udise_no} onChange={e => setEditTcForm({ ...editTcForm, udise_no: e.target.value })} className="col-span-3" />
+              <FormInput label="UDISE No." value={editTcForm.udise_no} onChange={e => setEditTcForm({ ...editTcForm, udise_no: e.target.value })} className="col-span-2" />
             </div>
 
             <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-1.5 mt-4">2. Pupil's Personal Details</h4>
