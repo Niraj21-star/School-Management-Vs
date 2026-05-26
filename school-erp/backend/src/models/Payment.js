@@ -48,20 +48,14 @@ paymentSchema.pre('validate', async function assignReceiptNo() {
   const lastPayment = await this.constructor.findOne().sort({ receiptNo: -1 });
   const maxReceiptNo = lastPayment && lastPayment.receiptNo ? lastPayment.receiptNo : 0;
 
+  const counterDoc = await ReceiptCounter.findById('receiptNo');
+  const currentSeq = counterDoc ? counterDoc.seq : 0;
+  
+  const nextSeq = Math.max(currentSeq + 1, maxReceiptNo + 1);
+
   const counter = await ReceiptCounter.findOneAndUpdate(
     { _id: 'receiptNo' },
-    [
-      {
-        $set: {
-          seq: {
-            $max: [
-              { $add: [{ $ifNull: ["$seq", 0] }, 1] },
-              maxReceiptNo + 1
-            ]
-          }
-        }
-      }
-    ],
+    { $set: { seq: nextSeq } },
     { new: true, upsert: true }
   );
 
