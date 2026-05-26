@@ -21,7 +21,7 @@ import { exportRowsToPdf } from '../../utils/pdfExport';
 const AdminRTE = () => {
   const [students, setStudents] = useState([]);
   const [selectedClass, setSelectedClass] = useState('All Classes');
-  const [selectedStatus, setSelectedStatus] = useState('Active');
+  const [selectedStatus, setSelectedStatus] = useState('All Status');
   const [classOptions, setClassOptions] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -132,12 +132,12 @@ const AdminRTE = () => {
   const selectedClassStats = useMemo(() => {
     const totalStudents = visibleStudents.length;
     const activeStudents = visibleStudents.filter((student) => String(student.status).toLowerCase() === 'active').length;
-    const feePending = visibleStudents.filter((student) => String(student.feeStatus).toLowerCase() === 'pending').length;
+    const inactiveStudents = visibleStudents.filter((student) => String(student.status).toLowerCase() === 'inactive').length;
 
     return {
       totalStudents,
       activeStudents,
-      feePending,
+      inactiveStudents,
     };
   }, [visibleStudents]);
 
@@ -311,7 +311,7 @@ const AdminRTE = () => {
         `Status Filter: ${selectedStatus}`,
         `Total Students: ${selectedClassStats.totalStudents}`,
         `Active Students: ${selectedClassStats.activeStudents}`,
-        `Fee Pending: ${selectedClassStats.feePending}`,
+        `Inactive Students: ${selectedClassStats.inactiveStudents}`,
       ],
       columns: [
         { header: 'GR No', key: 'grNo' },
@@ -427,8 +427,8 @@ const AdminRTE = () => {
             <p className="mt-1 text-2xl font-bold text-emerald-700">{selectedClassStats.activeStudents}</p>
           </div>
           <div className="rounded-xl border border-slate-100 bg-amber-50 p-4">
-            <p className="text-xs uppercase tracking-wide text-amber-700">Fee pending</p>
-            <p className="mt-1 text-2xl font-bold text-amber-700">{selectedClassStats.feePending}</p>
+            <p className="text-xs uppercase tracking-wide text-amber-700">Inactive</p>
+            <p className="mt-1 text-2xl font-bold text-amber-700">{selectedClassStats.inactiveStudents}</p>
           </div>
         </div>
       </div>
