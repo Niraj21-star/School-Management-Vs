@@ -453,7 +453,7 @@
       transform: translate(-50%, -50%);
       width: 70%;
       opacity: 0.08;
-      z-index: 9999 !important;
+      z-index: 0 !important;
       pointer-events: none;
       display: flex;
       justify-content: center;
@@ -494,11 +494,9 @@
 
   <div class="page-wrapper">
 
-    {{#logo_base64}}
     <div class="watermark-overlay">
       <img src="{{logo_base64}}" alt="watermark" />
     </div>
-    {{/logo_base64}}
 
     <!-- =============================================
          ORIGINAL BADGE

@@ -559,7 +559,7 @@ const generateFeeReceiptHtml = (student = {}, payment = {}, fee = {}) => {
 
   // Build all other placeholders (these ARE escaped to prevent injection)
   const placeholders = {
-    document_title: `Fee Receipt - ${[student?.name, student?.parent?.fatherName, student?.surname].filter(Boolean).join(' ')}`,
+    document_title: `Fee Receipt - ${[student?.name, student?.surname].filter(Boolean).join(' ')}`,
     // Receipt metadata
     receipt_no: String(payment?.receiptNo || payment?._id || ''),
     academic_year: `${currentYear}-${currentYear + 1}`,
@@ -570,7 +570,7 @@ const generateFeeReceiptHtml = (student = {}, payment = {}, fee = {}) => {
     cashier_name: '',
 
     // Student info
-    student_name: [student?.name, student?.parent?.fatherName, student?.surname].filter(Boolean).join(' '),
+    student_name: [student?.name, student?.surname].filter(Boolean).join(' '),
     class: student?.academic?.class || '',
     division: student?.academic?.section || '',
     gr_no: student?.generalRegisterNumber || student?.studentId || '',
