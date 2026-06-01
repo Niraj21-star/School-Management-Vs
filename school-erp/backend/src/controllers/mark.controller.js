@@ -15,12 +15,12 @@ const gradeFromMarks = (value) => {
 const getMarks = async (req, res) => {
   try {
     const className = String(req.query.class || '').trim();
-    const section = String(req.query.section || '').trim();
+    const section = String(req.query.section || 'A').trim();
     const examName = String(req.query.examName || '').trim();
     const subjectName = String(req.query.subjectName || '').trim();
 
-    if (!className || !section || !examName || !subjectName) {
-      const error = new Error('class, section, examName and subjectName are required');
+    if (!className || !examName || !subjectName) {
+      const error = new Error('class, examName and subjectName are required');
       error.statusCode = 400;
       throw error;
     }
@@ -40,10 +40,11 @@ const getMarks = async (req, res) => {
 
 const saveMarks = async (req, res) => {
   try {
-    const { className, section, examName, subjectName, entries } = req.body;
+    const { className, examName, subjectName, entries } = req.body;
+    const section = String(req.body.section || 'A').trim();
 
-    if (!className || !section || !examName || !subjectName || !Array.isArray(entries) || entries.length === 0) {
-      const error = new Error('className, section, examName, subjectName and entries are required');
+    if (!className || !examName || !subjectName || !Array.isArray(entries) || entries.length === 0) {
+      const error = new Error('className, examName, subjectName and entries are required');
       error.statusCode = 400;
       throw error;
     }

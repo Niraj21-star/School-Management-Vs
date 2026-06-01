@@ -20,8 +20,8 @@ const markAttendance = async (req, res) => {
       markAllPresent = false,
     } = req.body;
 
-    if (!classId || !section || !date) {
-      const error = new Error('classId, section and date are required');
+    if (!classId || !date) {
+      const error = new Error('classId and date are required');
       error.statusCode = 400;
       throw error;
     }
@@ -96,8 +96,8 @@ const getAttendanceByDate = async (req, res) => {
   try {
     const { classId, section, date } = req.query;
 
-    if (!classId || !section || !date) {
-      const error = new Error('classId, section and date are required');
+    if (!classId || !date) {
+      const error = new Error('classId and date are required');
       error.statusCode = 400;
       throw error;
     }
@@ -145,8 +145,8 @@ const getAttendanceReport = async (req, res) => {
   try {
     const { classId, section, from, to } = req.query;
 
-    if (!classId || !section) {
-      const error = new Error('classId and section are required');
+    if (!classId) {
+      const error = new Error('classId is required');
       error.statusCode = 400;
       throw error;
     }

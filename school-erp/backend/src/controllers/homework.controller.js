@@ -50,14 +50,14 @@ const createHomework = async (req, res) => {
     }
 
     const { className, section } = splitClassSection(classValue);
-    if (!className || !section) {
-      const error = new Error('class must be in "Class-Section" format, e.g. "10-A"');
+    if (!className) {
+      const error = new Error('class is required');
       error.statusCode = 400;
       throw error;
     }
 
     const schoolClass = await SchoolClass.findOne({ name: className }).lean();
-    if (!schoolClass || !Array.isArray(schoolClass.sections) || !schoolClass.sections.includes(section)) {
+    if (!schoolClass || !Array.isArray(schoolClass.sections) || (section && !schoolClass.sections.includes(section))) {
       const error = new Error('Selected class/section not found');
       error.statusCode = 400;
       throw error;
