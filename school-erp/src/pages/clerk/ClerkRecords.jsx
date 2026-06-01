@@ -96,7 +96,6 @@ const ClerkRecords = () => {
   };
 
   const columns = [
-    { key: 'rollNo', label: 'Roll No' },
     { key: 'name', label: 'Student Name' },
     { key: 'class', label: 'Class' },
     { key: 'gender', label: 'Gender' },

@@ -356,7 +356,7 @@ export default function AdminTC() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                {['Roll No', 'Student Name', 'Class', 'TC Status', 'First Printed', 'Actions'].map(h => (
+                {['Student Name', 'Class', 'TC Status', 'First Printed', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
                     {h}
                   </th>
@@ -370,7 +370,7 @@ export default function AdminTC() {
                 const isPrinting = printing === s.studentId;
                 return (
                   <tr key={s.id} className="hover:bg-slate-50">
-                    <td className="table-cell text-slate-500">{s.rollNo}</td>
+                    
                     <td className="table-cell font-medium text-slate-800">{s.name}</td>
                     <td className="table-cell">{s.class}</td>
                     <td className="table-cell"><TcBadge status={rowStatus} /></td>

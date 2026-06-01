@@ -36,7 +36,6 @@ const AdminRTE = () => {
     name: '',
     surname: '',
     class: '',
-    rollNo: '',
     gender: '',
     phone: '',
     status: 'Active',
@@ -191,7 +190,6 @@ const AdminRTE = () => {
       name: '',
       surname: '',
       class: '',
-      rollNo: '',
       gender: '',
       phone: '',
       status: 'Active',
@@ -223,7 +221,6 @@ const AdminRTE = () => {
       name: student.name,
       surname: student.raw?.surname || '',
       class: student.class,
-      rollNo: student.rollNo,
       gender: student.gender,
       phone: student.phone,
       status: student.status,
@@ -264,7 +261,6 @@ const AdminRTE = () => {
 
   const columns = [
     { key: 'grNo', label: 'GR No' },
-    { key: 'rollNo', label: 'Roll No' },
     { key: 'name', label: 'Student Name' },
     { key: 'class', label: 'Class' },
     { key: 'gender', label: 'Gender' },
@@ -315,7 +311,6 @@ const AdminRTE = () => {
       ],
       columns: [
         { header: 'GR No', key: 'grNo' },
-        { header: 'Roll No', key: 'rollNo' },
         { header: 'Student Name', key: 'name' },
         { header: 'Class', key: 'class' },
         { header: 'Gender', key: 'gender' },
@@ -446,7 +441,7 @@ const AdminRTE = () => {
           <FormInput label="General Register No. (GR No.)" value={form.grNo} onChange={(e) => setForm({ ...form, grNo: e.target.value })} />
           <FormInput label="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           <FormInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
-          <FormInput label="Roll No" value={form.rollNo} onChange={(e) => setForm({ ...form, rollNo: e.target.value })} required />
+
           <SelectInput label="Class" value={form.class} onChange={(e) => setForm({ ...form, class: e.target.value })} placeholder="Select class" options={classOptions} required />
           <SelectInput label="Gender" value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })} placeholder="Select gender" options={[
             { value: 'Male', label: 'Male' }, { value: 'Female', label: 'Female' },

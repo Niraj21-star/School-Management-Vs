@@ -179,7 +179,7 @@ const studentDetailsRows = (student) => `
   <tr><td class="key">Name</td><td>${escapeHtml(student.name)}</td></tr>
   <tr><td class="key">Class</td><td>${escapeHtml(student.academic?.class)}</td></tr>
   <tr><td class="key">Section</td><td>${escapeHtml(student.academic?.section)}</td></tr>
-  <tr><td class="key">Roll Number</td><td>${escapeHtml(student.academic?.rollNumber)}</td></tr>
+
   <tr><td class="key">Date of Birth</td><td>${escapeHtml(formatDate(student.dob))}</td></tr>
 `;
 
@@ -339,7 +339,7 @@ const buildTcPlaceholders = (student, extras = {}) => {
 
   const placeholders = {
     register_no: student.generalRegisterNumber || student.studentId || '',
-    roll_no: student.academic?.rollNumber || '',
+    roll_no: '',
     year: String(currentYear),
     // New identity fields
     full_name: computedFullName,
@@ -574,7 +574,7 @@ const generateFeeReceiptHtml = (student = {}, payment = {}, fee = {}) => {
     class: student?.academic?.class || '',
     division: student?.academic?.section || '',
     gr_no: student?.generalRegisterNumber || student?.studentId || '',
-    roll_no: student?.academic?.rollNumber || '',
+    roll_no: '',
     father_name: student?.parent?.fatherName || '',
 
     // Individual fee items (from breakdown)

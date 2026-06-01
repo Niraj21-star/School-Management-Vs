@@ -177,7 +177,7 @@ const ClerkDocuments = () => {
               <div key={student.id} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
                 <div>
                   <p className="text-sm font-medium text-slate-700">{student.name}</p>
-                  <p className="text-xs text-slate-500">{student.studentId || student.rollNo} · {student.class}</p>
+                  <p className="text-xs text-slate-500">{student.studentId || student.grNo} · {student.class}</p>
                 </div>
                 <Button onClick={() => openUploadModal(student)}><Upload className="w-4 h-4" /> Upload Document</Button>
               </div>
@@ -197,7 +197,7 @@ const ClerkDocuments = () => {
         <div className="space-y-4">
           <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
             <p className="text-sm font-medium text-slate-700">{selectedStudent?.name || '-'}</p>
-            <p className="text-xs text-slate-500">{selectedStudent?.studentId || selectedStudent?.rollNo || '-'} · {selectedStudent?.class || '-'}</p>
+            <p className="text-xs text-slate-500">{selectedStudent?.studentId || selectedStudent?.grNo || '-'} · {selectedStudent?.class || '-'}</p>
           </div>
 
           <SelectInput

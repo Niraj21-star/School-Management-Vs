@@ -151,24 +151,24 @@ async function seed() {
   console.log('🎓 Creating students …');
   const studentData = [
     // Class 10-A (5 students)
-    { name: 'Aarav Patel',    gender: 'male',   class: '10', section: 'A', rollNumber: '01', fatherName: 'Ramesh Patel',    motherName: 'Sunita Patel' },
-    { name: 'Ananya Singh',   gender: 'female', class: '10', section: 'A', rollNumber: '02', fatherName: 'Vikram Singh',    motherName: 'Kavita Singh' },
-    { name: 'Rohan Verma',    gender: 'male',   class: '10', section: 'A', rollNumber: '03', fatherName: 'Suresh Verma',    motherName: 'Meena Verma' },
-    { name: 'Ishita Gupta',   gender: 'female', class: '10', section: 'A', rollNumber: '04', fatherName: 'Ajay Gupta',      motherName: 'Neha Gupta' },
-    { name: 'Arjun Sharma',   gender: 'male',   class: '10', section: 'A', rollNumber: '05', fatherName: 'Deepak Sharma',   motherName: 'Pooja Sharma' },
+    { name: 'Aarav Patel',    gender: 'male',   class: '10', section: 'A', fatherName: 'Ramesh Patel',    motherName: 'Sunita Patel' },
+    { name: 'Ananya Singh',   gender: 'female', class: '10', section: 'A', fatherName: 'Vikram Singh',    motherName: 'Kavita Singh' },
+    { name: 'Rohan Verma',    gender: 'male',   class: '10', section: 'A', fatherName: 'Suresh Verma',    motherName: 'Meena Verma' },
+    { name: 'Ishita Gupta',   gender: 'female', class: '10', section: 'A', fatherName: 'Ajay Gupta',      motherName: 'Neha Gupta' },
+    { name: 'Arjun Sharma',   gender: 'male',   class: '10', section: 'A', fatherName: 'Deepak Sharma',   motherName: 'Pooja Sharma' },
     // Class 10-B (3 students)
-    { name: 'Diya Joshi',     gender: 'female', class: '10', section: 'B', rollNumber: '01', fatherName: 'Mohan Joshi',     motherName: 'Rekha Joshi' },
-    { name: 'Karan Mehta',    gender: 'male',   class: '10', section: 'B', rollNumber: '02', fatherName: 'Sanjay Mehta',    motherName: 'Priti Mehta' },
-    { name: 'Simran Kaur',    gender: 'female', class: '10', section: 'B', rollNumber: '03', fatherName: 'Gurpreet Singh',  motherName: 'Harpreet Kaur' },
+    { name: 'Diya Joshi',     gender: 'female', class: '10', section: 'B', fatherName: 'Mohan Joshi',     motherName: 'Rekha Joshi' },
+    { name: 'Karan Mehta',    gender: 'male',   class: '10', section: 'B', fatherName: 'Sanjay Mehta',    motherName: 'Priti Mehta' },
+    { name: 'Simran Kaur',    gender: 'female', class: '10', section: 'B', fatherName: 'Gurpreet Singh',  motherName: 'Harpreet Kaur' },
     // Class 9-A (4 students)
-    { name: 'Vivaan Reddy',   gender: 'male',   class: '9',  section: 'A', rollNumber: '01', fatherName: 'Krishna Reddy',   motherName: 'Lakshmi Reddy' },
-    { name: 'Aisha Khan',     gender: 'female', class: '9',  section: 'A', rollNumber: '02', fatherName: 'Imran Khan',      motherName: 'Fatima Khan' },
-    { name: 'Dev Malhotra',   gender: 'male',   class: '9',  section: 'A', rollNumber: '03', fatherName: 'Rahul Malhotra',  motherName: 'Anjali Malhotra' },
-    { name: 'Nisha Yadav',    gender: 'female', class: '9',  section: 'A', rollNumber: '04', fatherName: 'Bharat Yadav',    motherName: 'Rani Yadav' },
+    { name: 'Vivaan Reddy',   gender: 'male',   class: '9',  section: 'A', fatherName: 'Krishna Reddy',   motherName: 'Lakshmi Reddy' },
+    { name: 'Aisha Khan',     gender: 'female', class: '9',  section: 'A', fatherName: 'Imran Khan',      motherName: 'Fatima Khan' },
+    { name: 'Dev Malhotra',   gender: 'male',   class: '9',  section: 'A', fatherName: 'Rahul Malhotra',  motherName: 'Anjali Malhotra' },
+    { name: 'Nisha Yadav',    gender: 'female', class: '9',  section: 'A', fatherName: 'Bharat Yadav',    motherName: 'Rani Yadav' },
     // Class 8-A (3 students)
-    { name: 'Rahul Tiwari',   gender: 'male',   class: '8',  section: 'A', rollNumber: '01', fatherName: 'Arvind Tiwari',   motherName: 'Sarita Tiwari' },
-    { name: 'Prachi Dubey',   gender: 'female', class: '8',  section: 'A', rollNumber: '02', fatherName: 'Manoj Dubey',     motherName: 'Shweta Dubey' },
-    { name: 'Aditya Saxena',  gender: 'male',   class: '8',  section: 'A', rollNumber: '03', fatherName: 'Pankaj Saxena',   motherName: 'Ritu Saxena' },
+    { name: 'Rahul Tiwari',   gender: 'male',   class: '8',  section: 'A', fatherName: 'Arvind Tiwari',   motherName: 'Sarita Tiwari' },
+    { name: 'Prachi Dubey',   gender: 'female', class: '8',  section: 'A', fatherName: 'Manoj Dubey',     motherName: 'Shweta Dubey' },
+    { name: 'Aditya Saxena',  gender: 'male',   class: '8',  section: 'A', fatherName: 'Pankaj Saxena',   motherName: 'Ritu Saxena' },
   ];
 
   const createdStudents = [];
@@ -187,7 +187,6 @@ async function seed() {
       academic: {
         class: s.class,
         section: s.section,
-        rollNumber: s.rollNumber,
         admissionDate: daysAgo(Math.floor(Math.random() * 180) + 30),
       },
       status: 'active',
@@ -487,7 +486,7 @@ async function seed() {
       name: `${createdStudents[i].name} — ${docType}`,
       type: docType,
       status: i < 4 ? 'Uploaded' : 'Pending',
-      fileName: `${docType.toLowerCase().replace(/\s+/g, '_')}_${createdStudents[i].academic.rollNumber}.pdf`,
+      fileName: `${docType.toLowerCase().replace(/\s+/g, '_')}_${createdStudents[i].studentId}.pdf`,
       fileMimeType: 'application/pdf',
       fileSize: Math.floor(Math.random() * 500000) + 50000,
       uploadedBy: clerkUser._id,

@@ -91,7 +91,7 @@ const TeacherMarks = () => {
 
       const mappedStudents = studentsData.map((student) => ({
         id: student.id,
-        rollNo: student.rollNo,
+        
         name: student.name,
       }));
 
@@ -184,7 +184,6 @@ const TeacherMarks = () => {
         <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr>
-              <th className="table-header">Roll No</th>
               <th className="table-header">Student Name</th>
               <th className="table-header">Marks (out of 100)</th>
               <th className="table-header">Grade</th>
@@ -199,7 +198,6 @@ const TeacherMarks = () => {
               }
               return (
                 <tr key={student.id} className="hover:bg-slate-50">
-                  <td className="table-cell font-medium">{student.rollNo}</td>
                   <td className="table-cell">{student.name}</td>
                   <td className="table-cell">
                     <input

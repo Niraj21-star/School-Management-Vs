@@ -32,25 +32,6 @@ const createStudent = async (req, res) => {
   try {
     const payload = normalizeStudentPayload(req.body, false);
     
-    // Auto-assign rollNumber if missing or empty
-    if (!payload.academic.rollNumber) {
-      const lastStudent = await Student.findOne({
-        'academic.class': payload.academic.class,
-        'academic.section': payload.academic.section,
-      })
-        .sort({ 'academic.rollNumber': -1 })
-        .collation({ locale: 'en_US', numericOrdering: true });
-
-      let nextRoll = 1;
-      if (lastStudent && lastStudent.academic && lastStudent.academic.rollNumber) {
-        const lastRoll = parseInt(lastStudent.academic.rollNumber, 10);
-        if (!isNaN(lastRoll)) {
-          nextRoll = lastRoll + 1;
-        }
-      }
-      payload.academic.rollNumber = String(nextRoll).padStart(2, '0');
-    }
-
     if (req.body.isTcIssued) {
       payload.status = 'inactive';
       payload.tcCertificate = {
@@ -75,9 +56,6 @@ const createStudent = async (req, res) => {
         error.message = 'Duplicate studentId detected. Please retry.';
       } else if (keyPattern === 'prnNumber') {
         error.message = `PRN Number is already in use.`;
-      } else if (keys.includes('academic.class') || keys.includes('academic.rollNumber')) {
-        const rollNum = error.keyValue ? (error.keyValue['academic.rollNumber'] || error.keyValue.academic?.rollNumber || '') : '';
-        error.message = `Roll number ${rollNum} is already assigned in this class and section.`;
       } else {
         error.message = `Duplicate record detected for field(s): ${keys.join(', ')}. Value: ${JSON.stringify(error.keyValue || {})}`;
       }
@@ -163,7 +141,6 @@ const updateStudent = async (req, res) => {
       updates.academic = {
         class: updates.academic.class ?? student.academic.class,
         section: updates.academic.section ?? student.academic.section,
-        rollNumber: updates.academic.rollNumber ?? student.academic.rollNumber,
         admissionDate: updates.academic.admissionDate ?? student.academic.admissionDate,
       };
     }

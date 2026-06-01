@@ -140,11 +140,6 @@ const studentSchema = new mongoose.Schema(
         required: true,
         trim: true,
       },
-      rollNumber: {
-        type: String,
-        required: true,
-        trim: true,
-      },
       admissionDate: {
         type: Date,
         required: true,
@@ -223,10 +218,6 @@ studentSchema.pre('validate', async function generatePrnNumber() {
   this.prnNumber = `SSVES-${String(counter.seq).padStart(3, '0')}`;
 });
 
-studentSchema.index(
-  { 'academic.class': 1, 'academic.section': 1, 'academic.rollNumber': 1 },
-  { unique: true, partialFilterExpression: { status: 'active' } }
-);
 
 studentSchema.index(
   { generalRegisterNumber: 1 },
@@ -251,6 +242,9 @@ const Student = mongoose.model('Student', studentSchema);
 Student.collection.dropIndex('generalRegisterNumber_1').catch((err) => {
   // Silently ignore if the index doesn't exist
 });
+
+// Drop the old rollNumber unique index
+Student.collection.dropIndex('academic.class_1_academic.section_1_academic.rollNumber_1').catch(() => {});
 
 module.exports = {
   Student,

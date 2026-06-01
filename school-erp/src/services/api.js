@@ -39,7 +39,7 @@ const mapStudent = (student) => {
     id: student?._id,
     studentId: student?.studentId,
     grNo: student?.generalRegisterNumber || student?.studentId,
-    rollNo: student?.academic?.rollNumber || '-',
+
     name: student?.name || '-',
     surname: student?.surname || '',
     class: section ? `${className}-${section}` : className,
@@ -176,7 +176,7 @@ export const createStudent = async (formData) => {
       academic: {
         class: academicClass,
         section,
-        rollNumber: formData.rollNo || formData.rollNumber,
+
         admissionDate: formData.admissionDate || new Date().toISOString().split('T')[0],
       },
       status: String(formData.status || 'active').toLowerCase(),
@@ -226,7 +226,7 @@ export const updateStudentById = async (id, formData) => {
       academic: {
         class: academicClass,
         section,
-        rollNumber: formData.rollNo || formData.rollNumber,
+
         admissionDate: formData.admissionDate,
       },
       status: String(formData.status || 'active').toLowerCase(),

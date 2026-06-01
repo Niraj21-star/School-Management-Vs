@@ -162,7 +162,7 @@ const normalizeStudentPayload = (payload, forUpdate = false) => {
     updates.academic = {};
     if (academic.class !== undefined) updates.academic.class = String(academic.class).trim();
     if (academic.section !== undefined) updates.academic.section = String(academic.section).trim();
-    if (academic.rollNumber !== undefined) updates.academic.rollNumber = String(academic.rollNumber).trim();
+
     if (academic.admissionDate !== undefined) updates.academic.admissionDate = academic.admissionDate;
   }
 

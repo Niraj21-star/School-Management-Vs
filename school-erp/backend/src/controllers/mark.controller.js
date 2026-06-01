@@ -30,7 +30,7 @@ const getMarks = async (req, res) => {
       filter.teacherId = req.user._id;
     }
 
-    const marks = await Mark.find(filter).populate('studentId', 'name academic.rollNumber').lean();
+    const marks = await Mark.find(filter).populate('studentId', 'name').lean();
 
     return sendSuccess(res, 200, 'Marks fetched', marks);
   } catch (error) {

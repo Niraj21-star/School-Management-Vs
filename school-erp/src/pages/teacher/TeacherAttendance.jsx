@@ -187,7 +187,6 @@ const TeacherAttendance = () => {
         <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-100">
             <tr>
-              <th className="table-header">Roll No</th>
               <th className="table-header">Student Name</th>
               <th className="table-header">Status</th>
               <th className="table-header">Action</th>
@@ -196,7 +195,6 @@ const TeacherAttendance = () => {
           <tbody className="divide-y divide-slate-100">
             {students.map((student) => (
               <tr key={student.id} className="hover:bg-slate-50">
-                <td className="table-cell font-medium">{student.rollNo}</td>
                 <td className="table-cell">{student.name}</td>
                 <td className="table-cell">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${

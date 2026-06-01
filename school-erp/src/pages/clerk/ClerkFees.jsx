@@ -271,7 +271,7 @@ const ClerkFees = () => {
               }
             }}
             placeholder={form.class ? 'Select student' : 'Select a class first'}
-            options={classStudents.map(s => ({ value: s.id, label: s.surname ? `${s.name} ${s.surname} (${s.rollNo})` : `${s.name} (${s.rollNo})` }))}
+            options={classStudents.map(s => ({ value: s.id, label: s.surname ? `${s.name} ${s.surname} (${s.grNo || s.studentId})` : `${s.name} (${s.grNo || s.studentId})` }))}
             disabled={!form.class}
             required
           />

@@ -66,7 +66,6 @@ const AdminReports = () => {
           fileName: `student-performance-${Date.now()}.pdf`,
           summaryLines: [`Total Students: ${students.length}`],
           columns: [
-            { header: 'Roll No', key: 'rollNo' },
             { header: 'Student Name', key: 'name' },
             { header: 'Class', key: 'class' },
             { header: 'Gender', key: 'gender' },

@@ -91,14 +91,13 @@ const AdminExams = () => {
 
           return {
             id: student.id,
-            rollNo: student.rollNo,
             studentName: student.name,
             marks: markEntry?.marks ?? '—',
             grade: markEntry?.grade || '—',
             status: markEntry ? 'Entered' : 'Pending',
           };
         })
-        .sort((a, b) => String(a.rollNo).localeCompare(String(b.rollNo), undefined, { numeric: true }));
+        .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
       setResultRows(rows);
     } catch (err) {
@@ -154,7 +153,6 @@ const AdminExams = () => {
   ];
 
   const resultColumns = [
-    { key: 'rollNo', label: 'Roll No' },
     { key: 'studentName', label: 'Student Name' },
     { key: 'marks', label: 'Marks' },
     { key: 'grade', label: 'Grade' },
