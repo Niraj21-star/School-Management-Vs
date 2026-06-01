@@ -70,12 +70,38 @@ const getAllStudents = async (req, res) => {
     const filters = buildStudentFilters(req.query);
 
     if (req.user && req.user.role === 'teacher') {
-      const assignments = await Assignment.find({ teacherId: req.user._id }).lean();
-      const classIds = assignments.map(a => a.classId);
-      const schoolClasses = await SchoolClass.find({ _id: { $in: classIds } }).lean();
-      const classNames = schoolClasses.map(c => c.name);
+      const assigned = req.user.assignedClasses || [];
+      const SchoolClass = require('../models/SchoolClass');
+      const schoolClasses = await SchoolClass.find().lean();
       
-      filters['academic.class'] = { $in: classNames };
+      const allowedConditions = [];
+      for (const c of schoolClasses) {
+         if (assigned.includes(c.name)) {
+            allowedConditions.push({ 'academic.class': c.name });
+         } else if (c.sections) {
+            for (const sec of c.sections) {
+               if (assigned.includes(`${c.name}-${sec}`)) {
+                  allowedConditions.push({ 'academic.class': c.name, 'academic.section': sec });
+               }
+            }
+         }
+      }
+
+      if (allowedConditions.length === 0) {
+         return sendSuccess(res, 200, 'Students fetched successfully', {
+           students: [],
+           pagination: { page: 1, limit: 10, total: 0, totalPages: 0 }
+         });
+      }
+
+      if (filters.$and) {
+         filters.$and.push({ $or: allowedConditions });
+      } else {
+         filters.$and = [{ $or: allowedConditions }];
+      }
+      
+      delete filters['academic.class'];
+      if (req.query.class) filters['academic.class'] = req.query.class.trim();
     }
 
     const options = buildStudentListOptions(req.query);
