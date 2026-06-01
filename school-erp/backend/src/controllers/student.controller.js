@@ -34,11 +34,21 @@ const createStudent = async (req, res) => {
     
     // Auto-assign rollNumber if missing or empty
     if (!payload.academic.rollNumber) {
-      const count = await Student.countDocuments({
+      const lastStudent = await Student.findOne({
         'academic.class': payload.academic.class,
         'academic.section': payload.academic.section,
-      });
-      payload.academic.rollNumber = String(count + 1).padStart(2, '0');
+      })
+        .sort({ 'academic.rollNumber': -1 })
+        .collation({ locale: 'en_US', numericOrdering: true });
+
+      let nextRoll = 1;
+      if (lastStudent && lastStudent.academic && lastStudent.academic.rollNumber) {
+        const lastRoll = parseInt(lastStudent.academic.rollNumber, 10);
+        if (!isNaN(lastRoll)) {
+          nextRoll = lastRoll + 1;
+        }
+      }
+      payload.academic.rollNumber = String(nextRoll).padStart(2, '0');
     }
 
     if (req.body.isTcIssued) {
@@ -66,7 +76,8 @@ const createStudent = async (req, res) => {
       } else if (keyPattern === 'prnNumber') {
         error.message = `PRN Number is already in use.`;
       } else if (keys.includes('academic.class') || keys.includes('academic.rollNumber')) {
-        error.message = `Roll number ${error.keyValue && error.keyValue['academic.rollNumber']} is already assigned in this class and section.`;
+        const rollNum = error.keyValue ? (error.keyValue['academic.rollNumber'] || error.keyValue.academic?.rollNumber || '') : '';
+        error.message = `Roll number ${rollNum} is already assigned in this class and section.`;
       } else {
         error.message = `Duplicate record detected for field(s): ${keys.join(', ')}. Value: ${JSON.stringify(error.keyValue || {})}`;
       }
