@@ -31,11 +31,11 @@ const ensureClassAndSection = async (classId, section) => {
   const hasSection = Array.isArray(schoolClass.sections)
     && schoolClass.sections.some((item) => item.trim() === normalizedSection);
 
-  if (!hasSection) {
-    const error = new Error('Section does not belong to the selected class');
-    error.statusCode = 400;
-    throw error;
-  }
+  // if (!hasSection) {
+  //   const error = new Error('Section does not belong to the selected class');
+  //   error.statusCode = 400;
+  //   throw error;
+  // }
 
   return {
     schoolClass,
@@ -46,7 +46,7 @@ const ensureClassAndSection = async (classId, section) => {
 const ensureTeacherAssignment = async (teacherId, classId, section) => {
   const { User } = require('../models/User'); // inline require to avoid circular dependency issues at top level if any
   const teacher = await User.findById(teacherId).lean();
-  
+
   if (!teacher) {
     const error = new Error('Teacher not found');
     error.statusCode = 404;
@@ -61,7 +61,7 @@ const ensureTeacherAssignment = async (teacherId, classId, section) => {
   }
 
   const assigned = teacher.assignedClasses || [];
-  
+
   // Teachers might be assigned to a specific section (e.g. "10-A") or an entire class without sections (e.g. "10")
   const exactMatch = assigned.includes(`${schoolClass.name}-${section}`);
   const classMatch = assigned.includes(schoolClass.name);
