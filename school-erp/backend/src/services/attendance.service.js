@@ -151,11 +151,17 @@ const ensureStudentsBelongToClassSection = async ({ studentEntries, className, s
     throw error;
   }
 
-  const invalidStudent = students.find(
-    (student) => student.status !== 'active'
-      || student.academic.class !== className
-      || student.academic.section !== section
-  );
+  const normalizedQuerySection = String(section || 'A').trim();
+
+  const invalidStudent = students.find((student) => {
+    if (student.status !== 'active') return true;
+    if (student.academic.class !== className) return true;
+    
+    const studentSection = String(student.academic.section || 'A').trim();
+    if (studentSection !== normalizedQuerySection) return true;
+    
+    return false;
+  });
 
   if (invalidStudent) {
     const error = new Error('All students must be active and belong to the selected class and section');

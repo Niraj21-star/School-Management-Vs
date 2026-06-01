@@ -102,6 +102,8 @@ const getAllStudents = async (req, res) => {
       
       delete filters['academic.class'];
       if (req.query.class) filters['academic.class'] = req.query.class.trim();
+      
+      filters.status = 'active';
     }
 
     const options = buildStudentListOptions(req.query);
