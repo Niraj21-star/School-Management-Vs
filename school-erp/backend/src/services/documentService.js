@@ -265,7 +265,7 @@ const generateBonafideHtml = async (student) => {
     '{{dob_mm}}': escapeHtml(dobMm),
     '{{dob_yyyy}}': escapeHtml(dobYyyy),
     '{{issue_date}}': escapeHtml(issueDate),
-    '{{gr_no}}': escapeHtml(student.generalRegisterNumber || student.studentId || ''),
+    '{{gr_no}}': escapeHtml(student.generalRegisterNumber || ''),
   };
 
   for (const [key, value] of Object.entries(replacements)) {
@@ -338,7 +338,7 @@ const buildTcPlaceholders = (student, extras = {}) => {
   );
 
   const placeholders = {
-    register_no: student.generalRegisterNumber || student.studentId || '',
+    register_no: student.generalRegisterNumber || '',
     roll_no: '',
     year: String(currentYear),
     // New identity fields
@@ -573,7 +573,7 @@ const generateFeeReceiptHtml = (student = {}, payment = {}, fee = {}) => {
     student_name: [student?.name, student?.surname].filter(Boolean).join(' '),
     class: student?.academic?.class || '',
     division: student?.academic?.section || '',
-    gr_no: student?.generalRegisterNumber || student?.studentId || '',
+    gr_no: student?.generalRegisterNumber || '',
     roll_no: '',
     father_name: student?.parent?.fatherName || '',
 

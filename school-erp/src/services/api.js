@@ -38,7 +38,7 @@ const mapStudent = (student) => {
   return {
     id: student?._id,
     studentId: student?.studentId,
-    grNo: student?.generalRegisterNumber || student?.studentId,
+    grNo: student?.generalRegisterNumber || '',
 
     name: student?.name || '-',
     surname: student?.surname || '',
