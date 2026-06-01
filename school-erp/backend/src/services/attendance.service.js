@@ -27,7 +27,7 @@ const ensureClassAndSection = async (classId, section) => {
     throw error;
   }
 
-  const normalizedSection = String(section).trim();
+  const normalizedSection = String(section || 'A').trim();
   const hasSection = Array.isArray(schoolClass.sections)
     && schoolClass.sections.some((item) => item.trim() === normalizedSection);
 
