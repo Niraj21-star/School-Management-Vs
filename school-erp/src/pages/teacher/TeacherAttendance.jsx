@@ -117,8 +117,8 @@ const TeacherAttendance = () => {
         status: attendance[student.id].toLowerCase(),
       }));
 
-    if (!classId || !section) {
-      setError('Please select class and section.');
+    if (!classId) {
+      setError('Please select a class.');
       return;
     }
 
@@ -164,9 +164,17 @@ const TeacherAttendance = () => {
 
       <PageHeader title="Mark Attendance" subtitle={`Date: ${new Date().toLocaleDateString('en-IN')}`}>
         <div className="w-40">
-          <SelectInput value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)} options={[
-            ...classOptions,
-          ]} />
+          {classOptions.length === 1 ? (
+            <div className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700">
+              {classOptions[0].label}
+            </div>
+          ) : classOptions.length > 1 ? (
+            <SelectInput value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)} options={classOptions} />
+          ) : (
+            <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-400">
+              No classes assigned
+            </div>
+          )}
         </div>
       </PageHeader>
 

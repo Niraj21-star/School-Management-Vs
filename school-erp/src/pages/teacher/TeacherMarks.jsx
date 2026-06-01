@@ -37,8 +37,8 @@ const TeacherMarks = () => {
   const [error, setError] = useState('');
 
   const [className, section] = useMemo(() => {
-    const parts = String(selectedClass).split('-');
-    return [parts[0] || '', parts[1] || 'A'];
+    const parts = String(selectedClass).split('::');
+    return [parts[0] || '', parts[1] || ''];
   }, [selectedClass]);
 
   const bootstrap = useCallback(async () => {
@@ -50,15 +50,15 @@ const TeacherMarks = () => {
 
       const classesList = classes.flatMap((item) => {
         if (!item.sections || item.sections.length === 0) {
-          return [item.name];
+          return [{ value: `${item.name}::`, label: item.name }];
         }
-        return item.sections.map((sec) => `${item.name}-${sec}`);
+        return item.sections.map((sec) => ({ value: `${item.name}::${sec}`, label: `${item.name}-${sec}` }));
       });
 
       setClassOptions(classesList);
       setExamOptions(exams.map((exam) => exam.name));
       setSubjectOptions(subjects.map((sub) => sub.name));
-      setSelectedClass((prev) => prev || classesList[0] || '');
+      setSelectedClass((prev) => prev || classesList[0]?.value || '');
       setSelectedExam((prev) => prev || exams[0]?.name || '');
       setSelectedSubject((prev) => prev || subjects[0]?.name || '');
     } catch (err) {
@@ -82,11 +82,11 @@ const TeacherMarks = () => {
     setError('');
 
     try {
-      const [selectedClassName, selectedSection = 'A'] = String(selectedClass).split('-');
+      const [selectedClassName, selectedSection] = String(selectedClass).split('::');
 
       const [studentsData, marksData] = await Promise.all([
         getStudents({ class: selectedClassName, section: selectedSection, limit: 1000 }),
-        getMarksByExamAndClass({ className: selectedClassName, section: selectedSection, examName: selectedExam, subjectName: selectedSubject }),
+        getMarksByExamAndClass({ className: selectedClassName, section: selectedSection || 'A', examName: selectedExam, subjectName: selectedSubject }),
       ]);
 
       const mappedStudents = studentsData.map((student) => ({
@@ -157,7 +157,17 @@ const TeacherMarks = () => {
       <PageHeader title="Enter Exam Marks" subtitle="Enter marks for your subject">
         <div className="flex gap-3">
           <div className="w-36">
-            <SelectInput value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)} options={classOptions.map((value) => ({ value, label: value }))} />
+            {classOptions.length === 1 ? (
+              <div className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700">
+                {classOptions[0].label}
+              </div>
+            ) : classOptions.length > 1 ? (
+              <SelectInput value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)} options={classOptions} />
+            ) : (
+              <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-400">
+                No classes assigned
+              </div>
+            )}
           </div>
           <div className="w-44">
             <SelectInput value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} options={subjectOptions.map((value) => ({ value, label: value }))} />
