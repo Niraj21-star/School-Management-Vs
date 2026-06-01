@@ -38,9 +38,17 @@ const getAllClasses = async (req, res) => {
     let classes = await SchoolClass.find().sort({ createdAt: -1 }).lean();
 
     if (req.user && req.user.role === 'teacher') {
-      const assignments = await Assignment.find({ teacherId: req.user._id }).lean();
-      const assignedClassIds = new Set(assignments.map(a => String(a.classId)));
-      classes = classes.filter(c => assignedClassIds.has(String(c._id)));
+      const assigned = req.user.assignedClasses || [];
+      classes = classes.map(c => {
+        if (!c.sections || c.sections.length === 0) {
+          return assigned.includes(c.name) ? c : null;
+        }
+        const allowedSections = c.sections.filter(sec => assigned.includes(`${c.name}-${sec}`));
+        if (allowedSections.length > 0) {
+          return { ...c, sections: allowedSections };
+        }
+        return null;
+      }).filter(Boolean);
     }
 
     return sendSuccess(res, 200, 'Operation successful', classes);

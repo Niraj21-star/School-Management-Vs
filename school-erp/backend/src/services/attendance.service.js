@@ -43,10 +43,30 @@ const ensureClassAndSection = async (classId, section) => {
   };
 };
 
-const ensureTeacherAssignment = async (teacherId, classId) => {
-  const assignmentExists = await Assignment.exists({ teacherId, classId });
+const ensureTeacherAssignment = async (teacherId, classId, section) => {
+  const { User } = require('../models/User'); // inline require to avoid circular dependency issues at top level if any
+  const teacher = await User.findById(teacherId).lean();
+  
+  if (!teacher) {
+    const error = new Error('Teacher not found');
+    error.statusCode = 404;
+    throw error;
+  }
 
-  if (!assignmentExists) {
+  const schoolClass = await SchoolClass.findById(classId).lean();
+  if (!schoolClass) {
+    const error = new Error('Class not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const assigned = teacher.assignedClasses || [];
+  
+  // Teachers might be assigned to a specific section (e.g. "10-A") or an entire class without sections (e.g. "10")
+  const exactMatch = assigned.includes(`${schoolClass.name}-${section}`);
+  const classMatch = assigned.includes(schoolClass.name);
+
+  if (!exactMatch && !classMatch) {
     const error = new Error('Teacher is not assigned to this class');
     error.statusCode = 403;
     throw error;

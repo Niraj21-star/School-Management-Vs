@@ -312,47 +312,13 @@ export const getClerks = async () => {
 
 export const getTeachers = async () => {
   try {
-    const [staffList, assignments, subjects] = await Promise.all([
-      getAllStaff({ role: 'teacher' }),
-      getAssignments().catch(() => []),
-      getSubjects().catch(() => []),
-    ]);
-
-    const subjectById = subjects.reduce((accumulator, subject) => {
-      accumulator[subject._id] = subject;
-      return accumulator;
-    }, {});
-
-    const assignmentMap = assignments.reduce((accumulator, item) => {
-      const teacherId = item?.teacherId?._id;
-
-      if (!teacherId) return accumulator;
-      if (!accumulator[teacherId]) {
-        accumulator[teacherId] = {
-          classes: new Set(),
-          subjects: new Set(),
-        };
-      }
-
-      const subjectId = item?.subjectId?._id;
-      const subjectName = item?.subjectId?.name || subjectById[subjectId]?.name;
-      const className = item?.classId?.name;
-
-      if (subjectName) accumulator[teacherId].subjects.add(subjectName);
-      if (className) accumulator[teacherId].classes.add(className);
-
-      return accumulator;
-    }, {});
+    const staffList = await getAllStaff({ role: 'teacher' });
 
     return staffList.map((teacher) => {
       const teacherId = teacher.id || teacher._id;
-      const details = assignmentMap[teacherId];
       const assignedClasses = Array.isArray(teacher.assignedClasses) ? teacher.assignedClasses : [];
-      const fallbackClasses = assignedClasses.filter(Boolean);
-      const resolvedClasses = details?.classes?.size ? Array.from(details.classes) : fallbackClasses;
-      const subject = details?.subjects?.size
-        ? Array.from(details.subjects).join(', ')
-        : (teacher.subject || 'Not assigned');
+      const resolvedClasses = assignedClasses.filter(Boolean);
+      const subject = teacher.subject || 'Not assigned';
 
       return {
         id: teacherId,

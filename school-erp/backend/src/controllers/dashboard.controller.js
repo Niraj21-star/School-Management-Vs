@@ -93,21 +93,19 @@ const getTodayPresentTeachers = async (startOfDay, endOfDay) => {
     return 0;
   }
 
-  const teacherIds = await Assignment.distinct('teacherId', {
-    classId: { $in: classIds },
-  });
+  const SchoolClass = require('../models/SchoolClass');
+  const classes = await SchoolClass.find({ _id: { $in: classIds } }).lean();
+  const classNames = classes.map(c => c.name);
 
-  if (!teacherIds.length) {
-    return 0;
+  const activeTeachers = await User.find({ role: 'teacher', status: 'active' }).lean();
+  let presentCount = 0;
+  for (const teacher of activeTeachers) {
+    const assigned = teacher.assignedClasses || [];
+    const isPresent = assigned.some(a => classNames.some(cName => a.startsWith(cName)));
+    if (isPresent) presentCount++;
   }
 
-  const activeTeacherCount = await User.countDocuments({
-    _id: { $in: teacherIds },
-    role: 'teacher',
-    status: 'active',
-  });
-
-  return activeTeacherCount;
+  return presentCount;
 };
 
 const getDashboardStats = async (req, res) => {
@@ -156,14 +154,21 @@ const getDashboardStats = async (req, res) => {
           { documents: { $size: 0 } },
         ],
       }),
-      Assignment.countDocuments({ teacherId: req.user._id }),
+      (req.user.assignedClasses ? req.user.assignedClasses.length : 0),
       (async () => {
         if (req.user.role === 'teacher') {
-          const assignments = await Assignment.find({ teacherId: req.user._id }).lean();
-          const classIds = assignments.map(a => a.classId);
+          const assigned = req.user.assignedClasses || [];
+          const SchoolClass = require('../models/SchoolClass');
+          const allClasses = await SchoolClass.find().lean();
+          const validClassIds = allClasses.filter(c => {
+             const exactMatch = assigned.includes(c.name);
+             const sectionMatch = c.sections && c.sections.some(sec => assigned.includes(`${c.name}-${sec}`));
+             return exactMatch || sectionMatch;
+          }).map(c => c._id);
+          
           return Attendance.countDocuments({
             date: { $gte: startOfDay, $lte: endOfDay },
-            classId: { $in: classIds }
+            classId: { $in: validClassIds }
           });
         }
         return Attendance.countDocuments({ date: { $gte: startOfDay, $lte: endOfDay } });

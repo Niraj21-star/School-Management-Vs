@@ -42,7 +42,7 @@ const markAttendance = async (req, res) => {
     const { schoolClass, normalizedSection } = await ensureClassAndSection(classId, section);
 
     if (req.user.role === 'teacher') {
-      await ensureTeacherAssignment(req.user._id, classId);
+      await ensureTeacherAssignment(req.user._id, classId, normalizedSection);
     }
 
     const normalizedStudents = await normalizeStudentsInput({
@@ -118,7 +118,7 @@ const getAttendanceByDate = async (req, res) => {
     const { normalizedSection } = await ensureClassAndSection(classId, section);
 
     if (req.user.role === 'teacher') {
-      await ensureTeacherAssignment(req.user._id, classId);
+      await ensureTeacherAssignment(req.user._id, classId, normalizedSection);
     }
 
     const attendance = await Attendance.findOne({
@@ -259,7 +259,7 @@ const updateAttendance = async (req, res) => {
     }
 
     if (req.user.role === 'teacher') {
-      await ensureTeacherAssignment(req.user._id, attendance.classId._id);
+      await ensureTeacherAssignment(req.user._id, attendance.classId._id, attendance.section);
     }
 
     const normalizedStudents = await normalizeStudentsInput({
