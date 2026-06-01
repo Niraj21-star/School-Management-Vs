@@ -451,8 +451,12 @@ export const getAttendance = async () => {
     const today = new Date().toISOString().split('T')[0];
 
     await Promise.all(
-      classes.flatMap((schoolClass) =>
-        (schoolClass.sections || []).map(async (section) => {
+      classes.flatMap((schoolClass) => {
+        const sectionsToFetch = (!schoolClass.sections || schoolClass.sections.length === 0) 
+          ? [''] 
+          : schoolClass.sections;
+
+        return sectionsToFetch.map(async (section) => {
           try {
             const response = await apiClient.get('/api/attendance/report', {
               params: {
@@ -467,9 +471,11 @@ export const getAttendance = async () => {
             const present = summary?.present || 0;
             const absent = summary?.absent || 0;
 
+            const classNameLabel = section ? `${schoolClass.name}-${section}` : schoolClass.name;
+
             rows.push({
               id: `${schoolClass.id}-${section}`,
-              class: `${schoolClass.name}-${section}`,
+              class: classNameLabel,
               date: today,
               present,
               absent,
@@ -479,8 +485,8 @@ export const getAttendance = async () => {
           } catch {
             // Ignore classes that have no report yet.
           }
-        })
-      )
+        });
+      })
     );
 
     return rows.sort((a, b) => a.class.localeCompare(b.class));
